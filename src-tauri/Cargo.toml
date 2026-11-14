@@ -1,10 +1,10 @@
 [package]
 name = "marble-trace"
-version = "0.28.0"
-description = "Marble Trace - iRacing Telemetry Overlay"
+version = "0.28.1"
+description = "Trailbrake - iRacing overlay with Garage 61 reference laps (fork of Marble Trace)"
 authors = ["mvoof"]
 license = "GPL-3.0-or-later"
-repository = ""
+repository = "https://github.com/HalkaTolstaya/marble-trace-plus"
 edition = "2021"
 publish = false
 
