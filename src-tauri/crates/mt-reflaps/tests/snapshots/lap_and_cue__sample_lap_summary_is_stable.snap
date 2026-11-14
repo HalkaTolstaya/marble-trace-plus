@@ -1,0 +1,21 @@
+---
+source: crates/mt-reflaps/tests/lap_and_cue.rs
+expression: summary
+---
+{
+  "samples": 6959,
+  "hz": "59.996",
+  "lap_time": "1:55.992",
+  "track_length_est": "5786",
+  "zones": 10,
+  "strong_zones": 9,
+  "first_zone_start_pct": "0.1325",
+  "meta": {
+    "fileName": "Garage 61 - Sample Lap - Ferrari 296 GT3 - Silverstone Circuit (Grand Prix) - 01.55.992 - SAMPLE",
+    "source": "Garage 61",
+    "driver": "Sample Lap",
+    "car": "Ferrari 296 GT3",
+    "track": "Silverstone Circuit (Grand Prix)",
+    "lapTime": 115.992
+  }
+}

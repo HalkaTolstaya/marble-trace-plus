@@ -1,0 +1,28 @@
+[package]
+name = "mt-reflaps"
+description = "Reference laps from Garage 61 and CSV files: parser, library, providers, and the brake-point countdown."
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+mt-model.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+reqwest.workspace = true
+keyring.workspace = true
+sha2.workspace = true
+fastrand.workspace = true
+
+[dev-dependencies]
+proptest = "1"
+wiremock = "0.6"
+insta = { version = "1", features = ["json"] }
+tempfile = "3"
