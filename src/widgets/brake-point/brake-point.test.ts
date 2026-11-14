@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { BrakeCueFrame } from '@shared/contracts/reflaps';
-import { cueConfigOf } from './brake-point.store';
+import { BrakePointWidgetStore, cueConfigOf } from './brake-point.store';
 import {
   barLabel,
   formatMetres,
@@ -64,5 +64,63 @@ describe('brake point', () => {
     expect(formatMetres(-6.6)).toBe('−7 m');
     expect(percent(1.4)).toBe('100');
     expect(percent(null)).toBe('--');
+  });
+});
+
+const channel = vi.hoisted(() => ({
+  instances: [] as {
+    configure: ReturnType<typeof vi.fn>;
+    close: ReturnType<typeof vi.fn>;
+    onFrame: (frame: unknown) => void;
+  }[],
+}));
+
+vi.mock('@entities/brake-cue/brake-cue-channel', () => ({
+  BrakeCueChannel: class {
+    configure = vi.fn();
+    close = vi.fn();
+    constructor(public onFrame: (frame: unknown) => void) {
+      channel.instances.push(this);
+    }
+  },
+}));
+
+describe('BrakePointWidgetStore', () => {
+  const settings = { ...BRAKE_POINT_SETTINGS.defaults };
+  const core = (startsWidgetStores: boolean) => ({
+    startsWidgetStores,
+    liveWidgets: { getSettings: () => settings },
+  });
+
+  afterEach(() => {
+    channel.instances.length = 0;
+  });
+
+  it('opens no channel in a preview', () => {
+    const store = new BrakePointWidgetStore({
+      core: core(false),
+      instanceId: 'brake-point',
+      type: 'brake-point',
+    } as never);
+
+    expect(channel.instances).toHaveLength(0);
+    store.dispose();
+  });
+
+  it('configures the cue on mount, takes its frames, closes on dispose', () => {
+    const store = new BrakePointWidgetStore({
+      core: core(true),
+      instanceId: 'brake-point',
+      type: 'brake-point',
+    } as never);
+    const [opened] = channel.instances;
+
+    expect(opened?.configure).toHaveBeenCalledWith(cueConfigOf(settings));
+
+    opened?.onFrame(frame({ mode: 'brake' }));
+    expect(store.frame?.mode).toBe('brake');
+
+    store.dispose();
+    expect(opened?.close).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,0 +1,12 @@
+{
+  "name": "marble-trace-plus-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Smoke tests of the built Windows app through tauri-driver (WebDriver).",
+  "scripts": {
+    "test": "node --test --test-timeout=240000 smoke.e2e.mjs"
+  },
+  "devDependencies": {
+    "webdriverio": "9.20.0"
+  }
+}
