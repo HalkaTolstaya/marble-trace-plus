@@ -32,7 +32,7 @@ import path from 'node:path';
 import os from 'node:os';
 import process from 'node:process';
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync } from 'node:fs';
 
 import {
   printHeapSummary,
@@ -319,7 +319,7 @@ const main = async () => {
   }
 
   const outDir = path.resolve(
-    options.out ?? path.join(os.tmpdir(), 'marble-trace-perf')
+    options.out ?? mkdtempSync(path.join(os.tmpdir(), 'trailbrake-perf-'))
   );
   mkdirSync(outDir, { recursive: true });
 
