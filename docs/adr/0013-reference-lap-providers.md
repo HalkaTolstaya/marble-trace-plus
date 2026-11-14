@@ -7,10 +7,10 @@
 
 One abstraction, `ReferenceLapProvider`, with two implementations:
 
-| Provider            | Source                                                                                         |
-| ------------------- | ---------------------------------------------------------------------------------------------- |
+| Provider            | Source                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
 | `Garage61Provider`  | Garage 61 REST API (`https://garage61.net/api/v1`), personal access token, `Authorization: Bearer` |
-| `LocalFileProvider` | A Garage 61 CSV export (or any CSV with `LapDistPct, Brake, Throttle`) the user imports         |
+| `LocalFileProvider` | A Garage 61 CSV export (or any CSV with `LapDistPct, Brake, Throttle`) the user imports            |
 
 Both produce a `RefLap` (full-rate samples + brake zones) that is stored in a
 **local library** under `AppData/reflaps/` (`index.json` + one compact CSV per
@@ -40,7 +40,7 @@ ITO did, and the user can pin one explicitly.
 the session if available, else personal best), `personalBest`, `library`
 (auto-pick from the library only, no network), `pinned` (one library lap).
 The personal-best recorder is untouched: it keeps comparing against and
-writing the *personal* files only, so a downloaded lap never blocks or
+writing the _personal_ files only, so a downloaded lap never blocks or
 overwrites a personal best.
 
 ## Why
