@@ -213,8 +213,9 @@ jobs:
           python-version: '3.12'
       - name: Semgrep (p/rust, p/typescript, p/react, p/secrets)
         run: |
-          python -m pip install --quiet semgrep==1.142.0
-          semgrep scan --metrics=off --error --severity ERROR --severity WARNING \
+          python -m venv "$RUNNER_TEMP/semgrep"
+          "$RUNNER_TEMP/semgrep/bin/pip" install --quiet semgrep==1.185.0
+          "$RUNNER_TEMP/semgrep/bin/semgrep" scan --metrics=off --error --severity ERROR --severity WARNING \
             --config p/rust --config p/typescript --config p/react --config p/secrets \
             src src-tauri/src src-tauri/crates
 
@@ -223,6 +224,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      actions: read
       security-events: write
     strategy:
       fail-fast: false
@@ -235,9 +237,22 @@ jobs:
           languages: ${{ matrix.language }}
           build-mode: none
           queries: security-extended
+      # Code scanning uploads need GitHub Advanced Security on a private
+      # repository, so the SARIF is kept as an artifact and judged here.
       - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
         with:
           category: /language:${{ matrix.language }}
+          upload: never
+          output: codeql-results
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: codeql-${{ matrix.language }}
+          path: codeql-results
+      - name: Fail on error- or warning-level findings
+        run: |
+          count=$(jq '[.runs[].results[] | select((.level // "warning") == "error" or (.level // "warning") == "warning")] | length' codeql-results/*.sarif)
+          jq -r '.runs[].results[] | "\(.level // "warning") \(.ruleId) \(.locations[0].physicalLocation.artifactLocation.uri):\(.locations[0].physicalLocation.region.startLine) \(.message.text)"' codeql-results/*.sarif
+          [ "$count" -eq 0 ] || { echo "::error::CodeQL found $count issue(s)"; exit 1; }
 
   build:
     name: Build (Windows installer)
