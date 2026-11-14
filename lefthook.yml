@@ -1,27 +1,35 @@
 pre-commit:
   parallel: true # run all commands concurrently
   commands:
+    # Secrets in the staged changes. CI scans the whole history either way;
+    # without a local gitleaks the hook says so instead of blocking the commit.
+    gitleaks:
+      run: >-
+        if command -v gitleaks >/dev/null 2>&1;
+        then gitleaks git --pre-commit --staged --redact --no-banner --config .gitleaks.toml;
+        else echo "gitleaks not installed: staged secrets not checked locally (CI checks them)";
+        fi
     lint:
-      glob: "*.{ts,tsx,js,mjs}"
-      exclude: "src/shared/contracts/generated/*"
+      glob: '*.{ts,tsx,js,mjs}'
+      exclude: 'src/shared/contracts/generated/*'
       run: npx oxlint --type-aware --fix --deny-warnings {staged_files}
       stage_fixed: true
     format:
-      glob: "*.{ts,tsx,js,mjs,json,scss,md}"
+      glob: '*.{ts,tsx,js,mjs,json,scss,md}'
       run: npx oxfmt --write {staged_files}
       stage_fixed: true
     rust-fmt:
-      glob: "*.rs"
-      root: "src-tauri/"
+      glob: '*.rs'
+      root: 'src-tauri/'
       run: cargo fmt
       stage_fixed: true
     typecheck:
-      glob: "*.{ts,tsx}"
+      glob: '*.{ts,tsx}'
       run: npm run typecheck
     test:
-      glob: "*.{ts,tsx,js,mjs}"
+      glob: '*.{ts,tsx,js,mjs}'
       run: npx vitest related --run {staged_files}
     rust-clippy:
-      glob: "*.rs"
-      root: "src-tauri/"
+      glob: '*.rs'
+      root: 'src-tauri/'
       run: cargo clippy --all-targets -- -D warnings && cargo test

@@ -1,0 +1,304 @@
+# Lint, tests, coverage, security scans and a Windows build on every pull
+# request and push to main. Actions are pinned by commit SHA (the tag is in
+# the comment); permissions are read-only unless a job says otherwise.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  NODE_VERSION: '22'
+
+jobs:
+  lint-frontend:
+    name: Lint (frontend)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      # oxlint/oxfmt are this codebase's eslint/prettier.
+      - name: oxlint
+        run: npx oxlint --type-aware --deny-warnings .
+      - name: oxfmt --check
+        run: npm run format:check
+      - name: tsc --noEmit
+        run: npm run typecheck
+
+  lint-rust:
+    name: Lint (Rust, Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          workspaces: src-tauri -> target
+          key: lint
+      - name: cargo fmt --check
+        working-directory: src-tauri
+        run: cargo fmt --all --check
+      - name: cargo clippy (release features)
+        working-directory: src-tauri
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: cargo clippy (dev features)
+        working-directory: src-tauri
+        run: cargo clippy --locked --all-targets --features dev -- -D warnings
+
+  test-rust-windows:
+    name: Tests (Rust, Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          workspaces: src-tauri -> target
+          key: test
+      - name: cargo test --workspace
+        working-directory: src-tauri
+        run: cargo test --locked --workspace
+
+  test-rust-linux:
+    name: Tests + coverage (Rust domain, Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+          components: llvm-tools-preview
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          workspaces: src-tauri -> target
+          key: linux
+      - name: System libraries for the keyring backend
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
+      - uses: taiki-e/install-action@4a76afe23f9e08d2d9550fb56e556444e8611d21 # v2
+        with:
+          tool: cargo-llvm-cov
+      # The domain crates build without the iRacing SDK (kerb is Windows-only).
+      - name: Tests with coverage gate (domain logic >= 70 % lines)
+        working-directory: src-tauri
+        run: >-
+          cargo llvm-cov --locked
+          -p mt-reflaps -p mt-computations -p mt-model
+          --fail-under-lines 70
+          --lcov --output-path lcov.info
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: rust-coverage
+          path: src-tauri/lcov.info
+
+  test-frontend:
+    name: Tests + coverage (frontend)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - name: Vitest
+        run: npm test
+      # Stores written or changed for the merged features hold 70 % lines;
+      # every other store is held where it is today (60 %) so it cannot slide.
+      - name: Coverage gate (new and changed stores >= 70 %)
+        run: >-
+          npx vitest run --coverage --coverage.provider=v8
+          --coverage.include='src/features/reference-laps/*.store.ts'
+          --coverage.include='src/widgets/brake-point/*.store.ts'
+          --coverage.include='src/widgets/input-trace/*.store.ts'
+          --coverage.include='src/entities/brake-cue/*.ts'
+          --coverage.thresholds.lines=70
+          --coverage.reporter=text-summary
+      - name: Coverage ratchet (all stores >= 60 %)
+        run: >-
+          npx vitest run --coverage --coverage.provider=v8
+          --coverage.include='src/**/*.store.ts'
+          --coverage.thresholds.lines=60
+          --coverage.reporter=text-summary
+
+  fuzz:
+    name: Fuzz (parsers, 60 s each)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: nightly
+      - uses: taiki-e/install-action@4a76afe23f9e08d2d9550fb56e556444e8611d21 # v2
+        with:
+          tool: cargo-fuzz
+      - name: cargo fuzz
+        working-directory: src-tauri/crates/mt-reflaps
+        run: |
+          for target in garage61_csv garage61_json brake_cue; do
+            cargo +nightly fuzz run "$target" -- -max_total_time=60 -rss_limit_mb=2048
+          done
+      - if: failure()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: fuzz-artifacts
+          path: src-tauri/crates/mt-reflaps/fuzz/artifacts
+
+  security:
+    name: Security (SCA, secrets, SAST, Tauri config)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Tauri security configuration
+        run: npm run check:tauri-config
+      - name: npm audit (production, high+)
+        run: npm audit --audit-level=high --omit=dev
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+      - uses: taiki-e/install-action@4a76afe23f9e08d2d9550fb56e556444e8611d21 # v2
+        with:
+          tool: cargo-audit,cargo-deny
+      - name: cargo deny check (advisories, licenses, bans, sources)
+        working-directory: src-tauri
+        run: cargo deny --locked check
+      - name: cargo audit
+        working-directory: src-tauri
+        # The same ignores as deny.toml, each with its reason there.
+        run: >-
+          cargo audit
+          --ignore RUSTSEC-2024-0370 --ignore RUSTSEC-2024-0449
+          --ignore RUSTSEC-2026-0370 --ignore RUSTSEC-2026-0371
+          --ignore RUSTSEC-2026-0372 --ignore RUSTSEC-2024-0429
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: stable
+      - name: gitleaks (full history)
+        run: |
+          go install github.com/zricethezav/gitleaks/v8@v8.28.0
+          "$(go env GOPATH)/bin/gitleaks" git . --redact --no-banner --config .gitleaks.toml
+      - name: OSV-Scanner (lock files)
+        run: |
+          go install github.com/google/osv-scanner/v2/cmd/osv-scanner@v2.2.2
+          "$(go env GOPATH)/bin/osv-scanner" scan source --config osv-scanner.toml \
+            --lockfile package-lock.json --lockfile src-tauri/Cargo.lock
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Semgrep (p/rust, p/typescript, p/react, p/secrets)
+        run: |
+          python -m pip install --quiet semgrep==1.142.0
+          semgrep scan --metrics=off --error --severity ERROR --severity WARNING \
+            --config p/rust --config p/typescript --config p/react --config p/secrets \
+            src src-tauri/src src-tauri/crates
+
+  codeql:
+    name: CodeQL (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, rust]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          queries: security-extended
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          category: /language:${{ matrix.language }}
+
+  build:
+    name: Build (Windows installer)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          workspaces: src-tauri -> target
+          key: build
+      # No updater key on pull requests: the bundle is built unsigned.
+      - name: tauri build (NSIS)
+        shell: bash
+        run: >-
+          npx tauri build --ci
+          --config '{"bundle":{"createUpdaterArtifacts":false}}'
+          -- --locked
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: windows-installer
+          path: src-tauri/target/release/bundle/nsis/*.exe
+          if-no-files-found: error
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: windows-app-exe
+          path: src-tauri/target/release/marble-trace.exe
+          if-no-files-found: error
+
+  e2e:
+    name: E2E (Windows, tauri-driver)
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+        with:
+          name: windows-app-exe
+          path: e2e/bin
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+      - uses: taiki-e/install-action@4a76afe23f9e08d2d9550fb56e556444e8611d21 # v2
+        with:
+          tool: tauri-driver
+      - name: Install the e2e runner
+        working-directory: e2e
+        run: npm ci
+      - name: Run WebdriverIO against the release exe (no iRacing)
+        working-directory: e2e
+        shell: bash
+        env:
+          APP_PATH: ${{ github.workspace }}/e2e/bin/marble-trace.exe
+        run: npm test

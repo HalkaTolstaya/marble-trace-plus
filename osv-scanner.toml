@@ -1,0 +1,42 @@
+# OSV-Scanner exceptions. Each one says why it does not reach the shipped
+# app and when it is looked at again. Keep in step with src-tauri/deny.toml.
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0429"
+ignoreUntil = 2027-02-14
+reason = "glib 0.18 (GTK, Linux only via Tauri); not in the Windows binary, API unused"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0370"
+ignoreUntil = 2027-02-14
+reason = "proc-macro-error: build-time macro of glib-macros (Linux GTK stack)"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0449"
+ignoreUntil = 2027-02-14
+reason = "unsafe-libyaml via kerb's serde_yaml: unmaintained, no known vulnerability"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0370"
+ignoreUntil = 2027-02-14
+reason = "zvariant: Linux secret-service keyring backend, not compiled for Windows"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0371"
+ignoreUntil = 2027-02-14
+reason = "zbus_names: Linux secret-service keyring backend, not compiled for Windows"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0372"
+ignoreUntil = 2027-02-14
+reason = "zvariant_derive: Linux secret-service keyring backend, not compiled for Windows"
+
+[[IgnoredVulns]]
+id = "GHSA-3g3m-2fjr-6pw4"
+ignoreUntil = 2027-02-14
+reason = "glob 13 (dev only): Storybook's docgen plugin; never bundled into the app"
+
+[[IgnoredVulns]]
+id = "GHSA-g3hv-75wg-m249"
+ignoreUntil = 2027-02-14
+reason = "minimatch 10 (dev only): Storybook's docgen plugin; never bundled into the app"

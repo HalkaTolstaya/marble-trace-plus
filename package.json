@@ -31,7 +31,8 @@
     "perf:game": "node scripts/perf-game.mjs",
     "cargo:format": "cd src-tauri && cargo fmt",
     "test": "vitest run",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "check:tauri-config": "node scripts/check-tauri-config.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "~2.12",

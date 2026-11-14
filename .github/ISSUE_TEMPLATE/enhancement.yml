@@ -1,7 +1,7 @@
 name: Enhancement
 description: A small improvement to an existing widget, setting, or screen.
-title: "[Enhancement]: "
-labels: ["enhancement"]
+title: '[Enhancement]: '
+labels: ['enhancement']
 body:
   - type: markdown
     attributes:

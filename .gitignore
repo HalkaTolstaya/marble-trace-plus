@@ -57,3 +57,9 @@ __pycache__/
 
 # React Doctor writes its report here when asked for one.
 react-doctor.json
+
+# cargo-fuzz output
+src-tauri/crates/mt-reflaps/fuzz/target/
+src-tauri/crates/mt-reflaps/fuzz/artifacts/
+src-tauri/crates/mt-reflaps/fuzz/corpus/
+src-tauri/crates/mt-reflaps/fuzz/coverage/
