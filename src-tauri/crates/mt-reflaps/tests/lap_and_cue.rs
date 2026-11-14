@@ -372,3 +372,37 @@ fn a_bucketed_lap_round_trips_into_a_cue_lap() {
         );
     }
 }
+
+/// Found by `cargo fuzz` (brake_cue): a lap time near zero made the lap count
+/// on the reference clock overflow. Such a reference is now refused.
+#[test]
+fn a_degenerate_reference_is_refused_not_overflowed() {
+    let lap = RefLap {
+        lap_time: 1e-300,
+        ..sample()
+    };
+    let mut cue = BrakeCue::default();
+    let input = CueInput {
+        session_time: 1.0,
+        lap_dist_pct: 0.5,
+        brake: 0.0,
+        track_length_m: TRACK_LENGTH,
+    };
+
+    assert_eq!(
+        cue.update(Some(input), Some(&lap), &CueConfig::default())
+            .mode,
+        CueMode::NoReference
+    );
+
+    let absurd_track = CueInput {
+        track_length_m: 1e300,
+        ..input
+    };
+
+    assert_eq!(
+        cue.update(Some(absurd_track), Some(&sample()), &CueConfig::default())
+            .mode,
+        CueMode::NoCar
+    );
+}

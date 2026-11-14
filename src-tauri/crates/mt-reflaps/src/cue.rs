@@ -35,6 +35,11 @@ const MAX_EVENTS: usize = 64;
 /// The car moving back on the reference clock by more than this is a new
 /// trace (a tow, a reset, a new session).
 const BACKWARDS_S: f64 = 1.0;
+/// A reference outside these lap times is not a lap (and a lap time near zero
+/// would turn the lap count on the reference clock into nonsense).
+const LAP_TIME_RANGE_S: std::ops::RangeInclusive<f64> = 1.0..=3600.0;
+/// Track lengths the cue accepts from the session, metres.
+const TRACK_LENGTH_RANGE_M: std::ops::RangeInclusive<f64> = 100.0..=50_000.0;
 
 /// How the brake-on compared with the reference's.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
@@ -393,15 +398,19 @@ impl BrakeCue {
         config: &CueConfig,
     ) -> CueFrame {
         let config = config.sanitized();
-        let Some(lap) = lap.filter(|lap| lap.len() >= 2 && lap.hz > 0.0 && lap.lap_time > 0.0)
-        else {
+        let Some(lap) = lap.filter(|lap| {
+            lap.len() >= 2
+                && lap.hz.is_finite()
+                && lap.hz > 0.0
+                && LAP_TIME_RANGE_S.contains(&lap.lap_time)
+        }) else {
             return CueFrame::empty(CueMode::NoReference);
         };
         let Some(input) = input.filter(|input| {
             input.session_time.is_finite()
                 && input.lap_dist_pct.is_finite()
                 && (0.0..=1.0).contains(&input.lap_dist_pct)
-                && input.track_length_m.is_finite()
+                && TRACK_LENGTH_RANGE_M.contains(&input.track_length_m)
         }) else {
             return CueFrame::empty(CueMode::NoCar);
         };
@@ -525,7 +534,7 @@ impl BrakeCue {
     ) {
         let lap_now = (now / clock.lap.lap_time).floor() as i64;
 
-        for lap in lap_now - 1..=lap_now {
+        for lap in lap_now.saturating_sub(1)..=lap_now {
             for &zone in cue_zones {
                 let occurrence = clock.occurrence(lap, zone);
 
@@ -574,7 +583,7 @@ impl BrakeCue {
         let grade = |dt: Option<f64>| Grade::of(dt, config.tol, config.perfect.min(config.tol));
         let lap_now = (now / lap.lap_time).floor() as i64;
         let session_time = input.session_time;
-        let current = (lap_now - 1..=lap_now + 1)
+        let current = (lap_now.saturating_sub(1)..=lap_now.saturating_add(1))
             .flat_map(|copy| cue_zones.iter().map(move |&zone| (copy, zone)))
             .map(|(copy, zone)| clock.occurrence(copy, zone))
             .find(|occurrence| match self.results.get(&occurrence.key()) {
@@ -696,7 +705,8 @@ impl BrakeCue {
             .iter()
             .map(|&zone| {
                 let this_lap = self.results.get(&(current.lap, zone));
-                let shown = this_lap.or_else(|| self.results.get(&(current.lap - 1, zone)));
+                let shown =
+                    this_lap.or_else(|| self.results.get(&(current.lap.saturating_sub(1), zone)));
 
                 Pip {
                     grade: shown.map(|graded| grade(graded.dt)),
@@ -745,7 +755,7 @@ impl Clock<'_> {
         match list.iter().position(|&candidate| candidate == zone) {
             Some(index) if index > 0 => self.occurrence(lap, list[index - 1]).end,
             _ => match list.last() {
-                Some(&last) => self.occurrence(lap - 1, last).end,
+                Some(&last) => self.occurrence(lap.saturating_sub(1), last).end,
                 None => f64::NEG_INFINITY,
             },
         }
@@ -757,7 +767,7 @@ impl Clock<'_> {
     fn matching(&self, at: f64, all: &[usize]) -> Option<Occurrence> {
         let first_lap = (at / self.lap.lap_time).floor() as i64;
 
-        for lap in first_lap - 1..=first_lap + 1 {
+        for lap in first_lap.saturating_sub(1)..=first_lap.saturating_add(1) {
             for &zone in all {
                 let occurrence = self.occurrence(lap, zone);
 
