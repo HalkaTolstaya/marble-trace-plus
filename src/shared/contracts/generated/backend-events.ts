@@ -67,6 +67,18 @@ export const SIM_TRACK_SHAPE = 'sim://track-shape';
 export const SIM_REFERENCE_LAP_UPDATED = 'sim://reference-lap/updated';
 
 /**
+ * The brake-point countdown's state, on the overlay clock, while the
+ * brake-point widget is on a layout (ADR-0014).
+ */
+export const REFLAPS_BRAKE_CUE = 'reflaps://brake-cue';
+
+/**
+ * Which reference the session got and why (Garage 61, library, personal
+ * best), re-emitted whenever it is resolved again.
+ */
+export const REFLAPS_STATUS = 'reflaps://status';
+
+/**
  * One normalized chat message. Emitted per message, so the frontend
  * appends. Stream chat rides its own namespace on purpose: it keeps
  * running with no sim connected at all.

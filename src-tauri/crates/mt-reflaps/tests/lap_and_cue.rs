@@ -351,3 +351,24 @@ proptest! {
         }
     }
 }
+
+#[test]
+fn a_bucketed_lap_round_trips_into_a_cue_lap() {
+    let lap = sample();
+    let data = to_reference_data(&lap, 341, "Ferrari 296 GT3", TrackCondition::Dry);
+    let back = mt_reflaps::buckets::from_reference_data(&data).unwrap();
+
+    assert!((back.lap_time - lap.lap_time).abs() < 1e-3);
+    assert_eq!(back.zones.len(), lap.zones.len());
+
+    // Brake points land within a tenth of a second of the original's.
+    for (original, resampled) in lap.zones.iter().zip(&back.zones) {
+        let original_t = original.start as f64 / lap.hz;
+        let resampled_t = resampled.start as f64 / back.hz;
+
+        assert!(
+            (original_t - resampled_t).abs() < 0.1,
+            "{original_t} vs {resampled_t}"
+        );
+    }
+}

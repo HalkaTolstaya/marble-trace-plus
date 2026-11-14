@@ -8,7 +8,7 @@ use std::sync::mpsc::SyncSender;
 use std::sync::Arc;
 use std::time::Duration;
 
-use crate::control::{TelemetryCommand, TelemetryConfig};
+use crate::control::{ExternalReference, TelemetryCommand, TelemetryConfig};
 use crate::delivery::publications::PublicationRegistry;
 use crate::state::TelemetryServiceState;
 use mt_computations::crew::engineer::EngineerView;
@@ -19,6 +19,8 @@ use mt_model::app::crew::{CrewIntent, CrewReply};
 use mt_model::pit::pit_action::PitAction;
 use mt_model::sim::player::InputSample;
 use mt_model::sim::session::SessionSnapshot;
+use mt_reflaps::cue::{BrakeCue, CueConfig};
+use mt_reflaps::lap::RefLap;
 
 /// Start grid positions keyed by carIdx: (overall_pos, class_pos), 1-indexed.
 pub type StartPositions = HashMap<i32, (i32, i32)>;
@@ -77,6 +79,14 @@ pub struct LoopState {
     /// The player's inputs on each tick since the last publication, while the
     /// input trace asks for them — what the next bundle's `input_samples` carries.
     pub input_samples: Vec<InputSample>,
+    /// The external reference as last sent by the app, kept so the cue can
+    /// use its full-rate lap when it is the active one.
+    pub external_reference: Option<ExternalReference>,
+    /// The brake-point countdown and the lap it counts against.
+    pub brake_cue: BrakeCue,
+    pub cue_lap: Option<Arc<RefLap>>,
+    pub cue_config: CueConfig,
+    pub cue_enabled: bool,
 }
 
 impl LoopState {
@@ -102,6 +112,11 @@ impl LoopState {
             pending_reference: None,
             track_wetness: None,
             input_samples: Vec::new(),
+            external_reference: None,
+            brake_cue: BrakeCue::default(),
+            cue_lap: None,
+            cue_config: CueConfig::default(),
+            cue_enabled: false,
         }
     }
 
@@ -131,6 +146,20 @@ impl LoopState {
                 self.registry.command(ProcessorCommand::ResetReferenceLap);
                 let change = self.references.clear();
                 self.note_reference(change);
+            }
+            TelemetryCommand::ExternalReference(reference) => {
+                let change = self.references.set_external(
+                    reference
+                        .as_ref()
+                        .map(|external| Arc::clone(&external.buckets)),
+                );
+
+                self.external_reference = reference;
+                self.note_reference(change);
+            }
+            TelemetryCommand::BrakeCue { enabled, config } => {
+                self.cue_enabled = enabled;
+                self.cue_config = config.sanitized();
             }
             TelemetryCommand::PitAuto(command) => {
                 self.pit_auto.command(command, &self.config.pit_auto);
@@ -174,6 +203,9 @@ impl LoopState {
         self.pending_reference = None;
         self.track_wetness = None;
         self.input_samples.clear();
+        self.external_reference = None;
+        self.brake_cue.reset();
+        self.cue_lap = None;
     }
 
     /// Queues a change of the active reference for the next tick to announce.

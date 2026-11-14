@@ -4,7 +4,7 @@ use std::mem;
 /// Receives the adapted frame plus the due emit groups from the scheduler,
 /// runs the computations via `ProcessorRegistry` and emits a single bundle
 /// event per tick.
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 #[cfg(feature = "dev")]
 use std::time::Instant;
@@ -52,15 +52,17 @@ use mt_model::sim::player::{
 use mt_model::sim::radio::RadioFrame;
 use mt_model::sim::session::{SessionFrame, SessionSnapshot};
 use mt_model::utils::lock_or_recover;
+use mt_reflaps::buckets::from_reference_data;
+use mt_reflaps::cue::CueInput;
 use mt_source::{PitCommander, SourceFrame};
 
 // The names themselves live on the contract in `mt-model/src/contract/events.rs`, where the
 // remote hub and the generated TypeScript read them too. Re-exported here
 // because this is the module that emits them.
 pub use mt_model::contract::events::{
-    EVENT_CAPABILITIES, EVENT_DISCONNECTED, EVENT_REFERENCE_LAP_UPDATED, EVENT_SESSION_INFO,
-    EVENT_SIM_PERF, EVENT_STATUS, EVENT_TELEMETRY_BUNDLE, EVENT_TELEMETRY_BUNDLE_MIRROR,
-    EVENT_TELEMETRY_SLOW, EVENT_TRACK_SHAPE, EVENT_WEATHER_FORECAST,
+    EVENT_BRAKE_CUE, EVENT_CAPABILITIES, EVENT_DISCONNECTED, EVENT_REFERENCE_LAP_UPDATED,
+    EVENT_SESSION_INFO, EVENT_SIM_PERF, EVENT_STATUS, EVENT_TELEMETRY_BUNDLE,
+    EVENT_TELEMETRY_BUNDLE_MIRROR, EVENT_TELEMETRY_SLOW, EVENT_TRACK_SHAPE, EVENT_WEATHER_FORECAST,
 };
 
 pub struct EmitContext<'a> {
@@ -207,6 +209,8 @@ pub fn emit_domain_frames(ctx: EmitContext<'_>) -> Duration {
     } else {
         state.input_samples.clear();
     }
+
+    run_brake_cue(sink, frame, due.publish, state);
 
     // A clone of the Arc, so the processors below can borrow the rest of the state.
     let session_snapshot = state.session.clone();
@@ -437,8 +441,54 @@ fn publish_reference(sink: &dyn EventSink, service: &TelemetryServiceState, stat
         .command(ProcessorCommand::ActiveReference(reference.clone()));
     service.publish_active_reference(reference.clone());
 
+    // The cue counts against the full-rate lap when the active reference is
+    // the external one, else against the personal best resampled in time.
+    state.cue_lap = reference
+        .as_ref()
+        .and_then(|active| match state.external_reference.as_ref() {
+            Some(external) if Arc::ptr_eq(&external.buckets, active) => {
+                Some(Arc::clone(&external.lap))
+            }
+            _ => from_reference_data(active).map(Arc::new),
+        });
+    state.brake_cue.reset();
+
     if let Err(e) = sink.emit(EVENT_REFERENCE_LAP_UPDATED, &reference.as_deref()) {
         warn!("Failed to emit the active reference lap: {}", e);
+    }
+}
+
+/// The brake-point countdown: fed every tick so a short brake tap between
+/// publications is still seen, sent on the ticks that publish (ADR-0014).
+fn run_brake_cue(sink: &dyn EventSink, frame: &SourceFrame, publish: bool, state: &mut LoopState) {
+    if !state.cue_enabled {
+        return;
+    }
+
+    let on_track = frame.car_status.is_on_track.unwrap_or(false);
+    let input = match (
+        frame.session.session_time,
+        frame.lap_timing.lap_dist_pct,
+        state.track_length_m,
+    ) {
+        (Some(session_time), Some(lap_dist_pct), Some(track_length)) if on_track => {
+            Some(CueInput {
+                session_time,
+                lap_dist_pct: f64::from(lap_dist_pct),
+                brake: frame.car_inputs.brake,
+                track_length_m: f64::from(track_length),
+            })
+        }
+        _ => None,
+    };
+    let cue_frame = state
+        .brake_cue
+        .update(input, state.cue_lap.as_deref(), &state.cue_config);
+
+    if publish {
+        if let Err(e) = sink.emit(EVENT_BRAKE_CUE, &cue_frame) {
+            warn!("Failed to emit the brake cue: {}", e);
+        }
     }
 }
 

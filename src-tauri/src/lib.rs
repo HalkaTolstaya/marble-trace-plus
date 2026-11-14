@@ -6,6 +6,7 @@ mod logging;
 #[cfg(feature = "dev")]
 mod perf_run;
 mod process_priority;
+mod reflaps;
 mod remote_mirror;
 mod settings_snapshot;
 mod sim;
@@ -34,12 +35,8 @@ use std::sync::Arc;
 use tauri::{
     generate_context, App, AppHandle, Builder, Listener, Manager, Runtime, Window, WindowEvent,
 };
-use tauri_plugin_aptabase::EventTracker;
 use tauri_plugin_store::StoreExt;
 use tauri_plugin_window_state::StateFlags;
-
-/// A monitor's DPI at a scale factor of 1.
-const BASE_DPI: f64 = 96.0;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -63,8 +60,6 @@ pub fn run() {
 }
 
 fn with_plugins<R: Runtime>(builder: Builder<R>) -> Builder<R> {
-    let aptabase_key = option_env!("APTABASE_KEY").unwrap_or("");
-
     let builder = builder
         .plugin(
             tauri_plugin_window_state::Builder::new()
@@ -78,8 +73,7 @@ fn with_plugins<R: Runtime>(builder: Builder<R>) -> Builder<R> {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_aptabase::Builder::new(aptabase_key).build());
+        .plugin(tauri_plugin_dialog::init());
 
     #[cfg(feature = "dev")]
     let builder = builder.plugin(tauri_plugin_mcp_bridge::init());
@@ -131,7 +125,14 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
     });
     forward_to_telemetry(app, "track-map:clear", || TelemetryCommand::ClearTrackShape);
 
-    track_app_started(app);
+    // Reference laps from Garage 61 and the lap library (ADR-0013).
+    match reflaps::ReflapsState::new(app.handle()) {
+        Ok(state) => {
+            app.manage(Arc::new(state));
+            reflaps::spawn_watcher(app.handle());
+        }
+        Err(error) => tracing::error!("reference laps unavailable: {error}"),
+    }
 
     if start_minimized(app) {
         if let Some(main_window) = app.get_webview_window(MAIN_WINDOW_LABEL) {
@@ -156,20 +157,6 @@ fn forward_to_telemetry(app: &App, event: &'static str, command: fn() -> Telemet
     app.listen(event, move |_| {
         handle.state::<TelemetryState>().service.send(command());
     });
-}
-
-fn track_app_started(app: &App) {
-    let monitor = app.primary_monitor().ok().flatten();
-    let locale = sys_locale::get_locale().unwrap_or_else(|| "unknown".to_string());
-    let props = serde_json::json!({
-        "screen_width": monitor.as_ref().map(|monitor| monitor.size().width),
-        "screen_height": monitor.as_ref().map(|monitor| monitor.size().height),
-        "scale_factor": monitor.as_ref().map(|monitor| monitor.scale_factor()),
-        "dpi": monitor.as_ref().map(|monitor| (BASE_DPI * monitor.scale_factor()) as u32),
-        "locale": locale,
-    });
-
-    let _ = app.track_event("app_started", Some(props));
 }
 
 /// Read straight from the store: it has to act before the main window has

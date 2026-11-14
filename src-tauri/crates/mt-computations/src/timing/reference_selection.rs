@@ -81,6 +81,10 @@ pub struct ReferenceSelection {
     stored: StoredReferences,
     condition: Option<TrackCondition>,
     active: Option<Arc<ReferenceLapData>>,
+    /// A lap from outside the recorder — Garage 61 or the lap library
+    /// (ADR-0013). Preferred over the stored dry lap for its own track and
+    /// car; never compared against or written by the recorder.
+    external: Option<Arc<ReferenceLapData>>,
 }
 
 impl ReferenceSelection {
@@ -118,6 +122,11 @@ impl ReferenceSelection {
             self.identity = Some((track_id, car_screen_name.to_owned()));
             self.stored = read;
             self.condition = None;
+            // An external lap belongs to the session it was resolved for.
+            self.external = self
+                .external
+                .take()
+                .filter(|lap| lap.track_id == track_id && lap.car_screen_name == car_screen_name);
         }
 
         self.observe_wetness(track_wetness)
@@ -148,16 +157,37 @@ impl ReferenceSelection {
         self.reselect()
     }
 
+    /// The app resolved a reference outside the recorder for the session, or
+    /// withdrew it (`None`).
+    pub fn set_external(&mut self, lap: Option<Arc<ReferenceLapData>>) -> ReferenceChange {
+        self.external = lap;
+        self.reselect()
+    }
+
     /// The driver deleted the stored laps of this track and car.
     pub fn clear(&mut self) -> ReferenceChange {
         self.stored = StoredReferences::default();
         self.reselect()
     }
 
+    /// The external lap, when it belongs to this session and the track is in
+    /// the condition it was driven in.
+    fn external_for_session(&self) -> Option<&Arc<ReferenceLapData>> {
+        let (track_id, car) = self.identity.as_ref()?;
+        let condition = self.condition?;
+
+        self.external.as_ref().filter(|lap| {
+            lap.track_id == *track_id && lap.car_screen_name == *car && lap.condition == condition
+        })
+    }
+
     fn reselect(&mut self) -> ReferenceChange {
         let next = self
-            .condition
-            .and_then(|condition| self.stored.get(condition))
+            .external_for_session()
+            .or_else(|| {
+                self.condition
+                    .and_then(|condition| self.stored.get(condition))
+            })
             .cloned();
         let unchanged = match (&self.active, &next) {
             (Some(active), Some(next)) => Arc::ptr_eq(active, next),
@@ -220,6 +250,45 @@ mod tests {
         assert_eq!(TrackCondition::next(Some(Wet), Some(3)), Wet);
         assert_eq!(TrackCondition::next(Some(Wet), Some(1)), Dry);
         assert_eq!(TrackCondition::next(Some(Wet), Some(0)), Dry);
+    }
+
+    #[test]
+    fn an_external_lap_wins_over_the_stored_one_for_its_session_only() {
+        let mut selection = ReferenceSelection::default();
+
+        selection.load(TRACK, CAR, stored(Some(90.0), Some(100.0)), DRY);
+        assert!(selection
+            .set_external(Some(Arc::new(lap(TrackCondition::Dry, 85.0))))
+            .is_some());
+        assert_eq!(active_time(&selection), Some(85.0));
+
+        // A new personal best is recorded but the external lap stays active,
+        // and the recorder still compares against the personal time.
+        selection.record(lap(TrackCondition::Dry, 88.0));
+        assert_eq!(active_time(&selection), Some(85.0));
+        assert_eq!(selection.stored_times().dry, Some(88.0));
+
+        // Rain: the personal wet lap, not the dry external one.
+        selection.observe_wetness(WET);
+        assert_eq!(active_time(&selection), Some(100.0));
+        selection.observe_wetness(DRY);
+        assert_eq!(active_time(&selection), Some(85.0));
+
+        // Withdrawn: back to the personal best.
+        selection.set_external(None);
+        assert_eq!(active_time(&selection), Some(88.0));
+    }
+
+    #[test]
+    fn an_external_lap_of_another_car_is_dropped_on_the_next_session() {
+        let mut selection = ReferenceSelection::default();
+
+        selection.load(TRACK, CAR, stored(Some(90.0), None), DRY);
+        selection.set_external(Some(Arc::new(lap(TrackCondition::Dry, 85.0))));
+        selection.load(TRACK, "BMW M4 GT3", stored(None, None), DRY);
+        assert_eq!(active_time(&selection), None);
+        selection.load(TRACK, CAR, stored(Some(90.0), None), DRY);
+        assert_eq!(active_time(&selection), Some(90.0));
     }
 
     #[test]

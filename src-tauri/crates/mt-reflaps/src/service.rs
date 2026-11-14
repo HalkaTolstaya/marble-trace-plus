@@ -121,6 +121,11 @@ impl<T: HttpTransport, S: TokenStore> ReferenceLapService<T, S> {
         self.refresh_s = seconds.clamp(600, 7 * 24 * 3600);
     }
 
+    /// The next `Auto` resolve asks Garage 61 again, whatever the interval.
+    pub fn forget_searches(&mut self) {
+        self.catalog.searched.clear();
+    }
+
     pub fn library(&self) -> &Library {
         &self.library
     }
