@@ -39,6 +39,11 @@ interface RendererCoreOptions {
    * `!skipInit`.
    */
   startsWidgetStores?: boolean;
+  /**
+   * Checks for and installs updates. Only the main window does: an overlay
+   * has no update UI, and its capability grants no updater (ADR-0015).
+   */
+  ownsUpdates?: boolean;
 }
 
 /**
@@ -147,7 +152,7 @@ export class RendererCore {
 
     if (!options?.skipInit) {
       this.sim.init();
-      this.appSettings.init();
+      this.appSettings.init({ ownsUpdates: options?.ownsUpdates ?? false });
       this.pitServiceWidget.init();
       void this.chat.init();
       void this.crewRadio.init();

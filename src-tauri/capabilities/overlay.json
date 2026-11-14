@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "overlay",
+  "description": "Transparent overlays and the diagnostics HUD: they draw telemetry, read settings and toggle click-through. They create no windows, write no files, run no updates and open nothing (ADR-0015).",
+  "windows": ["overlay-*", "diagnostics-hud"],
+  "permissions": [
+    "core:default",
+    "core:window:allow-set-ignore-cursor-events",
+    "core:event:default",
+    "store:default",
+    "fs:allow-appdata-read-recursive"
+  ]
+}

@@ -1,8 +1,8 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
-  "description": "enables the default permissions",
-  "windows": ["main", "overlay-*", "diagnostics-hud"],
+  "identifier": "main",
+  "description": "The settings window: creates and places the overlays, edits settings and layouts, checks for updates, imports files through dialogs.",
+  "windows": ["main"],
   "permissions": [
     "core:default",
     "core:window:default",
@@ -11,13 +11,6 @@
     "core:window:allow-set-position",
     "core:window:allow-set-size",
     "core:window:allow-set-always-on-top",
-    "core:webview:default",
-    "core:webview:allow-create-webview-window",
-    "core:event:default",
-    "store:default",
-    "fs:allow-appdata-read-recursive",
-    "fs:allow-appdata-write-recursive",
-    "window-state:default",
     "core:window:allow-set-ignore-cursor-events",
     "core:window:allow-start-dragging",
     "core:window:allow-destroy",
@@ -27,14 +20,19 @@
     "core:window:allow-unminimize",
     "core:window:allow-is-maximized",
     "core:window:allow-is-minimized",
+    "core:webview:default",
+    "core:webview:allow-create-webview-window",
+    "core:event:default",
+    "store:default",
+    "fs:allow-appdata-read-recursive",
+    "fs:allow-appdata-write-recursive",
+    "window-state:default",
     "updater:default",
     "process:allow-restart",
-    "mcp-bridge:default",
     "opener:default",
     "opener:allow-open-url",
     "opener:allow-reveal-item-in-dir",
     "dialog:allow-open",
-    "dialog:allow-save",
-    "aptabase:allow-track-event"
+    "dialog:allow-save"
   ]
 }

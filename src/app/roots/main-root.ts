@@ -42,7 +42,7 @@ export class MainRoot extends RendererCore implements AppWindowStores {
   voiceCrew: VoiceCrewStore;
 
   constructor(options?: { skipInit?: boolean }) {
-    super(options);
+    super({ ...options, ownsUpdates: true });
 
     const appWindow = buildAppWindowStores();
 
