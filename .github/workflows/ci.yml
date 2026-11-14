@@ -155,7 +155,7 @@ jobs:
         working-directory: src-tauri/crates/mt-reflaps
         run: |
           for target in garage61_csv garage61_json brake_cue; do
-            cargo +nightly fuzz run "$target" -- -max_total_time=60 -rss_limit_mb=2048
+            cargo +nightly fuzz run --target x86_64-unknown-linux-gnu "$target" -- -max_total_time=60 -rss_limit_mb=2048
           done
       - if: failure()
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
@@ -271,7 +271,10 @@ jobs:
       - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
           name: windows-app-exe
-          path: src-tauri/target/release/marble-trace.exe
+          # mainBinaryName renames the exe; either name is accepted.
+          path: |
+            src-tauri/target/release/trailbrake.exe
+            src-tauri/target/release/marble-trace.exe
           if-no-files-found: error
 
   e2e:
@@ -299,6 +302,7 @@ jobs:
       - name: Run WebdriverIO against the release exe (no iRacing)
         working-directory: e2e
         shell: bash
-        env:
-          APP_PATH: ${{ github.workspace }}/e2e/bin/marble-trace.exe
-        run: npm test
+        run: |
+          app="$GITHUB_WORKSPACE/e2e/bin/trailbrake.exe"
+          [ -f "$app" ] || app="$GITHUB_WORKSPACE/e2e/bin/marble-trace.exe"
+          APP_PATH="$app" npm test
