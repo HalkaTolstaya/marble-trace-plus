@@ -1,0 +1,64 @@
+.fieldGroup {
+  padding-bottom: rem(24);
+  margin-bottom: rem(24);
+  border-bottom: 1px solid $sys-border-sub;
+
+  &:last-child {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+  }
+}
+
+.fieldTitle {
+  font-size: rem(14);
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: rem(4);
+}
+
+.fieldDesc {
+  font-size: rem(12);
+  color: $sys-text-secondary;
+  margin-bottom: rem(12);
+}
+
+.status {
+  font-size: rem(13);
+  color: $sys-text-secondary;
+}
+
+.error {
+  color: #ff4d4f;
+  font-size: rem(12);
+  margin-top: rem(8);
+}
+
+.lapRow {
+  display: flex;
+  align-items: center;
+  gap: rem(12);
+  padding: rem(6) 0;
+  border-bottom: 1px solid $sys-border-sub;
+  font-size: rem(13);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.lapMain {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lapTime {
+  font-variant-numeric: tabular-nums;
+}
+
+.lapMuted {
+  color: $sys-text-secondary;
+}

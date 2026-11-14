@@ -520,7 +520,8 @@
         "streamChat": "Stream chat",
         "maintenance": "Reset & diagnostics",
         "telemetryInspector": "Telemetry inspector",
-        "remoteScreens": "Remote screens"
+        "remoteScreens": "Remote screens",
+        "referenceLaps": "Reference laps"
       }
     },
     "remote": {
@@ -586,6 +587,56 @@
       "running": "Running",
       "stopped": "Not running",
       "title": "Companion apps"
+    },
+    "referenceLaps": {
+      "title": "Reference laps",
+      "tokenTitle": "Garage 61 personal access token",
+      "tokenDesc": "Create a personal access token in your Garage 61 account (developer settings, scope: driving data). It is stored in the Windows Credential Manager and used only by the app to request laps; it is never shown again.",
+      "tokenPlaceholder": "Paste the token",
+      "tokenSave": "Save",
+      "tokenStored": "Token stored",
+      "tokenRemove": "Remove token",
+      "sourceTitle": "Reference source",
+      "sourceDesc": "Automatic: when a session starts, the fastest clean lap of the current season for this track and car is fetched from Garage 61 (yours and your teammates'); without one, the library or your personal best is used.",
+      "sources": {
+        "auto": "Automatic (Garage 61)",
+        "library": "Library only",
+        "personalBest": "Personal best",
+        "pinned": "Pinned lap"
+      },
+      "notes": {
+        "fetched": "Garage 61: {{time}} by {{driver}} downloaded.",
+        "cached": "Using {{time}} by {{driver}} from the library.",
+        "offline": "Garage 61 unreachable; using the saved {{time}} by {{driver}}.",
+        "noToken": "No Garage 61 token: using the library or your personal best.",
+        "tokenRejected": "Garage 61 rejected the token.",
+        "trackNotOnGarage61": "This track is not on Garage 61.",
+        "carNotOnGarage61": "This car is not on Garage 61.",
+        "noLapsThisSeason": "No lap with telemetry this season on Garage 61 for this car and track.",
+        "rateLimited": "Garage 61 asked to slow down; trying later.",
+        "networkError": "Garage 61 could not be reached.",
+        "personalBestChosen": "Using your personal best.",
+        "pinnedMissing": "The pinned lap is no longer in the library.",
+        "noMatchInLibrary": "No lap in the library matches this session."
+      },
+      "noSession": "No session yet: the reference is chosen when you get in the car.",
+      "refreshHint": "Ask Garage 61 again now",
+      "libraryTitle": "Lap library",
+      "libraryDesc": "Laps downloaded from Garage 61 and CSV exports you imported. Pin one to use it whatever the session.",
+      "libraryEmpty": "No laps yet",
+      "importCsv": "Import CSV",
+      "pin": "Use this lap",
+      "delete": "Delete",
+      "lapSource": {
+        "garage61": "Garage 61",
+        "file": "CSV"
+      },
+      "match": {
+        "match": "This session",
+        "differentCar": "Other car",
+        "differentTrack": "Other track",
+        "unknown": "—"
+      }
     }
   },
   "bindings": {

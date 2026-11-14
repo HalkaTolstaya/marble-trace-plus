@@ -518,7 +518,8 @@
         "streamChat": "直播聊天",
         "maintenance": "重置与诊断",
         "telemetryInspector": "遥测检查器",
-        "remoteScreens": "远程屏幕"
+        "remoteScreens": "远程屏幕",
+        "referenceLaps": "参考圈"
       }
     },
     "remote": {
@@ -584,6 +585,56 @@
       "running": "运行中",
       "stopped": "未运行",
       "title": "配套程序"
+    },
+    "referenceLaps": {
+      "title": "参考圈",
+      "tokenTitle": "Garage 61 个人访问令牌",
+      "tokenDesc": "在你的 Garage 61 账户中创建个人访问令牌（开发者设置，权限：driving data）。令牌保存在 Windows 凭据管理器中，仅供本应用请求圈速数据，之后不会再显示。",
+      "tokenPlaceholder": "粘贴令牌",
+      "tokenSave": "保存",
+      "tokenStored": "令牌已保存",
+      "tokenRemove": "移除令牌",
+      "sourceTitle": "参考来源",
+      "sourceDesc": "自动：会话开始时，从 Garage 61 下载本赛季该赛道和车辆最快的干净圈（你和队友的）；如果没有，则使用圈速库或你的个人最佳。",
+      "sources": {
+        "auto": "自动（Garage 61）",
+        "library": "仅圈速库",
+        "personalBest": "个人最佳",
+        "pinned": "固定圈"
+      },
+      "notes": {
+        "fetched": "Garage 61：已下载 {{driver}} 的 {{time}}。",
+        "cached": "使用圈速库中 {{driver}} 的 {{time}}。",
+        "offline": "无法连接 Garage 61；使用已保存的 {{driver}} 的 {{time}}。",
+        "noToken": "没有 Garage 61 令牌：使用圈速库或你的个人最佳。",
+        "tokenRejected": "Garage 61 拒绝了令牌。",
+        "trackNotOnGarage61": "Garage 61 上没有这条赛道。",
+        "carNotOnGarage61": "Garage 61 上没有这辆车。",
+        "noLapsThisSeason": "本赛季 Garage 61 上没有该车和赛道的带遥测圈。",
+        "rateLimited": "Garage 61 要求放慢请求；稍后重试。",
+        "networkError": "无法连接 Garage 61。",
+        "personalBestChosen": "使用你的个人最佳。",
+        "pinnedMissing": "固定的圈已不在圈速库中。",
+        "noMatchInLibrary": "圈速库中没有与本会话匹配的圈。"
+      },
+      "noSession": "尚无会话：上车后选择参考圈。",
+      "refreshHint": "立即重新查询 Garage 61",
+      "libraryTitle": "圈速库",
+      "libraryDesc": "从 Garage 61 下载的圈以及你导入的 CSV。固定某一圈即可在任何会话中使用。",
+      "libraryEmpty": "还没有圈",
+      "importCsv": "导入 CSV",
+      "pin": "使用此圈",
+      "delete": "删除",
+      "lapSource": {
+        "garage61": "Garage 61",
+        "file": "CSV"
+      },
+      "match": {
+        "match": "本会话",
+        "differentCar": "其他车辆",
+        "differentTrack": "其他赛道",
+        "unknown": "—"
+      }
     }
   },
   "bindings": {

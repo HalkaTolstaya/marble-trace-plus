@@ -27,12 +27,17 @@ use tracing::{error, info};
 
 use crate::sink::TauriSink;
 
+/// The driver's choice of reference, kept beside the library rather than in
+/// `settings.json` so it needs no settings migration.
+const POLICY_FILE: &str = "policy.json";
+
 /// How often the watcher looks at the session the telemetry thread holds.
 const WATCH_INTERVAL: Duration = Duration::from_secs(1);
 
 pub type Service = ReferenceLapService<ReqwestTransport, KeyringTokenStore>;
 
 pub struct ReflapsState {
+    policy_path: std::path::PathBuf,
     pub service: Mutex<Service>,
     pub policy: Mutex<ReferencePolicy>,
     /// Wakes the watcher to resolve again (token, policy or library changed).
@@ -87,16 +92,42 @@ impl ReflapsState {
             ReqwestTransport::new(Allowlist::production()).map_err(|error| error.to_string())?;
         let client = Garage61Client::new(transport, PRODUCTION_BASE);
 
+        let policy_path = data_dir
+            .join(mt_reflaps::library::LIBRARY_DIR)
+            .join(POLICY_FILE);
+        let policy = std::fs::read_to_string(&policy_path)
+            .ok()
+            .and_then(|text| serde_json::from_str::<ReferencePolicy>(&text).ok())
+            .unwrap_or_default();
+
         Ok(Self {
+            policy_path,
             service: Mutex::new(ReferenceLapService::new(
                 &data_dir,
                 client,
                 KeyringTokenStore,
             )),
-            policy: Mutex::new(ReferencePolicy::default()),
+            policy: Mutex::new(policy),
             dirty: Notify::new(),
             last_status: Mutex::new(None),
         })
+    }
+}
+
+impl ReflapsState {
+    /// Sets and persists the policy; a failed write keeps it for this run.
+    pub async fn set_policy(&self, policy: ReferencePolicy) {
+        if let Ok(json) = serde_json::to_vec(&policy) {
+            if let Some(parent) = self.policy_path.parent() {
+                let _ = tokio::fs::create_dir_all(parent).await;
+            }
+
+            if let Err(error) = tokio::fs::write(&self.policy_path, json).await {
+                error!("could not save the reference policy: {error}");
+            }
+        }
+
+        *self.policy.lock().await = policy;
     }
 }
 

@@ -520,7 +520,8 @@
         "streamChat": "Chat del directo",
         "maintenance": "Restablecer y diagnóstico",
         "telemetryInspector": "Inspector de telemetría",
-        "remoteScreens": "Pantallas remotas"
+        "remoteScreens": "Pantallas remotas",
+        "referenceLaps": "Vueltas de referencia"
       }
     },
     "remote": {
@@ -586,6 +587,56 @@
       "running": "En ejecución",
       "stopped": "Detenido",
       "title": "Aplicaciones complementarias"
+    },
+    "referenceLaps": {
+      "title": "Vueltas de referencia",
+      "tokenTitle": "Token de acceso personal de Garage 61",
+      "tokenDesc": "Crea un token de acceso personal en tu cuenta de Garage 61 (ajustes de desarrollador, permiso: driving data). Se guarda en el Administrador de credenciales de Windows y solo la app lo usa para pedir vueltas; no se vuelve a mostrar.",
+      "tokenPlaceholder": "Pega el token",
+      "tokenSave": "Guardar",
+      "tokenStored": "Token guardado",
+      "tokenRemove": "Quitar token",
+      "sourceTitle": "Origen de la referencia",
+      "sourceDesc": "Automático: al empezar una sesión se descarga de Garage 61 la vuelta limpia más rápida de la temporada actual para este circuito y coche (tuyas y de tus compañeros); si no hay, se usa la biblioteca o tu mejor vuelta.",
+      "sources": {
+        "auto": "Automático (Garage 61)",
+        "library": "Solo biblioteca",
+        "personalBest": "Mejor personal",
+        "pinned": "Vuelta fijada"
+      },
+      "notes": {
+        "fetched": "Garage 61: descargada {{time}} de {{driver}}.",
+        "cached": "Usando {{time}} de {{driver}} de la biblioteca.",
+        "offline": "Garage 61 no responde; usando la guardada {{time}} de {{driver}}.",
+        "noToken": "Sin token de Garage 61: se usa la biblioteca o tu mejor vuelta.",
+        "tokenRejected": "Garage 61 rechazó el token.",
+        "trackNotOnGarage61": "Este circuito no está en Garage 61.",
+        "carNotOnGarage61": "Este coche no está en Garage 61.",
+        "noLapsThisSeason": "No hay vuelta con telemetría esta temporada en Garage 61 para este coche y circuito.",
+        "rateLimited": "Garage 61 pidió esperar; se reintentará.",
+        "networkError": "No se pudo contactar con Garage 61.",
+        "personalBestChosen": "Usando tu mejor vuelta personal.",
+        "pinnedMissing": "La vuelta fijada ya no está en la biblioteca.",
+        "noMatchInLibrary": "Ninguna vuelta de la biblioteca coincide con esta sesión."
+      },
+      "noSession": "Aún no hay sesión: la referencia se elige al subir al coche.",
+      "refreshHint": "Consultar Garage 61 de nuevo ahora",
+      "libraryTitle": "Biblioteca de vueltas",
+      "libraryDesc": "Vueltas descargadas de Garage 61 y CSV importados. Fija una para usarla en cualquier sesión.",
+      "libraryEmpty": "Aún no hay vueltas",
+      "importCsv": "Importar CSV",
+      "pin": "Usar esta vuelta",
+      "delete": "Eliminar",
+      "lapSource": {
+        "garage61": "Garage 61",
+        "file": "CSV"
+      },
+      "match": {
+        "match": "Esta sesión",
+        "differentCar": "Otro coche",
+        "differentTrack": "Otro circuito",
+        "unknown": "—"
+      }
     }
   },
   "bindings": {

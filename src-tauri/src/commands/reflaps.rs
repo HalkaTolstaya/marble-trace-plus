@@ -121,7 +121,7 @@ pub async fn reflaps_set_policy(
     policy: ReferencePolicy,
 ) -> Result<(), String> {
     check_policy(&policy)?;
-    *reflaps.policy.lock().await = policy;
+    reflaps.set_policy(policy).await;
     reflaps.dirty.notify_one();
 
     Ok(())

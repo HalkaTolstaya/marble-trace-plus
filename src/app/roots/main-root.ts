@@ -8,6 +8,7 @@ import type { BindingsStore } from '@features/hotkey-bindings/bindings.store';
 import type { SettingsPanelUiStore } from '@entities/widget/settings-panel-ui.store';
 import { LayoutEditorStore } from '@features/layout-editor/layout-editor.store';
 import { CompanionAppsStore } from '@features/companion-apps/companion-apps.store';
+import { ReferenceLapsStore } from '@features/reference-laps/reference-laps.store';
 import { VoiceCrewStore } from '@features/voice-crew/voice-crew.store';
 import { TwitchAuthStore } from '@features/twitch-auth/twitch-auth.store';
 import { DeviceInputStore } from '@features/hotkey-bindings/device-input.store';
@@ -31,6 +32,7 @@ export class MainRoot extends RendererCore implements AppWindowStores {
   settingsPanelUi: SettingsPanelUiStore;
   layoutEditor: LayoutEditorStore;
   companionApps: CompanionAppsStore;
+  referenceLaps: ReferenceLapsStore;
   twitchAuth: TwitchAuthStore;
   deviceInput: DeviceInputStore;
   bindingsUi: BindingsUiStore;
@@ -50,6 +52,7 @@ export class MainRoot extends RendererCore implements AppWindowStores {
     this.settingsPanelUi = appWindow.settingsPanelUi;
     this.layoutEditor = new LayoutEditorStore(this.layouts, this.liveWidgets);
     this.companionApps = new CompanionAppsStore(this);
+    this.referenceLaps = new ReferenceLapsStore();
     this.twitchAuth = new TwitchAuthStore(this);
     this.deviceInput = new DeviceInputStore();
     this.bindingsUi = new BindingsUiStore();
@@ -69,6 +72,7 @@ export class MainRoot extends RendererCore implements AppWindowStores {
     this.fpsDiagnostics.dispose();
     this.twitchAuth.dispose();
     this.companionApps.dispose();
+    this.referenceLaps.dispose();
     this.voiceCrew.dispose();
     super.dispose();
   }
