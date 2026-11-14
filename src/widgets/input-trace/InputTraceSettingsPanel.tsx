@@ -91,6 +91,14 @@ export const InputTraceSettingsPanel = observer(() => {
         <Row setting="showInputValues" dependsOn="showBars" />
       </Card>
 
+      <Card title={t('settingsPanels.inputTrace.reference')}>
+        <div className={styles.fieldGroup}>
+          <Row setting="showReference" />
+        </div>
+
+        <Row setting="referenceOpacity" dependsOn="showReference" />
+      </Card>
+
       <Card title={t('settingsPanels.inputTrace.graphSettings')}>
         <div className={styles.fieldGroup}>
           <SettingRow

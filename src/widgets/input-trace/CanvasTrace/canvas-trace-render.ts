@@ -11,6 +11,8 @@ export interface TraceBufferState {
   absBuffer: Uint8Array;
   steerBuffer: Float32Array;
   slideBuffer: Uint8Array;
+  /** Reference throttle and brake per sample, interleaved; NaN where none. */
+  refBuffer: Float32Array;
   head: number;
   count: number;
 }
@@ -20,6 +22,7 @@ export const createTraceBufferState = (): TraceBufferState => ({
   absBuffer: new Uint8Array(0),
   steerBuffer: new Float32Array(0),
   slideBuffer: new Uint8Array(0),
+  refBuffer: new Float32Array(0),
   head: 0,
   count: 0,
 });
@@ -233,6 +236,68 @@ const drawSteering = (pass: ChannelPassContext) => {
   ctx.stroke();
 };
 
+/** Fill alpha as two hex digits, for `#rrggbb` colours. */
+const alphaHex = (opacity: number): string =>
+  Math.round(Math.min(Math.max(opacity, 0), 1) * 255)
+    .toString(16)
+    .padStart(2, '0');
+
+const withOpacity = (color: string, opacity: number): string =>
+  /^#[0-9a-f]{6}$/i.test(color) ? `${color}${alphaHex(opacity)}` : color;
+
+// The reference lap's pedals as filled areas from the baseline, behind the
+// live lines: the gap between fill and line is the difference to the
+// reference at the same place on the lap (ADR-0014).
+const drawReference = (
+  pass: ChannelPassContext,
+  offset: 0 | 1,
+  color: string
+) => {
+  const { ctx, state, settings, logicalWidth, logicalHeight, bufferSize } =
+    pass;
+  const verticalInset = settings.lineWidth / 2;
+  const drawableHeight = logicalHeight - verticalInset * 2;
+  const baseline = verticalInset + drawableHeight;
+
+  ctx.fillStyle = withOpacity(color, settings.referenceOpacity);
+
+  let open = false;
+  let lastX = 0;
+
+  const close = () => {
+    if (!open) return;
+
+    ctx.lineTo(lastX, baseline);
+    ctx.closePath();
+    ctx.fill();
+    open = false;
+  };
+
+  for (let sampleIndex = 0; sampleIndex < state.count; sampleIndex++) {
+    const circularIndex = sampleAt(pass, sampleIndex);
+    const value = state.refBuffer[circularIndex * 2 + offset];
+    const xPos = (sampleIndex / (bufferSize - 1)) * logicalWidth;
+
+    if (value === undefined || Number.isNaN(value)) {
+      close();
+      continue;
+    }
+
+    const yPos = verticalInset + (1 - value) * drawableHeight;
+
+    if (!open) {
+      ctx.beginPath();
+      ctx.moveTo(xPos, baseline);
+      open = true;
+    }
+
+    ctx.lineTo(xPos, yPos);
+    lastX = xPos;
+  }
+
+  close();
+};
+
 export const drawInputTrace = (
   canvas: HTMLCanvasElement,
   state: TraceBufferState,
@@ -269,6 +334,12 @@ export const drawInputTrace = (
     bufferSize: bufferSizeFor(settings),
   };
 
+  if (settings.showReference && state.refBuffer.length > 0) {
+    if (settings.showThrottle) drawReference(pass, 0, settings.throttleColor);
+
+    if (settings.showBrake) drawReference(pass, 1, settings.brakeColor);
+  }
+
   for (let channelIndex = 0; channelIndex < channels.length; channelIndex++) {
     const channel = channels[channelIndex];
 
@@ -303,6 +374,9 @@ export interface TraceSample {
   steeringWheelAngle: number;
   /** The car is sliding sideways past `SLIDE_ANGLE_DEG`. */
   sliding: boolean;
+  /** The reference lap's pedals where the car was; absent without one. */
+  refThrottle?: number | null;
+  refBrake?: number | null;
 }
 
 // Resizes the circular buffers when the settings change. Split out from
@@ -348,6 +422,11 @@ export const ensureTraceBuffers = (
     buffersResized = true;
   }
 
+  if (state.refBuffer.length !== bufferSize * 2) {
+    state.refBuffer = new Float32Array(bufferSize * 2).fill(Number.NaN);
+    buffersResized = true;
+  }
+
   if (buffersResized) {
     state.head = 0;
     state.count = 0;
@@ -385,6 +464,8 @@ export const pushTraceSample = (
   state.absBuffer[state.head] = sample.absActive ? 1 : 0;
   state.steerBuffer[state.head] = sample.steeringWheelAngle;
   state.slideBuffer[state.head] = sample.sliding ? 1 : 0;
+  state.refBuffer[state.head * 2] = sample.refThrottle ?? Number.NaN;
+  state.refBuffer[state.head * 2 + 1] = sample.refBrake ?? Number.NaN;
 
   state.head = (state.head + 1) % bufferSize;
 

@@ -146,3 +146,100 @@ describe('InputTraceWidgetStore — frameTick', () => {
     ]);
   });
 });
+
+describe('InputTraceWidgetStore — reference overlay', () => {
+  let core: PreviewCore;
+  let inputTrace: InputTraceWidgetStore;
+
+  const BUCKETS = 1000;
+  const PLAYER = 3;
+
+  const referenceLap = (brakeAt: (pct: number) => number) => ({
+    trackId: 1,
+    carScreenName: 'Car',
+    lapTime: 100,
+    condition: 'dry' as const,
+    recordedWetness: null,
+    recordedTireWear: null,
+    recordedFuelLevel: null,
+    samples: Array.from({ length: BUCKETS }, (_, bucket) => {
+      const pct = (bucket + 0.5) / BUCKETS;
+
+      return {
+        speed: 50,
+        throttle: 1 - brakeAt(pct),
+        brake: brakeAt(pct),
+        latAccel: null,
+        longAccel: null,
+        steeringWheelAngle: 0,
+        timeIntoLap: pct * 100,
+      };
+    }),
+  });
+
+  const atPct = (pct: number) => {
+    const positions = Array.from({ length: 8 }, () => -1);
+
+    positions[PLAYER] = pct;
+
+    runInAction(() => {
+      core.cars.updateCarPositions({
+        car_idx_lap_dist_pct: positions,
+        car_idx_track_surface: positions.map(() => 3),
+      });
+      core.player.updateCarInputs({ throttle: 0.5 } as CarInputsFrame);
+    });
+  };
+
+  beforeEach(() => {
+    core = new PreviewCore();
+    runInAction(() => {
+      core.session.updateSessionInfo({
+        playerCarIdx: PLAYER,
+      } as Parameters<typeof core.session.updateSessionInfo>[0]);
+    });
+    inputTrace = core.widgetInstances.open(
+      { core, instanceId: INPUT_TRACE, type: INPUT_TRACE },
+      createInputTrace
+    ) as InputTraceWidgetStore;
+  });
+
+  afterEach(() => {
+    core.dispose();
+  });
+
+  it('carries no reference without a reference lap', () => {
+    atPct(0.25);
+
+    expect(inputTrace.frameSamples[0]?.refBrake).toBeNull();
+  });
+
+  it('samples the reference at the car’s lap position', () => {
+    runInAction(() => {
+      core.referenceLap.updateReferenceLap(
+        referenceLap((pct) => (pct > 0.4 && pct < 0.6 ? 1 : 0))
+      );
+    });
+
+    atPct(0.2);
+    expect(inputTrace.frameSamples[0]?.refBrake).toBe(0);
+    expect(inputTrace.frameSamples[0]?.refThrottle).toBe(1);
+
+    atPct(0.5);
+    // A jump of more than 5% of a lap is not spread across the frame.
+    expect(inputTrace.frameSamples.at(-1)?.refBrake).toBe(1);
+  });
+
+  it('spreads a frame across start/finish without jumping back a lap', () => {
+    runInAction(() => {
+      core.referenceLap.updateReferenceLap(
+        referenceLap((pct) => (pct < 0.01 ? 1 : 0))
+      );
+    });
+
+    atPct(0.995);
+    atPct(0.005);
+
+    expect(inputTrace.frameSamples.at(-1)?.refBrake).toBe(1);
+  });
+});
