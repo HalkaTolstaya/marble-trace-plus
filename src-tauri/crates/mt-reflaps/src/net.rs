@@ -20,7 +20,7 @@ const MAX_ATTEMPTS: u32 = 4;
 const BACKOFF_BASE_MS: u64 = 500;
 /// A `Retry-After` longer than this is not waited for.
 const MAX_RETRY_AFTER: Duration = Duration::from_secs(30);
-const USER_AGENT: &str = concat!("marble-trace-plus/", env!("CARGO_PKG_VERSION"));
+const USER_AGENT: &str = concat!("trailbrake/", env!("CARGO_PKG_VERSION"));
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum NetError {

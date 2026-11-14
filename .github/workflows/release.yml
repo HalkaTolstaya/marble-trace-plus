@@ -131,9 +131,9 @@ jobs:
         run: |
           mkdir -p dist
           installer=$(ls src-tauri/target/release/bundle/nsis/*-setup.exe | head -1)
-          cp "$installer" "dist/marble-trace-plus_${VERSION}_x64-setup.exe"
+          cp "$installer" "dist/trailbrake_${VERSION}_x64-setup.exe"
           if [ -f "$installer.sig" ]; then
-            cp "$installer.sig" "dist/marble-trace-plus_${VERSION}_x64-setup.exe.sig"
+            cp "$installer.sig" "dist/trailbrake_${VERSION}_x64-setup.exe.sig"
           fi
 
       - name: SBOM (CycloneDX, Rust + npm)
@@ -153,7 +153,7 @@ jobs:
           node -e '
             const fs = require("fs");
             const v = process.env.VERSION;
-            const file = `marble-trace-plus_${v}_x64-setup.exe`;
+            const file = `trailbrake_${v}_x64-setup.exe`;
             const notes = (fs.readFileSync("CHANGELOG.md", "utf8").split(/^## \[/m)
               .find((s) => s.startsWith(v + "]")) || "").split("\n").slice(1).join("\n").trim();
             fs.writeFileSync("dist/latest.json", JSON.stringify({
@@ -181,7 +181,7 @@ jobs:
               "",
               "### Install",
               "",
-              "Download `marble-trace-plus_" + v + "_x64-setup.exe` and run it. Until the installer is code-signed, Windows SmartScreen shows *Windows protected your PC*: choose **More info → Run anyway**. Verify the download against `SHA256SUMS.txt`.",
+              "Download `trailbrake_" + v + "_x64-setup.exe` and run it. Until the installer is code-signed, Windows SmartScreen shows *Windows protected your PC*: choose **More info → Run anyway**. Verify the download against `SHA256SUMS.txt`.",
             ].join("\n"));
           '
 
@@ -200,7 +200,7 @@ jobs:
       - name: Publish the release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
-          name: Marble Trace Plus ${{ env.VERSION }}
+          name: Trailbrake ${{ env.VERSION }}
           body_path: notes/RELEASE_NOTES.md
           files: dist/*
           fail_on_unmatched_files: true

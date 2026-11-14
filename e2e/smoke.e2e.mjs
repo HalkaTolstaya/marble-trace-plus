@@ -86,7 +86,7 @@ void test('the main window renders without a sim', async () => {
 
   const title = await browser.getTitle();
 
-  assert.match(title, /Marble Trace/);
+  assert.match(title, /Trailbrake/);
 });
 
 void test('the global Tauri object is not exposed', async () => {

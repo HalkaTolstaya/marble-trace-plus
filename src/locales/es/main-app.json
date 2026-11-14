@@ -29,7 +29,7 @@
   "settingsLock": {
     "from-the-future": {
       "title": "Tus ajustes se guardaron con una versión más nueva",
-      "description": "Esta versión no puede leerlos y no los sobrescribirá. Actualiza Marble Trace para recuperar tus diseños y asignaciones."
+      "description": "Esta versión no puede leerlos y no los sobrescribirá. Actualiza Trailbrake para recuperar tus diseños y asignaciones."
     },
     "too-old": {
       "title": "Tus ajustes son demasiado antiguos para actualizarse automáticamente",
@@ -37,7 +37,7 @@
     },
     "corrupt": {
       "title": "No se pudo leer tu archivo de ajustes",
-      "description": "Se ha dejado intacto para que puedas recuperarlo a mano. Marble Trace funciona con los valores por defecto y no lo sobrescribirá."
+      "description": "Se ha dejado intacto para que puedas recuperarlo a mano. Trailbrake funciona con los valores por defecto y no lo sobrescribirá."
     },
     "reset": "Restablecer ajustes",
     "resetConfirm": "¿Reemplazar el archivo de ajustes por los valores por defecto? Se perderán los diseños, widgets y asignaciones que contiene.",
@@ -45,8 +45,8 @@
     "resetCancel": "Cancelar"
   },
   "installMismatch": {
-    "title": "Estás ejecutando una segunda copia desactualizada de Marble Trace",
-    "description": "Esta ventana ejecuta la v{{runningVersion}} desde {{runningDir}}, pero la versión instalada es {{registeredVersion}} en {{registeredDir}}. Las actualizaciones van a la copia instalada, así que esta se queda atrás. Desinstala la copia de {{runningDir}} e inicia Marble Trace desde la instalada.",
+    "title": "Estás ejecutando una segunda copia desactualizada de Trailbrake",
+    "description": "Esta ventana ejecuta la v{{runningVersion}} desde {{runningDir}}, pero la versión instalada es {{registeredVersion}} en {{registeredDir}}. Las actualizaciones van a la copia instalada, así que esta se queda atrás. Desinstala la copia de {{runningDir}} e inicia Trailbrake desde la instalada.",
     "unknownVersion": "desconocida"
   },
   "updateBanner": {
@@ -343,10 +343,11 @@
       "checkForUpdates": "Buscar actualizaciones"
     },
     "about": {
-      "title": "Acerca de Marble Trace",
+      "title": "Acerca de Trailbrake",
+      "forkOf": "Un fork de Marble Trace de voof (GPL-3.0) con la cuenta atrás de frenada y las vueltas de referencia de Garage 61 de Input Telemetry Overlay de Mitch Warrenburg (MIT). Trailbrake no es el proyecto oficial de Marble Trace.",
       "tagline": "Un overlay de telemetría para iRacing. Gratuito y de código abierto bajo GPL-3.0.",
       "trademarks": "Marble Trace™ y el logotipo de Marble Trace son marcas comerciales de voof. iRacing es una marca de iRacing.com Motorsport Simulations, LLC. TAURI es una marca de The Tauri Programme within the Commons Conservancy. Windows es una marca del grupo de empresas Microsoft. Twitch es una marca de Twitch Interactive, Inc. YouTube es una marca de Google LLC. Los demás nombres pertenecen a sus respectivos propietarios.",
-      "independence": "Marble Trace es un proyecto independiente de código abierto. No está hecho por iRacing, no tiene ninguna relación con iRacing.com Motorsport Simulations, LLC y no está afiliado, patrocinado ni respaldado por ella ni por ninguna de las empresas indicadas a continuación."
+      "independence": "Trailbrake es un proyecto independiente de código abierto. No está hecho por iRacing, no tiene ninguna relación con iRacing.com Motorsport Simulations, LLC y no está afiliado, patrocinado ni respaldado por ella ni por ninguna de las empresas indicadas a continuación."
     },
     "trackMap": {
       "title": "Mapa del circuito",
@@ -433,7 +434,7 @@
       "waitingRaw": "Esperando al simulador… Una grabación reproducida solo contiene frames procesados.",
       "noteRawTelemetry": "Todas las variables que publica iRacing, con sus propios nombres, tal como kerb las lee de la memoria compartida. Nada se renombra, enmascara ni redondea. La búsqueda también encuentra la descripción del simulador.",
       "noteRawSession": "El YAML de la sesión tal como lo escribe iRacing. La vista de texto no se toca; la vista de árbol solo pone entre comillas los nombres de pilotos y equipos para que no rompan el análisis.",
-      "noteProcessedTitle": "Procesado por Marble Trace — no son los datos en bruto",
+      "noteProcessedTitle": "Procesado por Trailbrake — no son los datos en bruto",
       "noteTelemetry": "La salida del adaptador: el frame de kerb se reparte en los frames de la app en src-tauri/crates/mt-sim-iracing/src/frame_map.rs, donde también se vacían los campos de estado que el coche no declara (DeclaredVars). Se muestra antes de la división por frecuencias, el filtrado por demanda y el redondeo.",
       "noteSession": "La sesión analizada: src-tauri/crates/mt-sim-iracing/src/session_parse.rs elige los campos que usa la app y los normaliza; los distintivos y colores de clase se resuelven en car_classes.rs y car_badges.rs.",
       "viewTree": "Árbol",
@@ -579,10 +580,10 @@
       "empty": "Aún no hay programas.",
       "launch": "Iniciar ahora",
       "launchWithApp": "Iniciar con la app",
-      "listDesc": "Se inician con Marble Trace si no están ya en marcha. Al cerrar la aplicación se cierran las marcadas, las haya iniciado quien las haya iniciado; un programa que requiere permisos de administrador no puede cerrarse así.",
+      "listDesc": "Se inician con Trailbrake si no están ya en marcha. Al cerrar la aplicación se cierran las marcadas, las haya iniciado quien las haya iniciado; un programa que requiere permisos de administrador no puede cerrarse así.",
       "listTitle": "Tus programas",
       "missing": "Archivo no encontrado",
-      "notOurs": "Iniciado fuera de Marble Trace: ciérralo donde lo iniciaste.",
+      "notOurs": "Iniciado fuera de Trailbrake: ciérralo donde lo iniciaste.",
       "removeConfirm": "¿Quitar este programa de la lista?",
       "running": "En ejecución",
       "stopped": "Detenido",

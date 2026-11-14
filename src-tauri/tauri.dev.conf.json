@@ -1,5 +1,5 @@
 {
-  "identifier": "io.github.halkatolstaya.marble-trace-plus.dev",
+  "identifier": "io.github.halkatolstaya.trailbrake.dev",
   "app": {
     "security": {
       "csp": {

@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Marble Trace Plus",
-  "version": "0.28.0",
-  "identifier": "io.github.halkatolstaya.marble-trace-plus",
+  "productName": "Trailbrake",
+  "version": "0.28.1",
+  "identifier": "io.github.halkatolstaya.trailbrake",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
@@ -15,7 +15,7 @@
       {
         "label": "main",
         "url": "main.html",
-        "title": "Marble Trace Plus",
+        "title": "Trailbrake",
         "width": 800,
         "height": 600,
         "resizable": true,
@@ -103,5 +103,6 @@
         "installMode": "passive"
       }
     }
-  }
+  },
+  "mainBinaryName": "trailbrake"
 }

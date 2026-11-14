@@ -8,7 +8,7 @@ use std::sync::Mutex;
 use keyring::Entry;
 use tracing::warn;
 
-const SERVICE: &str = "marble-trace-plus";
+const SERVICE: &str = "trailbrake";
 const ACCOUNT: &str = "garage61-personal-access-token";
 /// Longest token accepted from the settings field.
 pub const MAX_TOKEN_LEN: usize = 512;

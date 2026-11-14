@@ -20,9 +20,9 @@ pub struct CompanionApp {
     pub path: String,
     /// Command line passed on launch, split on spaces. Usually empty.
     pub args: String,
-    /// Start it when Marble Trace starts, if it is not already running.
+    /// Start it when the app starts, if it is not already running.
     pub launch_with_app: bool,
-    /// Close it when Marble Trace closes — only ever the instance we started.
+    /// Close it when the app closes — only ever the instance we started.
     pub close_with_app: bool,
     /// The executable to look for in the process list, when it is not the
     /// one that gets launched. Discord is started through its updater and
