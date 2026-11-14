@@ -95,6 +95,9 @@
     },
     "crew-radio": {
       "description": "El ingeniero de voz por radio: lo que pediste, la respuesta, ✓ o ✗."
+    },
+    "brake-point": {
+      "description": "Cuenta 3-2-1-FRENA hasta cada frenada de referencia y califica la tuya."
     }
   },
   "settingsPanels": {
@@ -353,7 +356,12 @@
       "showSlide": "Derrape",
       "showSlideDesc": "Colorear la línea del volante mientras el coche derrapa de lado.",
       "showBars": "Barras de pedales",
-      "showBarsDesc": "Mostrar las barras de acelerador, freno y embrague junto al gráfico."
+      "showBarsDesc": "Mostrar las barras de acelerador, freno y embrague junto al gráfico.",
+      "reference": "Vuelta de referencia",
+      "showReference": "Mostrar referencia",
+      "showReferenceDesc": "Dibuja el acelerador y el freno de la vuelta de referencia activa detrás de tus líneas, en el mismo punto de la vuelta.",
+      "referenceOpacity": "Opacidad de la referencia",
+      "referenceOpacityDesc": "Intensidad del relleno de las áreas de referencia."
     },
     "linearMap": {
       "moduleLayout": "Disposición del módulo",
@@ -926,6 +934,44 @@
       "recentCount": "Líneas recientes",
       "hideDriverLines": "Ocultar tus líneas",
       "hideDriverLinesDesc": "Muestra solo al ingeniero. Lo que dijiste y el ✓ o ✗ de un comando no aparecen."
+    },
+    "brakePoint": {
+      "countdown": "Cuenta atrás",
+      "grading": "Calificación",
+      "display": "Visualización",
+      "countdownSeconds": "Duración de la cuenta, s",
+      "countdownSecondsDesc": "Cuánto duran los tres conteos antes de cada punto de frenada.",
+      "reactionSeconds": "Margen de reacción, s",
+      "reactionSecondsDesc": "Muestra FRENA este tiempo antes del punto de referencia.",
+      "minPeakPercent": "Omitir zonas suaves por debajo de, %",
+      "minPeakPercentDesc": "Las zonas cuyo pico de referencia es menor no tienen cuenta atrás.",
+      "goodWindowMs": "Ventana «bien», ms",
+      "goodWindowMsDesc": "± tiempo desde el punto de referencia calificado como bien; el triple es pronto o tarde.",
+      "perfectWindowMs": "Ventana «perfecto», ms",
+      "perfectWindowMsDesc": "± tiempo calificado como perfecto, dentro de la ventana «bien».",
+      "showTiming": "Fila de tiempos",
+      "showTimingDesc": "La última calificación con la desviación en segundos y metros.",
+      "showTarget": "Presión objetivo",
+      "showTargetDesc": "El pico de referencia de la zona y tu pedal al lado.",
+      "showPips": "Indicadores de zona",
+      "showPipsDesc": "Un punto por zona con la calificación de esta vuelta.",
+      "zone": "Zona",
+      "target": "Objetivo",
+      "waiting": "Esperando la primera zona de frenada",
+      "messages": {
+        "noReference": "Aún no hay vuelta de referencia. Añade un token de Garage 61 o da una vuelta.",
+        "noZones": "La vuelta de referencia no tiene zonas de frenada por encima del mínimo.",
+        "noCar": "Súbete al coche para empezar la cuenta atrás."
+      },
+      "grades": {
+        "perfect": "Perfecto",
+        "good": "Bien",
+        "early": "Pronto",
+        "late": "Tarde",
+        "veryEarly": "Muy pronto",
+        "veryLate": "Muy tarde",
+        "noBrake": "Sin frenar"
+      }
     }
   },
   "streamChat": {

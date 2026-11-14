@@ -95,6 +95,9 @@
     },
     "crew-radio": {
       "description": "The voice engineer on the radio: what you asked, the reply, ✓ or ✗."
+    },
+    "brake-point": {
+      "description": "Counts 3-2-1-BRAKE into each reference brake point and grades your brake-on."
     }
   },
   "settingsPanels": {
@@ -353,7 +356,12 @@
       "showSlide": "Slide",
       "showSlideDesc": "Color the steering line while the car slides sideways.",
       "showBars": "Pedal Bars",
-      "showBarsDesc": "Show the throttle, brake and clutch bars beside the graph."
+      "showBarsDesc": "Show the throttle, brake and clutch bars beside the graph.",
+      "reference": "Reference lap",
+      "showReference": "Show reference",
+      "showReferenceDesc": "Draw the active reference lap's throttle and brake behind your lines, at the same place on the lap.",
+      "referenceOpacity": "Reference opacity",
+      "referenceOpacityDesc": "How strongly the reference areas are filled."
     },
     "linearMap": {
       "moduleLayout": "Module Layout",
@@ -926,6 +934,44 @@
       "recentCount": "Recent lines",
       "hideDriverLines": "Hide your lines",
       "hideDriverLinesDesc": "Show only the engineer. What you said, and the ✓ or ✗ of a command, are left out."
+    },
+    "brakePoint": {
+      "countdown": "Countdown",
+      "grading": "Grading",
+      "display": "Display",
+      "countdownSeconds": "Countdown length, s",
+      "countdownSecondsDesc": "How long the three counts take before each brake point.",
+      "reactionSeconds": "Reaction allowance, s",
+      "reactionSecondsDesc": "Show BRAKE this much before the reference brake point.",
+      "minPeakPercent": "Skip light zones below, %",
+      "minPeakPercentDesc": "Brake zones whose reference peak is lower get no countdown.",
+      "goodWindowMs": "Good window, ms",
+      "goodWindowMsDesc": "± time from the reference brake point graded good; three times it is early or late.",
+      "perfectWindowMs": "Perfect window, ms",
+      "perfectWindowMsDesc": "± time graded perfect, inside the good window.",
+      "showTiming": "Timing row",
+      "showTimingDesc": "The last grade with how far off you were in seconds and metres.",
+      "showTarget": "Target pressure",
+      "showTargetDesc": "The zone's reference peak and your pedal beside it.",
+      "showPips": "Zone pips",
+      "showPipsDesc": "One dot per counted zone with this lap's grade.",
+      "zone": "Zone",
+      "target": "Target",
+      "waiting": "Waiting for the first brake zone",
+      "messages": {
+        "noReference": "No reference lap yet. Add a Garage 61 token or drive a lap.",
+        "noZones": "The reference lap has no brake zones above the minimum.",
+        "noCar": "Get in the car to start the countdown."
+      },
+      "grades": {
+        "perfect": "Perfect",
+        "good": "Good",
+        "early": "Early",
+        "late": "Late",
+        "veryEarly": "Very early",
+        "veryLate": "Very late",
+        "noBrake": "No brake"
+      }
     }
   },
   "streamChat": {
