@@ -1,7 +1,7 @@
 # Widget screenshots
 
 The widget pictures the README and the website gallery show are one set, in
-`site/assets/widgets/`: transparent PNGs taken at 3x, so they stay sharp on
+`docs/assets/widgets/`: transparent PNGs taken at 3x, so they stay sharp on
 high-density screens. The README shows each at a third of its width
 (`<img width>`), the widget's own size. The site shows one picture per widget;
 the README may add variants beside it (Delta against the best lap, Fuel with the
@@ -55,12 +55,7 @@ the `Showcase` stories of Input Trace and G-Meter do.
 
 ## The site serves WebP copies, not the PNGs
 
-`site/scripts/images.mjs` (`npm run images` in `site/`) writes each picture as
-WebP at a ladder of widths into `site/assets/img/`, with a manifest, and the
-site's build turns every `<img src="assets/...">` into those copies with a
-`srcset`. `capture:widgets` runs it for you at the end, so a recaptured widget
-reaches the site with nothing else to do; **commit `site/assets/img/` with the
-PNGs**.
+The upstream website and its WebP pipeline are not part of this fork; the PNGs are used by the README only.
 
 Run it by hand only when you put a picture in `site/assets/` some other way — a
 replaced screenshot in `control/`, `layouts/` or `screens/`. The PNGs and the
