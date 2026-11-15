@@ -29,7 +29,7 @@
   "settingsLock": {
     "from-the-future": {
       "title": "设置由更新版本保存",
-      "description": "此版本无法读取，也不会覆盖它们。请更新 Marble Trace 以恢复您的布局和按键绑定。"
+      "description": "此版本无法读取，也不会覆盖它们。请更新 Trailbrake 以恢复您的布局和按键绑定。"
     },
     "too-old": {
       "title": "设置过旧，无法自动升级",
@@ -37,7 +37,7 @@
     },
     "corrupt": {
       "title": "无法读取设置文件",
-      "description": "文件保持原样，以便手动恢复。Marble Trace 正在使用默认值运行，不会覆盖该文件。"
+      "description": "文件保持原样，以便手动恢复。Trailbrake 正在使用默认值运行，不会覆盖该文件。"
     },
     "reset": "重置设置",
     "resetConfirm": "用默认值替换设置文件？其中的布局、小部件和按键绑定将会丢失。",
@@ -45,8 +45,8 @@
     "resetCancel": "取消"
   },
   "installMismatch": {
-    "title": "你正在运行 Marble Trace 的第二个旧副本",
-    "description": "此窗口运行的是位于 {{runningDir}} 的 v{{runningVersion}}，而已安装的版本是位于 {{registeredDir}} 的 v{{registeredVersion}}。更新只会安装到已安装的副本，因此这一份会一直是旧版。请卸载 {{runningDir}} 中的副本，并从已安装的副本启动 Marble Trace。",
+    "title": "你正在运行 Trailbrake 的第二个旧副本",
+    "description": "此窗口运行的是位于 {{runningDir}} 的 v{{runningVersion}}，而已安装的版本是位于 {{registeredDir}} 的 v{{registeredVersion}}。更新只会安装到已安装的副本，因此这一份会一直是旧版。请卸载 {{runningDir}} 中的副本，并从已安装的副本启动 Trailbrake。",
     "unknownVersion": "未知"
   },
   "updateBanner": {
@@ -341,10 +341,11 @@
       "checkForUpdates": "检查更新"
     },
     "about": {
-      "title": "关于 Marble Trace",
+      "title": "关于 Trailbrake",
+      "forkOf": "基于 voof 的 Marble Trace（GPL-3.0）的分支，加入了 Mitch Warrenburg 的 Input Telemetry Overlay（MIT）中的刹车点倒数和 Garage 61 参考圈。Trailbrake 不是 Marble Trace 官方项目。",
       "tagline": "iRacing 遥测叠加层。免费开源，采用 GPL-3.0 许可。",
       "trademarks": "Marble Trace™ 及 Marble Trace 标志是 voof 的商标。iRacing 是 iRacing.com Motorsport Simulations, LLC 的商标。TAURI 是 The Tauri Programme within the Commons Conservancy 的商标。Windows 是 Microsoft 集团公司的商标。Twitch 是 Twitch Interactive, Inc. 的商标。YouTube 是 Google LLC 的商标。所有其他名称均为其各自所有者的财产。",
-      "independence": "Marble Trace 是一个独立的开源项目。它并非由 iRacing 开发，与 iRacing.com Motorsport Simulations, LLC 没有任何关系，也与其及下列任何公司无关联，未获得其赞助或认可。"
+      "independence": "Trailbrake 是一个独立的开源项目。它并非由 iRacing 开发，与 iRacing.com Motorsport Simulations, LLC 没有任何关系，也与其及下列任何公司无关联，未获得其赞助或认可。"
     },
     "trackMap": {
       "title": "赛道地图",
@@ -431,7 +432,7 @@
       "waitingRaw": "正在等待模拟器… 回放的录制文件只包含已处理的帧。",
       "noteRawTelemetry": "iRacing 发布的全部变量，使用其原始名称，与 kerb 从共享内存中读取的完全一致。没有重命名、屏蔽或取整。搜索也会匹配模拟器的描述。",
       "noteRawSession": "iRacing 写出的原始会话 YAML。文本视图未作改动；树视图仅在解析前为车手和车队名称加上引号，以免破坏解析。",
-      "noteProcessedTitle": "由 Marble Trace 处理 — 不是原始数据",
+      "noteProcessedTitle": "由 Trailbrake 处理 — 不是原始数据",
       "noteTelemetry": "适配器的输出：kerb 帧在 src-tauri/crates/mt-sim-iracing/src/frame_map.rs 中映射为应用的帧，车辆未声明的状态字段也在那里被清空（DeclaredVars）。显示的是分频、按需过滤和取整之前的数据。",
       "noteSession": "解析后的会话：src-tauri/crates/mt-sim-iracing/src/session_parse.rs 选取应用使用的字段并进行规范化；级别徽章和颜色在 car_classes.rs 和 car_badges.rs 中确定。",
       "viewTree": "树",
@@ -518,7 +519,8 @@
         "streamChat": "直播聊天",
         "maintenance": "重置与诊断",
         "telemetryInspector": "遥测检查器",
-        "remoteScreens": "远程屏幕"
+        "remoteScreens": "远程屏幕",
+        "referenceLaps": "参考圈"
       }
     },
     "remote": {
@@ -576,14 +578,64 @@
       "empty": "暂无程序。",
       "launch": "立即启动",
       "launchWithApp": "随应用启动",
-      "listDesc": "若尚未运行，将随 Marble Trace 一起启动。关闭应用时会关闭已勾选的程序，无论由谁启动——需要管理员权限的程序无法以此方式关闭。",
+      "listDesc": "若尚未运行，将随 Trailbrake 一起启动。关闭应用时会关闭已勾选的程序，无论由谁启动——需要管理员权限的程序无法以此方式关闭。",
       "listTitle": "你的程序",
       "missing": "文件缺失",
-      "notOurs": "该程序不是由 Marble Trace 启动的，请在启动它的地方关闭。",
+      "notOurs": "该程序不是由 Trailbrake 启动的，请在启动它的地方关闭。",
       "removeConfirm": "要将该程序移出列表吗？",
       "running": "运行中",
       "stopped": "未运行",
       "title": "配套程序"
+    },
+    "referenceLaps": {
+      "title": "参考圈",
+      "tokenTitle": "Garage 61 个人访问令牌",
+      "tokenDesc": "在你的 Garage 61 账户中创建个人访问令牌（开发者设置，权限：driving data）。令牌保存在 Windows 凭据管理器中，仅供本应用请求圈速数据，之后不会再显示。",
+      "tokenPlaceholder": "粘贴令牌",
+      "tokenSave": "保存",
+      "tokenStored": "令牌已保存",
+      "tokenRemove": "移除令牌",
+      "sourceTitle": "参考来源",
+      "sourceDesc": "自动：会话开始时，从 Garage 61 下载本赛季该赛道和车辆最快的干净圈（你和队友的）；如果没有，则使用圈速库或你的个人最佳。",
+      "sources": {
+        "auto": "自动（Garage 61）",
+        "library": "仅圈速库",
+        "personalBest": "个人最佳",
+        "pinned": "固定圈"
+      },
+      "notes": {
+        "fetched": "Garage 61：已下载 {{driver}} 的 {{time}}。",
+        "cached": "使用圈速库中 {{driver}} 的 {{time}}。",
+        "offline": "无法连接 Garage 61；使用已保存的 {{driver}} 的 {{time}}。",
+        "noToken": "没有 Garage 61 令牌：使用圈速库或你的个人最佳。",
+        "tokenRejected": "Garage 61 拒绝了令牌。",
+        "trackNotOnGarage61": "Garage 61 上没有这条赛道。",
+        "carNotOnGarage61": "Garage 61 上没有这辆车。",
+        "noLapsThisSeason": "本赛季 Garage 61 上没有该车和赛道的带遥测圈。",
+        "rateLimited": "Garage 61 要求放慢请求；稍后重试。",
+        "networkError": "无法连接 Garage 61。",
+        "personalBestChosen": "使用你的个人最佳。",
+        "pinnedMissing": "固定的圈已不在圈速库中。",
+        "noMatchInLibrary": "圈速库中没有与本会话匹配的圈。"
+      },
+      "noSession": "尚无会话：上车后选择参考圈。",
+      "refreshHint": "立即重新查询 Garage 61",
+      "libraryTitle": "圈速库",
+      "libraryDesc": "从 Garage 61 下载的圈以及你导入的 CSV。固定某一圈即可在任何会话中使用。",
+      "libraryEmpty": "还没有圈",
+      "importCsv": "导入 CSV",
+      "pin": "使用此圈",
+      "delete": "删除",
+      "lapSource": {
+        "garage61": "Garage 61",
+        "file": "CSV"
+      },
+      "match": {
+        "match": "本会话",
+        "differentCar": "其他车辆",
+        "differentTrack": "其他赛道",
+        "unknown": "—"
+      }
     }
   },
   "bindings": {

@@ -1,0 +1,8 @@
+# gitleaks configuration: the default rules plus reviewed false positives.
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Remote-screen token alphabet constant, not a secret (src/shared/lib/remote-screen.ts)"
+regexTarget = "line"
+regexes = ['''TOKEN_ALPHABET = '23456789abcdefghjkmnopqrstuvwxyz'''']

@@ -13,6 +13,7 @@ pub mod install;
 #[cfg(feature = "dev")]
 pub mod perf;
 pub mod pit;
+pub mod reflaps;
 pub mod remote;
 pub mod settings;
 pub mod telemetry;
@@ -26,6 +27,14 @@ use tauri::{generate_handler, Wry};
 /// and to this list, nowhere else.
 pub fn invoke_handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     generate_handler![
+        reflaps::reflaps_overview,
+        reflaps::reflaps_set_token,
+        reflaps::reflaps_clear_token,
+        reflaps::reflaps_set_policy,
+        reflaps::reflaps_refresh,
+        reflaps::reflaps_delete,
+        reflaps::reflaps_import_csv,
+        reflaps::brake_cue_configure,
         voice::configure_voice_crew,
         voice::voice_status,
         voice::move_voice_folder,

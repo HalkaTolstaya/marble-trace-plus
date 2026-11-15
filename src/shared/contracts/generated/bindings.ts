@@ -853,11 +853,11 @@ export type CompanionApp = {
    */
   args: string;
   /**
-   * Start it when Marble Trace starts, if it is not already running.
+   * Start it when the app starts, if it is not already running.
    */
   launchWithApp: boolean;
   /**
-   * Close it when Marble Trace closes — only ever the instance we started.
+   * Close it when the app closes — only ever the instance we started.
    */
   closeWithApp: boolean;
   /**

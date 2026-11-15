@@ -1982,3 +1982,32 @@ MARBLE_TRACE_REPLAY=<tape> npm run tauri:dev        # play a tape instead of the
 ```
 
 Every environment variable is listed in `CONTRIBUTING.md` → Environment variables.
+
+## Data flows (merged product)
+
+Added with the Garage 61 / brake-point work (ADR-0012 … ADR-0016).
+
+```mermaid
+flowchart LR
+  subgraph PC[User's PC]
+    SDK[(iRacing SDK<br/>memory-mapped file)] --> SIM[mt-sim-iracing<br/>kerb]
+    SIM --> TEL[mt-telemetry runtime<br/>processors]
+    TEL -- "session: TrackID, CarID" --> RL[mt-reflaps<br/>library + providers]
+    RL -- "active reference" --> TEL
+    TEL -- "BrakeCue state" --> EMIT
+    TEL --> EMIT[app.emit<br/>sim://* , reflaps://*]
+    EMIT -- IPC --> STORES[MobX stores]
+    STORES --> W1[Input Trace<br/>+ reference overlay]
+    STORES --> W2[Brake point widget]
+    STORES --> W3[Coach, Delta, other widgets]
+    KC[(Windows Credential<br/>Manager)] -. token .-> G61P
+    RL --> CACHE[(AppData/reflaps<br/>index.json + laps)]
+    CSV[/User CSV file/] -- "Rust-side dialog" --> LFP[LocalFileProvider] --> RL
+    MIC[(Microphone<br/>push-to-talk)] --> STT[local STT<br/>Vosk] --> VC[Voice Crew] --> TTS[local TTS<br/>Piper]
+  end
+  G61[(garage61.net/api/v1)] -- "HTTPS, allowlist,<br/>Bearer PAT" --> G61P[Garage61Provider] --> RL
+  GH[(GitHub Releases<br/>latest.json, signed)] --> UPD[Tauri updater]
+```
+
+Nothing in the diagram sends data off the PC except the Garage 61 requests
+(track/car IDs and the token) and the updater's version check.

@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "Marble Trace",
-  "version": "0.28.0",
-  "identifier": "com.voof.marble-trace",
+  "productName": "Trailbrake",
+  "version": "0.28.1",
+  "identifier": "io.github.halkatolstaya.trailbrake",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
@@ -10,12 +10,12 @@
     "beforeBuildCommand": "npm run build"
   },
   "app": {
-    "withGlobalTauri": true,
+    "withGlobalTauri": false,
     "windows": [
       {
         "label": "main",
         "url": "main.html",
-        "title": "Marble Trace",
+        "title": "Trailbrake",
         "width": 800,
         "height": 600,
         "resizable": true,
@@ -96,12 +96,13 @@
   "plugins": {
     "updater": {
       "endpoints": [
-        "https://github.com/mvoof/Marble-Trace/releases/latest/download/latest.json"
+        "https://github.com/HalkaTolstaya/marble-trace-plus/releases/latest/download/latest.json"
       ],
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJCOTk5QTRFNUUxNTc2RkUKUldUK2RoVmVUcHFadS81MVowVTRVQ3p2UHJkVVg0ZUxNdFJjV3F0WmpGM0p5dG5HenNZUXVPQ0sK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDI0RThCQTBEREI0NDMzRjQKUldUME0wVGJEYnJvSk1Fa3Q2SmpNckx6WUFwbnpkVWlCK1dneG01NlgveS9MRHlFbnVXSkNpZ3EK",
       "windows": {
         "installMode": "passive"
       }
     }
-  }
+  },
+  "mainBinaryName": "trailbrake"
 }

@@ -27,7 +27,10 @@ pub fn unpack_zip_within(archive: &Path, target: &Path, max_bytes: u64) -> io::R
         let Some(name) = entry.enclosed_name() else {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidData,
-                format!("unsafe path in archive: {}", entry.name()),
+                format!(
+                    "unsafe path in archive: {}",
+                    entry.name().unwrap_or_default()
+                ),
             ));
         };
 

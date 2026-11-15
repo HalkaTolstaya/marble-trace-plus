@@ -29,7 +29,7 @@
   "settingsLock": {
     "from-the-future": {
       "title": "Your settings were saved by a newer version",
-      "description": "This build cannot read them, and will not overwrite them. Update Marble Trace to get your layouts and bindings back."
+      "description": "This build cannot read them, and will not overwrite them. Update Trailbrake to get your layouts and bindings back."
     },
     "too-old": {
       "title": "Your settings are too old to upgrade automatically",
@@ -37,7 +37,7 @@
     },
     "corrupt": {
       "title": "Your settings file could not be read",
-      "description": "It has been left untouched so it can be recovered by hand. Marble Trace is running on defaults and will not save over it."
+      "description": "It has been left untouched so it can be recovered by hand. Trailbrake is running on defaults and will not save over it."
     },
     "reset": "Reset settings",
     "resetConfirm": "Replace the settings file with defaults? Layouts, widgets and bindings in it will be lost.",
@@ -45,8 +45,8 @@
     "resetCancel": "Cancel"
   },
   "installMismatch": {
-    "title": "You are running a second, outdated copy of Marble Trace",
-    "description": "This window is running v{{runningVersion}} from {{runningDir}}, but the installed version is {{registeredVersion}} in {{registeredDir}}. Updates go to the installed copy, so this one stays behind. Uninstall the copy in {{runningDir}} and start Marble Trace from the installed one.",
+    "title": "You are running a second, outdated copy of Trailbrake",
+    "description": "This window is running v{{runningVersion}} from {{runningDir}}, but the installed version is {{registeredVersion}} in {{registeredDir}}. Updates go to the installed copy, so this one stays behind. Uninstall the copy in {{runningDir}} and start Trailbrake from the installed one.",
     "unknownVersion": "unknown"
   },
   "updateBanner": {
@@ -343,10 +343,11 @@
       "checkForUpdates": "Check for Updates"
     },
     "about": {
-      "title": "About Marble Trace",
+      "title": "About Trailbrake",
+      "forkOf": "A fork of Marble Trace by voof (GPL-3.0) with the brake-point countdown and Garage 61 reference laps of Input Telemetry Overlay by Mitch Warrenburg (MIT). Trailbrake is not the official Marble Trace project.",
       "tagline": "A telemetry overlay for iRacing. Free and open source under GPL-3.0.",
       "trademarks": "Marble Trace™ and the Marble Trace logo are trademarks of voof. iRacing is a trademark of iRacing.com Motorsport Simulations, LLC. TAURI is trademark of The Tauri Programme within the Commons Conservancy. Windows is a trademark of the Microsoft group of companies. Twitch is a trademark of Twitch Interactive, Inc. YouTube is a trademark of Google LLC. All other names are the property of their respective owners.",
-      "independence": "Marble Trace is an independent open-source project. It is not made by iRacing, has no connection to iRacing.com Motorsport Simulations, LLC, and is not affiliated with, sponsored or endorsed by it or by any of the companies below."
+      "independence": "Trailbrake is an independent open-source project. It is not made by iRacing, has no connection to iRacing.com Motorsport Simulations, LLC, and is not affiliated with, sponsored or endorsed by it or by any of the companies below."
     },
     "trackMap": {
       "title": "Track Map",
@@ -433,7 +434,7 @@
       "waitingRaw": "Waiting for the simulator… A replayed tape holds processed frames only.",
       "noteRawTelemetry": "Every variable iRacing publishes, under its own names, exactly as kerb reads it from shared memory. Nothing is renamed, masked or rounded. Search also matches the sim's description.",
       "noteRawSession": "The session YAML exactly as iRacing writes it. The text view is untouched; the tree view only quotes driver and team names first, so they cannot break the parse.",
-      "noteProcessedTitle": "Processed by Marble Trace — not the raw data",
+      "noteProcessedTitle": "Processed by Trailbrake — not the raw data",
       "noteTelemetry": "The adapter's output: the kerb frame is mapped into the app's frames in src-tauri/crates/mt-sim-iracing/src/frame_map.rs, and car status fields the car does not declare are blanked there (DeclaredVars). Shown before tiering, demand gating and quantization.",
       "noteSession": "The parsed session: src-tauri/crates/mt-sim-iracing/src/session_parse.rs picks the fields the app uses and normalizes them; class badges and colors are resolved in car_classes.rs and car_badges.rs.",
       "viewTree": "Tree",
@@ -520,7 +521,8 @@
         "streamChat": "Stream chat",
         "maintenance": "Reset & diagnostics",
         "telemetryInspector": "Telemetry inspector",
-        "remoteScreens": "Remote screens"
+        "remoteScreens": "Remote screens",
+        "referenceLaps": "Reference laps"
       }
     },
     "remote": {
@@ -578,14 +580,64 @@
       "empty": "No programs yet.",
       "launch": "Start now",
       "launchWithApp": "Start with app",
-      "listDesc": "Started with Marble Trace when they are not already running. Closing the app closes the ones you marked for it, whoever started them — a program that needs administrator rights cannot be closed this way.",
+      "listDesc": "Started with Trailbrake when they are not already running. Closing the app closes the ones you marked for it, whoever started them — a program that needs administrator rights cannot be closed this way.",
       "listTitle": "Your programs",
       "missing": "File missing",
-      "notOurs": "Started outside Marble Trace — close it where you started it.",
+      "notOurs": "Started outside Trailbrake — close it where you started it.",
       "removeConfirm": "Remove this program from the list?",
       "running": "Running",
       "stopped": "Not running",
       "title": "Companion apps"
+    },
+    "referenceLaps": {
+      "title": "Reference laps",
+      "tokenTitle": "Garage 61 personal access token",
+      "tokenDesc": "Create a personal access token in your Garage 61 account (developer settings, scope: driving data). It is stored in the Windows Credential Manager and used only by the app to request laps; it is never shown again.",
+      "tokenPlaceholder": "Paste the token",
+      "tokenSave": "Save",
+      "tokenStored": "Token stored",
+      "tokenRemove": "Remove token",
+      "sourceTitle": "Reference source",
+      "sourceDesc": "Automatic: when a session starts, the fastest clean lap of the current season for this track and car is fetched from Garage 61 (yours and your teammates'); without one, the library or your personal best is used.",
+      "sources": {
+        "auto": "Automatic (Garage 61)",
+        "library": "Library only",
+        "personalBest": "Personal best",
+        "pinned": "Pinned lap"
+      },
+      "notes": {
+        "fetched": "Garage 61: {{time}} by {{driver}} downloaded.",
+        "cached": "Using {{time}} by {{driver}} from the library.",
+        "offline": "Garage 61 unreachable; using the saved {{time}} by {{driver}}.",
+        "noToken": "No Garage 61 token: using the library or your personal best.",
+        "tokenRejected": "Garage 61 rejected the token.",
+        "trackNotOnGarage61": "This track is not on Garage 61.",
+        "carNotOnGarage61": "This car is not on Garage 61.",
+        "noLapsThisSeason": "No lap with telemetry this season on Garage 61 for this car and track.",
+        "rateLimited": "Garage 61 asked to slow down; trying later.",
+        "networkError": "Garage 61 could not be reached.",
+        "personalBestChosen": "Using your personal best.",
+        "pinnedMissing": "The pinned lap is no longer in the library.",
+        "noMatchInLibrary": "No lap in the library matches this session."
+      },
+      "noSession": "No session yet: the reference is chosen when you get in the car.",
+      "refreshHint": "Ask Garage 61 again now",
+      "libraryTitle": "Lap library",
+      "libraryDesc": "Laps downloaded from Garage 61 and CSV exports you imported. Pin one to use it whatever the session.",
+      "libraryEmpty": "No laps yet",
+      "importCsv": "Import CSV",
+      "pin": "Use this lap",
+      "delete": "Delete",
+      "lapSource": {
+        "garage61": "Garage 61",
+        "file": "CSV"
+      },
+      "match": {
+        "match": "This session",
+        "differentCar": "Other car",
+        "differentTrack": "Other track",
+        "unknown": "—"
+      }
     }
   },
   "bindings": {

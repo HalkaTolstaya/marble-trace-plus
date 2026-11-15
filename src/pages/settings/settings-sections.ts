@@ -16,6 +16,7 @@ export type SettingsSectionId =
   | 'devices'
   | 'trackMap'
   | 'sharedValues'
+  | 'referenceLaps'
   | 'streamChat'
   | 'remoteScreens'
   | 'maintenance'
@@ -37,7 +38,7 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
   // Widget data: what the widgets draw from, and the values several of them
   // read at once. The chat is not either of those — it is a source of its own,
   // wired to an account rather than to a session, so it keeps its own group.
-  { id: 'data', sections: ['trackMap', 'sharedValues'] },
+  { id: 'data', sections: ['referenceLaps', 'trackMap', 'sharedValues'] },
   { id: 'chat', sections: ['streamChat'] },
   { id: 'remote', sections: ['remoteScreens'] },
   // The inspector is a developer tool and is left out of a release build.

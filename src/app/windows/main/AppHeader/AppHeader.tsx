@@ -33,7 +33,7 @@ export const AppHeader = observer(
 
         <div className={styles.brand} data-tauri-drag-region>
           <Logo className={styles.logo} />
-          <span className={styles.name}>Marble Trace</span>
+          <span className={styles.name}>Trailbrake</span>
         </div>
 
         <div className={styles.nav}>

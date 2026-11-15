@@ -30,7 +30,7 @@ pub fn html_page(status: StatusCode, language: &str, body: &str) -> Response {
     let html = format!(
         "<!doctype html><html lang=\"{language}\"><head><meta charset=\"utf-8\">\
 <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\
-<title>Marble Trace</title><style>{PAGE_STYLE}</style></head>\
+<title>Trailbrake</title><style>{PAGE_STYLE}</style></head>\
 <body><main>{body}</main></body></html>"
     );
 
@@ -168,7 +168,7 @@ pub fn index_page(screens: &[(String, String)], token: &str, language: &str) -> 
     html_page(
         StatusCode::OK,
         language,
-        &format!("<h1>Marble Trace</h1><p>{}</p><ul>{links}</ul>", text.pick),
+        &format!("<h1>Trailbrake</h1><p>{}</p><ul>{links}</ul>", text.pick),
     )
 }
 

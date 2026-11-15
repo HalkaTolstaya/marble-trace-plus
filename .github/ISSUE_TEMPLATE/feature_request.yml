@@ -1,7 +1,7 @@
 name: Feature request
 description: A new widget or a substantial new capability.
-title: "[Feature]: "
-labels: ["feature"]
+title: '[Feature]: '
+labels: ['feature']
 body:
   - type: markdown
     attributes:

@@ -22,7 +22,7 @@
 use mt_model::app::install::InstallMismatch;
 
 #[cfg(windows)]
-const UNINSTALL_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\Uninstall\Marble Trace";
+const UNINSTALL_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\Uninstall\Trailbrake";
 
 /// `Some` only when the two directories genuinely differ.
 ///

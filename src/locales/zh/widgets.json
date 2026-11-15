@@ -95,6 +95,9 @@
     },
     "crew-radio": {
       "description": "语音工程师无线电：你的请求、回复，以及指令的 ✓ 或 ✗。"
+    },
+    "brake-point": {
+      "description": "在参考圈的每个刹车点前倒数 3-2-1-刹车，并评价你踩下刹车的时机。"
     }
   },
   "settingsPanels": {
@@ -353,7 +356,12 @@
       "showSlide": "侧滑",
       "showSlideDesc": "车辆横向侧滑时为方向盘曲线着色。",
       "showBars": "踏板条",
-      "showBarsDesc": "在图表旁显示油门、刹车和离合踏板条。"
+      "showBarsDesc": "在图表旁显示油门、刹车和离合踏板条。",
+      "reference": "参考圈",
+      "showReference": "显示参考",
+      "showReferenceDesc": "在你的曲线后方，按圈内相同位置绘制当前参考圈的油门和刹车。",
+      "referenceOpacity": "参考不透明度",
+      "referenceOpacityDesc": "参考区域的填充强度。"
     },
     "linearMap": {
       "moduleLayout": "模块布局",
@@ -926,6 +934,44 @@
       "recentCount": "最近消息数",
       "hideDriverLines": "隐藏车手消息",
       "hideDriverLinesDesc": "只显示工程师。你说的话和指令的 ✓ / ✗ 不再显示。"
+    },
+    "brakePoint": {
+      "countdown": "倒数",
+      "grading": "评分",
+      "display": "显示",
+      "countdownSeconds": "倒数时长（秒）",
+      "countdownSecondsDesc": "每个刹车点前三次计数所用的时间。",
+      "reactionSeconds": "反应余量（秒）",
+      "reactionSecondsDesc": "比参考刹车点提前这么久显示“刹车”。",
+      "minPeakPercent": "跳过低于此值的轻刹区（%）",
+      "minPeakPercentDesc": "参考峰值低于此值的刹车区不倒数。",
+      "goodWindowMs": "“良好”窗口（毫秒）",
+      "goodWindowMsDesc": "距参考刹车点 ± 此时间内评为良好；三倍以外为过早或过晚。",
+      "perfectWindowMs": "“完美”窗口（毫秒）",
+      "perfectWindowMsDesc": "评为完美的 ± 时间，位于良好窗口之内。",
+      "showTiming": "计时行",
+      "showTimingDesc": "最近一次评分及以秒和米计的偏差。",
+      "showTarget": "目标压力",
+      "showTargetDesc": "该区的参考峰值以及旁边你的踏板。",
+      "showPips": "区域指示点",
+      "showPipsDesc": "每个计数区一个点，显示本圈评分。",
+      "zone": "区域",
+      "target": "目标",
+      "waiting": "等待第一个刹车区",
+      "messages": {
+        "noReference": "还没有参考圈。添加 Garage 61 令牌或跑一圈。",
+        "noZones": "参考圈中没有高于最小值的刹车区。",
+        "noCar": "上车后开始倒数。"
+      },
+      "grades": {
+        "perfect": "完美",
+        "good": "良好",
+        "early": "过早",
+        "late": "过晚",
+        "veryEarly": "太早",
+        "veryLate": "太晚",
+        "noBrake": "未刹车"
+      }
     }
   },
   "streamChat": {

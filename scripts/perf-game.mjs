@@ -43,7 +43,7 @@
 import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, mkdtempSync } from 'node:fs';
 
 import {
   APP_EXE,
@@ -125,7 +125,7 @@ const numberOption = (value, fallback) =>
 
 const outDirOf = (options) => {
   const dir = path.resolve(
-    options.out ?? path.join(os.tmpdir(), 'marble-trace-perf', 'game')
+    options.out ?? mkdtempSync(path.join(os.tmpdir(), 'trailbrake-perf-game-'))
   );
   mkdirSync(dir, { recursive: true });
 

@@ -80,6 +80,12 @@ export const INPUT_TRACE_SETTINGS = defineSettings('inputTrace', {
   /** Paints the steering line in `slideColor` while the car slides sideways. */
   showSlide: bool(true),
   slideColor: color('#a855f7'),
+  /**
+   * The active reference lap's throttle and brake as filled areas behind the
+   * live lines, at the lap distance the car was at (ADR-0014).
+   */
+  showReference: bool(true),
+  referenceOpacity: num(0.3, { min: 0.05, max: 0.8, step: 0.05 }),
   historySeconds: num(5, { min: 1, max: 60, step: 1 }),
   lineWidth: num(3.5, { min: 1, max: 10, step: 0.5 }),
   smoothing: num(0, { min: 0, max: 20, step: 1 }),

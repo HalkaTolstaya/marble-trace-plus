@@ -38,6 +38,7 @@ import { DiagnosticsExportContext } from '@features/diagnostics/diagnostics-expo
 import { TelemetryInspectorContext } from '@features/telemetry-inspector/telemetry-inspector-context';
 import { TwitchAuthContext } from '@features/twitch-auth/twitch-auth-context';
 import { CompanionAppsContext } from '@features/companion-apps/companion-apps-context';
+import { ReferenceLapsContext } from '@features/reference-laps/reference-laps-context';
 import { VoiceCrewContext } from '@features/voice-crew/voice-crew-context';
 import { RemoteDevicesContext } from '@features/remote-screens/remote-devices-context';
 import { WidgetHostContext } from '@widgets/widget-host-context';
@@ -104,6 +105,7 @@ const mainStores = (root: MainRoot): ProvidedStore[] => [
   provide(MainLiveWidgetsContext, root.liveWidgets),
   provide(LayoutEditorContext, root.layoutEditor),
   provide(CompanionAppsContext, root.companionApps),
+  provide(ReferenceLapsContext, root.referenceLaps),
   provide(VoiceCrewContext, root.voiceCrew),
   provide(TwitchAuthContext, root.twitchAuth),
   provide(DeviceInputContext, root.deviceInput),

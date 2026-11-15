@@ -68,6 +68,14 @@ ts_values! {
     /// A new or replaced reference lap is available for this track and car.
     pub const EVENT_REFERENCE_LAP_UPDATED: &str = "sim://reference-lap/updated" => SIM_REFERENCE_LAP_UPDATED;
 
+    /// The brake-point countdown's state, on the overlay clock, while the
+    /// brake-point widget is on a layout (ADR-0014).
+    pub const EVENT_BRAKE_CUE: &str = "reflaps://brake-cue" => REFLAPS_BRAKE_CUE;
+
+    /// Which reference the session got and why (Garage 61, library, personal
+    /// best), re-emitted whenever it is resolved again.
+    pub const EVENT_REFLAPS_STATUS: &str = "reflaps://status" => REFLAPS_STATUS;
+
     /// One normalized chat message. Emitted per message, so the frontend
     /// appends. Stream chat rides its own namespace on purpose: it keeps
     /// running with no sim connected at all.

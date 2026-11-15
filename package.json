@@ -2,7 +2,7 @@
   "name": "marble-trace",
   "description": "iRacing Telemetry Overlay",
   "private": true,
-  "version": "0.28.0",
+  "version": "0.28.1",
   "license": "GPL-3.0-or-later",
   "type": "module",
   "repository": {
@@ -31,7 +31,9 @@
     "perf:game": "node scripts/perf-game.mjs",
     "cargo:format": "cd src-tauri && cargo fmt",
     "test": "vitest run",
-    "prepare": "lefthook install"
+    "prepare": "lefthook install",
+    "check:tauri-config": "node scripts/check-tauri-config.mjs",
+    "notices": "node scripts/third-party-notices.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "~2.12",

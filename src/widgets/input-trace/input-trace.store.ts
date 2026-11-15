@@ -9,6 +9,9 @@ import type { WidgetInstanceContext } from '@entities/widget/widget-instances.st
 import { useWidgetInstanceStore } from '@entities/widget/widget-instance-context';
 import type { PlayerStore } from '@entities/player/player.store';
 import type { LiveWidgetsView } from '@entities/layout/live-widgets.store';
+import type { CarsStore } from '@entities/cars/cars.store';
+import type { SessionStore } from '@entities/session/session.store';
+import type { ReferenceLapStore } from '@entities/player/reference-lap.store';
 import type { InputTraceSettings } from './settings-schema';
 import type {
   CarDynamicsFrame,
@@ -20,6 +23,9 @@ import type { TraceSample } from './CanvasTrace/canvas-trace-render';
 interface InputTraceDeps {
   player: PlayerStore;
   liveWidgets: LiveWidgetsView;
+  cars: CarsStore;
+  session: SessionStore;
+  referenceLap: ReferenceLapStore;
 }
 
 export type InputChannel = 'throttle' | 'brake' | 'clutch';
@@ -70,6 +76,9 @@ export class InputTraceWidgetStore {
 
   private readonly disposers: IReactionDisposer[] = [];
 
+  /** The car's lap position at the previous frame, to spread a frame's samples. */
+  private previousLapPct: number | null = null;
+
   private readonly root: InputTraceDeps;
 
   private readonly instanceId: string;
@@ -81,9 +90,17 @@ export class InputTraceWidgetStore {
     this.root = core;
     this.instanceId = instanceId;
 
-    makeAutoObservable<InputTraceWidgetStore, 'root' | 'disposers'>(
+    makeAutoObservable<
+      InputTraceWidgetStore,
+      'root' | 'disposers' | 'previousLapPct'
+    >(
       this,
-      { root: false, disposers: false, frameSamples: observableRef },
+      {
+        root: false,
+        disposers: false,
+        previousLapPct: false,
+        frameSamples: observableRef,
+      },
       { autoBind: true }
     );
 
@@ -100,9 +117,12 @@ export class InputTraceWidgetStore {
             sampleOfFrames(inputs, this.root.player.carDynamics),
           ];
 
+          const lapPct = this.playerLapPct();
+          const referenceAt = this.referenceAlong(lapPct, samples.length);
+
           // Smoothed tick by tick, so the filter keeps the strength it has at
           // the sim's rate whatever the overlay clock is.
-          this.frameSamples = samples.map((sample) => {
+          this.frameSamples = samples.map((sample, sampleIndex) => {
             this.smoothed = {
               throttle: advance(
                 this.smoothed.throttle,
@@ -122,13 +142,59 @@ export class InputTraceWidgetStore {
               absActive: sample.brakeAbsActive,
               steeringWheelAngle: sample.steeringWheelAngle,
               sliding: Math.abs(sample.bodySlipDeg ?? 0) >= SLIDE_ANGLE_DEG,
+              ...referenceAt(sampleIndex),
             };
           });
 
+          this.previousLapPct = lapPct;
           this.frameTick++;
         }
       )
     );
+  }
+
+  /** The player's lap position from the 60 Hz car positions, if on track. */
+  private playerLapPct(): number | null {
+    const playerIdx = this.root.session.sessionInfo?.playerCarIdx;
+    const positions = this.root.cars.carPositions?.car_idx_lap_dist_pct;
+
+    if (playerIdx === undefined || !positions) return null;
+
+    const pct = positions[playerIdx];
+
+    return pct !== undefined && pct >= 0 && pct <= 1 ? pct : null;
+  }
+
+  /**
+   * The reference's pedals for each of this frame's samples: the frame's
+   * samples are spread evenly between the previous frame's lap position and
+   * this one's, wrapping at the line.
+   */
+  private referenceAlong(
+    lapPct: number | null,
+    sampleCount: number
+  ): (sampleIndex: number) => {
+    refThrottle: number | null;
+    refBrake: number | null;
+  } {
+    const none = () => ({ refThrottle: null, refBrake: null });
+
+    if (lapPct === null || !this.root.referenceLap.data) return none;
+
+    const start = this.previousLapPct ?? lapPct;
+    // Across start/finish the position falls by almost a whole lap.
+    const span = lapPct - start < -0.5 ? lapPct + 1 - start : lapPct - start;
+    const tooFar = Math.abs(span) > 0.05;
+
+    return (sampleIndex) => {
+      const fraction = sampleCount <= 1 ? 1 : (sampleIndex + 1) / sampleCount;
+      const pct = tooFar ? lapPct : (start + span * fraction) % 1;
+      const reference = this.root.referenceLap.getSampleAtDistPct(pct);
+
+      return reference
+        ? { refThrottle: reference.throttle, refBrake: reference.brake }
+        : { refThrottle: null, refBrake: null };
+    };
   }
 
   // Called when the instance unmounts; the reaction otherwise outlives it.
@@ -145,6 +211,7 @@ export class InputTraceWidgetStore {
     this.smoothed = { throttle: 0, brake: 0, clutch: 0 };
     this.frameTick = 0;
     this.frameSamples = [];
+    this.previousLapPct = null;
   }
 }
 

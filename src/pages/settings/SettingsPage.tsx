@@ -16,6 +16,7 @@ import { SharedValuesSection } from './sections/SharedValuesSection';
 import { MaintenanceSection } from './sections/MaintenanceSection';
 import { TelemetryInspectorSection } from '@features/telemetry-inspector/TelemetryInspectorSection/TelemetryInspectorSection';
 import { RemoteScreensSection } from '@features/remote-screens/RemoteScreensSection';
+import { ReferenceLapsSection } from '@features/reference-laps/ReferenceLapsSection';
 import {
   DEFAULT_SECTION,
   groupOfSection,
@@ -35,6 +36,7 @@ const SECTION_COMPONENTS: Record<SettingsSectionId, () => React.ReactElement> =
     devices: DevicesSettings,
     trackMap: TrackMapSection,
     sharedValues: SharedValuesSection,
+    referenceLaps: ReferenceLapsSection,
     streamChat: StreamChatSourceCard,
     remoteScreens: RemoteScreensSection,
     maintenance: MaintenanceSection,

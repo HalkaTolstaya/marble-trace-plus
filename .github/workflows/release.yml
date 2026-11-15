@@ -1,0 +1,206 @@
+# Builds and publishes a release for a `v*` tag on main: the NSIS installer,
+# its updater signature and latest.json, CycloneDX SBOMs, SHA-256 sums and a
+# build provenance attestation. Nothing is deployed anywhere else.
+#
+# Secrets (repository settings → Secrets and variables → Actions):
+#   TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+#     minisign key for the updater; its public half is in tauri.conf.json.
+#     Without them the installer is still released, but no latest.json, so
+#     installed copies are not offered the update.
+#   WINDOWS_CERTIFICATE (base64 .pfx), WINDOWS_CERTIFICATE_PASSWORD
+#     optional Authenticode certificate; without it SmartScreen warns.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  NODE_VERSION: '22'
+
+jobs:
+  verify:
+    name: Verify tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+      - name: The tag is on main
+        run: |
+          git fetch --no-tags origin main
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+      - name: Versions agree and the changelog has the entry
+        id: version
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          package=$(node -p "require('./package.json').version")
+          tauri=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          cargo=$(grep -m1 '^version = ' src-tauri/Cargo.toml | cut -d'"' -f2)
+          for found in "$package" "$tauri" "$cargo"; do
+            if [ "$found" != "$version" ]; then
+              echo "::error::tag $version does not match $package / $tauri / $cargo"
+              exit 1
+            fi
+          done
+          grep -q "^## \[$version\]" CHANGELOG.md || { echo "::error::CHANGELOG.md has no [$version]"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  ci:
+    name: CI
+    needs: verify
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+      security-events: write
+
+  release:
+    name: Build, sign and publish
+    needs: [verify, ci]
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    env:
+      VERSION: ${{ needs.verify.outputs.version }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
+        with:
+          toolchain: stable
+
+      - name: Updater signing key present?
+        id: keys
+        shell: bash
+        env:
+          KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          CERT: ${{ secrets.WINDOWS_CERTIFICATE }}
+        run: |
+          echo "updater=$([ -n "$KEY" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "codesign=$([ -n "$CERT" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          [ -n "$KEY" ] || echo "::warning::TAURI_SIGNING_PRIVATE_KEY is not set: releasing without updater artifacts."
+          [ -n "$CERT" ] || echo "::warning::No Windows code-signing certificate: the installer is unsigned and SmartScreen will warn."
+
+      # Authenticode stub: imports the certificate when the secret exists and
+      # hands its thumbprint to the bundler.
+      - name: Import code-signing certificate
+        id: cert
+        if: steps.keys.outputs.codesign == 'true'
+        shell: pwsh
+        env:
+          CERT: ${{ secrets.WINDOWS_CERTIFICATE }}
+          CERT_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          $bytes = [Convert]::FromBase64String($env:CERT)
+          $path = Join-Path $env:RUNNER_TEMP 'codesign.pfx'
+          [IO.File]::WriteAllBytes($path, $bytes)
+          $secure = ConvertTo-SecureString $env:CERT_PASSWORD -AsPlainText -Force
+          $cert = Import-PfxCertificate -FilePath $path -CertStoreLocation Cert:\CurrentUser\My -Password $secure
+          Remove-Item $path
+          "thumbprint=$($cert.Thumbprint)" >> $env:GITHUB_OUTPUT
+
+      - name: tauri build (NSIS)
+        shell: bash
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          UPDATER: ${{ steps.keys.outputs.updater }}
+          THUMBPRINT: ${{ steps.cert.outputs.thumbprint }}
+        run: |
+          config='{"bundle":{"createUpdaterArtifacts":'"$UPDATER"'}}'
+          if [ -n "$THUMBPRINT" ]; then
+            config='{"bundle":{"createUpdaterArtifacts":'"$UPDATER"',"windows":{"certificateThumbprint":"'"$THUMBPRINT"'","digestAlgorithm":"sha256","timestampUrl":"http://timestamp.digicert.com"}}}'
+          fi
+          npx tauri build --ci --config "$config" -- --locked
+
+      - name: Collect artifacts
+        shell: bash
+        run: |
+          mkdir -p dist
+          installer=$(ls src-tauri/target/release/bundle/nsis/*-setup.exe | head -1)
+          cp "$installer" "dist/trailbrake_${VERSION}_x64-setup.exe"
+          if [ -f "$installer.sig" ]; then
+            cp "$installer.sig" "dist/trailbrake_${VERSION}_x64-setup.exe.sig"
+          fi
+
+      - name: SBOM (CycloneDX, Rust + npm)
+        shell: bash
+        run: |
+          cargo install --locked cargo-cyclonedx@0.5.7
+          (cd src-tauri && cargo cyclonedx --format json --override-filename sbom)
+          cp src-tauri/sbom.json "dist/sbom-rust.cdx.json"
+          npx --yes @cyclonedx/cyclonedx-npm@4.0.2 --omit dev --output-format JSON --output-file dist/sbom-npm.cdx.json
+
+      - name: latest.json for the updater
+        if: steps.keys.outputs.updater == 'true'
+        shell: bash
+        env:
+          REPO: ${{ github.repository }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const v = process.env.VERSION;
+            const file = `trailbrake_${v}_x64-setup.exe`;
+            const notes = (fs.readFileSync("CHANGELOG.md", "utf8").split(/^## \[/m)
+              .find((s) => s.startsWith(v + "]")) || "").split("\n").slice(1).join("\n").trim();
+            fs.writeFileSync("dist/latest.json", JSON.stringify({
+              version: v,
+              notes,
+              pub_date: new Date().toISOString(),
+              platforms: { "windows-x86_64": {
+                signature: fs.readFileSync(`dist/${file}.sig`, "utf8"),
+                url: `https://github.com/${process.env.REPO}/releases/download/v${v}/${file}`,
+              } },
+            }, null, 2));
+          '
+
+      - name: Release notes
+        shell: bash
+        run: |
+          mkdir -p notes
+          node -e '
+            const fs = require("fs");
+            const v = process.env.VERSION;
+            const section = (fs.readFileSync("CHANGELOG.md", "utf8").split(/^## \[/m)
+              .find((s) => s.startsWith(v + "]")) || "").split("\n").slice(1).join("\n").trim();
+            fs.writeFileSync("notes/RELEASE_NOTES.md", [
+              section,
+              "",
+              "### Install",
+              "",
+              "Download `trailbrake_" + v + "_x64-setup.exe` and run it. Until the installer is code-signed, Windows SmartScreen shows *Windows protected your PC*: choose **More info → Run anyway**. Verify the download against `SHA256SUMS.txt`.",
+            ].join("\n"));
+          '
+
+      - name: SHA-256 sums
+        shell: bash
+        working-directory: dist
+        run: sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      # Attestations need a public repository (or GitHub Enterprise Cloud).
+      - name: Build provenance
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
+        with:
+          subject-path: dist/*.exe
+
+      - name: Publish the release
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        with:
+          name: Trailbrake ${{ env.VERSION }}
+          body_path: notes/RELEASE_NOTES.md
+          files: dist/*
+          fail_on_unmatched_files: true

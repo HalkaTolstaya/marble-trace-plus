@@ -10,9 +10,13 @@ use std::time::Instant;
 use mt_computations::strategy::fuel::FuelSettings;
 use mt_computations::strategy::pit_auto::PitAutoCommand;
 use mt_model::app::crew::{CrewIntent, CrewReply};
+use mt_model::computed::reference_lap::ReferenceLapData;
 use mt_model::contract::defaults::{DEFAULT_CAR_LENGTH_M, DEFAULT_OVERLAY_UPDATE_HZ};
 use mt_model::pit::pit_action::PitAction;
 use mt_model::pit::pit_auto::PitAutoConfig;
+use mt_reflaps::cue::CueConfig;
+use mt_reflaps::lap::RefLap;
+use std::sync::Arc;
 
 /// The values a command sets that must outlive a run: they are kept beside the
 /// channel and handed to the next thread, so a value set while the stream is
@@ -60,6 +64,12 @@ pub enum TelemetryCommand {
     ResetPitLane,
     /// The stored reference laps for the track and car were deleted.
     ResetReferenceLap,
+    /// A reference from outside the recorder (Garage 61 or the lap library)
+    /// for the session, or `None` to go back to the personal best.
+    ExternalReference(Option<ExternalReference>),
+    /// The brake-point widget's settings; `enabled` is whether any layout
+    /// shows it, so the cue costs nothing otherwise.
+    BrakeCue { enabled: bool, config: CueConfig },
     /// The auto mode key.
     PitAuto(PitAutoCommand),
     /// A manual change to the pit order, from a key or a click. Resolved
@@ -81,6 +91,14 @@ pub enum TelemetryCommand {
         intent: CrewIntent,
         answer: SyncSender<Vec<CrewReply>>,
     },
+}
+
+/// One external reference: the buckets the coach and the windows read, and
+/// the full-rate lap the brake cue grades against.
+#[derive(Debug, Clone)]
+pub struct ExternalReference {
+    pub buckets: Arc<ReferenceLapData>,
+    pub lap: Arc<RefLap>,
 }
 
 /// What a telemetry thread is started with.

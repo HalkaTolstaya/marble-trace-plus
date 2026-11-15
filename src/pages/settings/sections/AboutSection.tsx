@@ -15,7 +15,7 @@ export const AboutSection = observer(() => {
       <div className={styles.fieldGroup}>
         <div className={styles.fieldTexts}>
           <div className={styles.fieldTitle}>
-            Marble Trace™{' '}
+            Trailbrake{' '}
             <span className={styles.versionLabel}>
               v{appSettings.currentVersion}
             </span>
@@ -30,6 +30,10 @@ export const AboutSection = observer(() => {
       <div className={styles.fieldGroup}>
         <div className={styles.fieldTexts}>
           <div className={styles.fieldDesc}>
+            {t('settingsPage.about.forkOf')}
+          </div>
+
+          <div className={`${styles.fieldDesc} ${styles.fieldDescOffset}`}>
             {t('settingsPage.about.independence')}
           </div>
 

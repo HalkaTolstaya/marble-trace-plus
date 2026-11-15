@@ -1,5 +1,5 @@
 // Captures widget pictures from Storybook as transparent PNGs into
-// site/assets/widgets/ - the one set of widget pictures the site gallery
+// docs/assets/widgets/ - the one set of widget pictures the README
 // and the README both use.
 //
 // Start Storybook first, and nothing else heavy beside it:
@@ -21,12 +21,11 @@
 
 import path from 'node:path';
 import process from 'node:process';
-import { execSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright';
 
 const STORYBOOK_URL = process.env.STORYBOOK_URL ?? 'http://localhost:6006';
-const OUT_DIR = path.join(process.cwd(), 'site', 'assets', 'widgets');
+const OUT_DIR = path.join(process.cwd(), 'docs', 'assets', 'widgets');
 const DEVICE_SCALE = 3;
 const VIEWPORT = { width: 1600, height: 1200 };
 // Long enough for a sweep, a blink or a chart to reach a resting frame
@@ -239,14 +238,6 @@ const main = async () => {
   } finally {
     await browser.close();
   }
-
-  // The site never serves these PNGs: it serves WebP copies at several
-  // widths, which go stale the moment a PNG is written over. Refreshing
-  // them here means a new picture reaches the site with no step to forget.
-  execSync('npm run images', {
-    cwd: path.join(process.cwd(), 'site'),
-    stdio: 'inherit',
-  });
 };
 
 main().catch((error) => {

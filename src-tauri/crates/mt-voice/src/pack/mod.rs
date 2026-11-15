@@ -694,7 +694,7 @@ pub fn phrases_schema() -> Value {
 
     json!({
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "Marble Trace voice phrases",
+        "title": "Trailbrake voice phrases",
         "type": "object",
         "required": ["format", "phrases"],
         "properties": {
@@ -832,7 +832,7 @@ pub fn commands_schema() -> Value {
 
     json!({
         "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "title": "Marble Trace voice commands",
+        "title": "Trailbrake voice commands",
         "type": "object",
         "required": ["format", "intents"],
         "properties": {

@@ -1,11 +1,12 @@
 [package]
 name = "marble-trace"
-version = "0.28.0"
-description = "Marble Trace - iRacing Telemetry Overlay"
+version = "0.28.1"
+description = "Trailbrake - iRacing overlay with Garage 61 reference laps (fork of Marble Trace)"
 authors = ["mvoof"]
 license = "GPL-3.0-or-later"
-repository = ""
+repository = "https://github.com/HalkaTolstaya/marble-trace-plus"
 edition = "2021"
+publish = false
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -54,6 +55,7 @@ mt-remote = { path = "crates/mt-remote" }
 mt-companions = { path = "crates/mt-companions" }
 mt-hotkeys = { path = "crates/mt-hotkeys" }
 mt-voice = { path = "crates/mt-voice" }
+mt-reflaps = { path = "crates/mt-reflaps" }
 
 serde_json = "1.0"
 # Build scripts read `src-tauri/.env` for the keys baked in at compile time.
@@ -66,7 +68,7 @@ tracing = "0.1"
 fastrand = "2"
 # Voice downloads: the versions the updater already pulls in.
 sha2 = "0.10"
-zip = { version = "4", default-features = false, features = ["deflate"] }
+zip = { version = "9", default-features = false, features = ["deflate"] }
 # Held at rc.22 until specta 2.0 is stable. rc.25 splits types whose serde
 # shape differs by direction (skip_serializing_if, default, alias) into
 # `*_Serialize | *_Deserialize` pairs, refuses serde_json::Value (it holds
@@ -144,6 +146,7 @@ mt-remote.workspace = true
 mt-companions.workspace = true
 mt-hotkeys.workspace = true
 mt-voice.workspace = true
+mt-reflaps.workspace = true
 reqwest.workspace = true
 
 serde_json.workspace = true
@@ -159,12 +162,14 @@ tauri-plugin-store = "2"
 tauri-plugin-fs = "2"
 tauri-plugin-window-state = "2"
 tauri-plugin-global-shortcut = "2"
-tauri-plugin-updater = "2"
+# No `zip`: Windows NSIS updates are the signed .exe itself (createUpdaterArtifacts
+# true, not v1Compatible), so the archive path and zip 4.x are never needed.
+tauri-plugin-updater = { version = "2", default-features = false, features = ["rustls-tls", "system-proxy"] }
 tauri-plugin-process = "2"
-tauri-plugin-mcp-bridge = "0.13"
+# Only for driving the app from a coding agent in dev builds.
+tauri-plugin-mcp-bridge = { version = "0.13", optional = true }
 tauri-plugin-opener = "2"
 tauri-plugin-dialog = "2"
-tauri-plugin-aptabase = "1.0.0"
 sys-locale = "0.3"
 specta = { workspace = true, optional = true }
 specta-typescript = { version = "0.0.9", optional = true }
@@ -177,6 +182,7 @@ windows.workspace = true
 [features]
 default = []
 dev = [
+    "dep:tauri-plugin-mcp-bridge",
     "dep:specta",
     "dep:specta-typescript",
     "dep:specta-serde",

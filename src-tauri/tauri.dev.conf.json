@@ -1,11 +1,21 @@
 {
-  "identifier": "com.voof.marble-trace",
+  "identifier": "io.github.halkatolstaya.trailbrake.dev",
   "app": {
     "security": {
       "csp": {
         "script-src": ["'self'", "'unsafe-inline'"]
       },
-      "dangerousDisableAssetCspModification": true
+      "dangerousDisableAssetCspModification": true,
+      "capabilities": [
+        "main",
+        "overlay",
+        {
+          "identifier": "dev-mcp-bridge",
+          "description": "Dev builds only (--features dev): lets a coding agent drive the app through the Tauri MCP bridge. Never in release.",
+          "windows": ["main", "overlay-*", "diagnostics-hud"],
+          "permissions": ["mcp-bridge:default"]
+        }
+      ]
     }
   },
   "bundle": {

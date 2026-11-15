@@ -4,19 +4,24 @@ One file per decision that was argued and could have gone the other way. A
 decision that a later one overturns keeps its file and says so in its status
 line; it is never edited into agreeing with the new one.
 
-| ADR                                                | Decision                                                                                                | Status                    |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------- |
-| [0001](0001-per-field-telemetry-observables.md)    | Telemetry frames stay whole observables rather than one observable per field                            | accepted, 2026-09-06      |
-| [0002](0002-settings-writes-mark-themselves.md)    | A settings write marks itself in a log both stores share                                                | partly superseded by 0007 |
-| [0003](0003-widget-state-lives-in-three-stores.md) | Widget-related state lives in three stores: layout records, the live map, the edit session              | partly superseded by 0007 |
-| [0004](0004-widget-preview-runs-on-mocks.md)       | The widget preview runs on mock builders, not on recorded sessions                                      | accepted, 2026-09-14      |
-| [0005](0005-monitors-own-their-widgets.md)         | Each monitor owns its widgets                                                                           | accepted, 2026-10-03      |
-| [0006](0006-telemetry-stays-json.md)               | Telemetry stays JSON — the binary transport failed its measured gate                                    | accepted, 2026-10-05      |
-| [0007](0007-main-owns-settings.md)                 | Main owns the settings; every other window is a client of one protocol                                  | accepted, 2026-10-05      |
-| [0008](0008-frontend-by-feature-sliced-design.md)  | The frontend is laid out by Feature-Sliced Design; a widget's settings are described once, in its slice | accepted, 2026-10-08      |
-| [0009](0009-overlay-changes-on-one-clock.md)       | The overlay changes on one clock, 30 Hz by default; nothing on it animates between ticks                | accepted, 2026-10-12      |
-| [0010](0010-overlay-window-covers-its-monitor.md)  | The overlay window covers its whole monitor; it is not shrunk to the widgets' bounding box              | accepted, 2026-10-19      |
-| [0011](0011-backend-is-a-cargo-workspace.md)       | The backend is a Cargo workspace, one crate per layer or domain; only `mt-sim-*` sees kerb              | accepted, 2026-10-25      |
+| ADR                                                        | Decision                                                                                                | Status                    |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ------------------------- |
+| [0001](0001-per-field-telemetry-observables.md)            | Telemetry frames stay whole observables rather than one observable per field                            | accepted, 2026-09-06      |
+| [0002](0002-settings-writes-mark-themselves.md)            | A settings write marks itself in a log both stores share                                                | partly superseded by 0007 |
+| [0003](0003-widget-state-lives-in-three-stores.md)         | Widget-related state lives in three stores: layout records, the live map, the edit session              | partly superseded by 0007 |
+| [0004](0004-widget-preview-runs-on-mocks.md)               | The widget preview runs on mock builders, not on recorded sessions                                      | accepted, 2026-09-14      |
+| [0005](0005-monitors-own-their-widgets.md)                 | Each monitor owns its widgets                                                                           | accepted, 2026-10-03      |
+| [0006](0006-telemetry-stays-json.md)                       | Telemetry stays JSON — the binary transport failed its measured gate                                    | accepted, 2026-10-05      |
+| [0007](0007-main-owns-settings.md)                         | Main owns the settings; every other window is a client of one protocol                                  | accepted, 2026-10-05      |
+| [0008](0008-frontend-by-feature-sliced-design.md)          | The frontend is laid out by Feature-Sliced Design; a widget's settings are described once, in its slice | accepted, 2026-10-08      |
+| [0009](0009-overlay-changes-on-one-clock.md)               | The overlay changes on one clock, 30 Hz by default; nothing on it animates between ticks                | accepted, 2026-10-12      |
+| [0010](0010-overlay-window-covers-its-monitor.md)          | The overlay window covers its whole monitor; it is not shrunk to the widgets' bounding box              | accepted, 2026-10-19      |
+| [0011](0011-backend-is-a-cargo-workspace.md)               | The backend is a Cargo workspace, one crate per layer or domain; only `mt-sim-*` sees kerb              | accepted, 2026-10-25      |
+| [0012](0012-marble-trace-is-the-base.md)                   | Marble Trace is the base; ITO's features are ported into it as modules                                  | accepted, 2026-11-14      |
+| [0013](0013-reference-lap-providers.md)                    | Reference laps come from providers (Garage 61 API, CSV) into one local library, matched by iRacing IDs  | accepted, 2026-11-14      |
+| [0014](0014-one-input-trace-and-the-brake-point-widget.md) | One Input Trace with a reference overlay; the brake-point countdown is its own widget                   | accepted, 2026-11-14      |
+| [0015](0015-threat-model-and-hardening.md)                 | Threat model and the hardening it requires                                                              | accepted, 2026-11-14      |
+| [0016](0016-no-usage-analytics.md)                         | No usage analytics                                                                                      | accepted, 2026-11-14      |
 
 When a decision is resolved, see [`docs/agents/domain.md`](../agents/domain.md)
 for how the record is written.

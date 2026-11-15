@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.1] — 2026-11-14
+
+First Trailbrake release: Marble Trace 0.28.0 with the features of Input Telemetry Overlay 0.1.7.
+
+### Added
+
+- **Garage 61 reference laps:** When a session starts, the track and car are looked up on Garage 61 by their iRacing IDs and the fastest clean lap of the current season with telemetry is downloaded and made the reference. Laps are cached in a local library and reused offline; a refresh button asks again. Needs a Garage 61 personal access token, stored in the Windows Credential Manager.
+- **Brake Point widget:** A 3-2-1-BRAKE countdown into each reference brake point, the zone's target pressure beside your pedal, and a grade for your brake-on (perfect, good, early, late, very early/late, no brake) with the miss in seconds and metres and a pip per zone.
+- **Input Trace — reference overlay:** The reference lap's throttle and brake are filled in behind your lines at the same place on the lap, with an opacity setting.
+- **Reference laps settings:** Token, reference source (automatic Garage 61, library only, personal best, pinned lap), the session's reference status, Garage 61 CSV import and the lap library.
+
+### Changed
+
+- **New name and icon:** Trailbrake, with its own settings folder and updater, so it installs beside Marble Trace without either updating the other.
+- **The Coach, Delta and Corner Speeds** compare against whichever reference is active, Garage 61 included; your own best keeps being recorded as before.
+
+### Security
+
+- Usage analytics (Aptabase) removed; nothing is sent except the Garage 61 requests and the update check.
+- Overlay windows get their own, much smaller set of permissions; the global Tauri API is off; the MCP bridge exists only in dev builds.
+- Updates are signed with this project's key and fetched only from this repository.
+- `zip`, `rustls-webpki`, `webpki-roots` and `ctutils` updated past their advisories; the updater no longer pulls in `zip` 4.
+
 ## [0.28.0] — 2026-11-03
 
 ### Added

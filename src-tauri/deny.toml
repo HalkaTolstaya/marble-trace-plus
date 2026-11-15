@@ -1,0 +1,67 @@
+# cargo-deny policy (ADR-0015). Run from src-tauri/: `cargo deny check`.
+
+[graph]
+# The product ships for Windows only; Linux targets are checked too because
+# the pure crates are tested on Linux in CI.
+targets = ["x86_64-pc-windows-msvc", "x86_64-unknown-linux-gnu"]
+all-features = false
+
+[advisories]
+version = 2
+yanked = "deny"
+# Every ignore names who pulls the crate in and why it cannot go yet.
+ignore = [
+  # proc-macro-error: build-time proc macro of glib-macros (GTK, Linux only),
+  # not in the Windows binary. Goes when gtk-rs moves to 0.20 in Tauri.
+  { id = "RUSTSEC-2024-0370", reason = "build-time only, Linux GTK stack via Tauri" },
+  # unsafe-libyaml via serde_yaml via kerb 0.4: parses iRacing's session YAML.
+  # Unmaintained, not vulnerable; replaced when kerb drops serde_yaml.
+  { id = "RUSTSEC-2024-0449", reason = "kerb's session YAML parser; no known vulnerability" },
+  # zbus / zvariant: the Linux secret-service keyring backend; not compiled
+  # for Windows.
+  { id = "RUSTSEC-2026-0370", reason = "Linux-only keyring backend (zvariant)" },
+  { id = "RUSTSEC-2026-0371", reason = "Linux-only keyring backend (zbus_names)" },
+  { id = "RUSTSEC-2026-0372", reason = "Linux-only keyring backend (zvariant_derive)" },
+]
+
+[licenses]
+version = 2
+confidence-threshold = 0.9
+# The product is GPL-3.0-or-later (own crates are private and not checked);
+# every licence below is compatible with it.
+allow = [
+  "MIT",
+  "MIT-0",
+  "Apache-2.0",
+  "Apache-2.0 WITH LLVM-exception",
+  "BSD-2-Clause",
+  "BSD-3-Clause",
+  "BSL-1.0",
+  "CC0-1.0",
+  "CDLA-Permissive-2.0",
+  "ISC",
+  "MPL-2.0",
+  "Unicode-3.0",
+  "Unlicense",
+  "Zlib",
+  "0BSD",
+]
+
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "allow"
+wildcards = "deny"
+allow-wildcard-paths = true
+# Never back: an OpenSSL toolchain on Windows builds (rustls everywhere).
+deny = [
+  { crate = "openssl-sys", reason = "rustls only (ADR-0015)" },
+  { crate = "native-tls", reason = "rustls only (ADR-0015)" },
+]
+
+[sources]
+unknown-registry = "deny"
+# No git dependencies: everything comes from crates.io, pinned by Cargo.lock.
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

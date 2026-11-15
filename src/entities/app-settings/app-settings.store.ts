@@ -228,7 +228,10 @@ export class AppSettingsStore {
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
-  init() {
+  private ownsUpdates = false;
+
+  init(options?: { ownsUpdates?: boolean }) {
+    this.ownsUpdates = options?.ownsUpdates ?? false;
     void this._initAsync().catch((err) =>
       console.error('Failed to initialize AppSettingsStore:', err)
     );
@@ -247,7 +250,7 @@ export class AppSettingsStore {
       this.installMismatch = mismatch;
     });
 
-    if (this.appSettings.autoUpdate) {
+    if (this.ownsUpdates && this.appSettings.autoUpdate) {
       void this.checkForUpdates(true);
 
       this.startUpdateTimer();
@@ -257,7 +260,7 @@ export class AppSettingsStore {
   private startUpdateTimer() {
     this.stopUpdateTimer();
 
-    if (!this.appSettings.autoUpdate) return;
+    if (!this.ownsUpdates || !this.appSettings.autoUpdate) return;
 
     const ms = this.appSettings.updateCheckInterval * 60 * 60 * 1000;
 

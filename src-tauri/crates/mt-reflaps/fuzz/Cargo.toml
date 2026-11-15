@@ -1,0 +1,43 @@
+[package]
+name = "mt-reflaps-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+license = "GPL-3.0-or-later"
+
+[package.metadata]
+cargo-fuzz = true
+
+# A workspace of its own: cargo-fuzz needs nightly and sanitizers, which the
+# app's workspace must never depend on.
+[workspace]
+members = ["."]
+
+[dependencies]
+libfuzzer-sys = "0.4"
+arbitrary = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+mt-reflaps = { path = ".." }
+mt-model = { path = "../../mt-model" }
+
+[[bin]]
+name = "garage61_csv"
+path = "fuzz_targets/garage61_csv.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "garage61_json"
+path = "fuzz_targets/garage61_json.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "brake_cue"
+path = "fuzz_targets/brake_cue.rs"
+test = false
+doc = false
+bench = false

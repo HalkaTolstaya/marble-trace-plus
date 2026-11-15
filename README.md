@@ -1,44 +1,37 @@
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-light.svg">
-    <img src="docs/assets/logo-dark.svg" alt="Logo" width="120">
-  </picture>
-</p>
-
-<h1 align="center">Marble Trace</h1>
+<h1 align="center">Trailbrake</h1>
 
 <p align="center">
-  <strong>Open-source iRacing telemetry overlay — beautiful, lightweight, always on top.</strong>
+  <strong>iRacing overlay with a brake-point coach that pulls the season's best lap from Garage 61 by itself.</strong>
 </p>
 
 <div align="center">
 
-[![Latest release](https://img.shields.io/github/v/release/mvoof/Marble-Trace?style=flat-square)](https://github.com/mvoof/Marble-Trace/releases) [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue?style=flat-square)](LICENSE) [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen?style=flat-square)](CONTRIBUTING.md) ![Windows only](https://img.shields.io/badge/platform-Windows-blue?style=flat-square) ![Tauri v2](https://img.shields.io/badge/built%20with-Tauri%20v2-purple?style=flat-square)
+[![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue?style=flat-square)](LICENSE) ![Windows only](https://img.shields.io/badge/platform-Windows-blue?style=flat-square) ![Tauri v2](https://img.shields.io/badge/built%20with-Tauri%20v2-purple?style=flat-square)
 
 </div>
 
-<p align="center">
-  Marble Trace™ is actively developed — new widgets, fixes, and features land regularly.<br>
-  Got a bug, an idea, or just want to share your setup? Join the community on Discord.
-</p>
-<p align="center">
-  <a href="https://discord.gg/tkdS9sn49b">
-    <img src="https://discordapp.com/api/guilds/1342905186041073684/widget.png?style=shield" alt="Discord">
-  </a>
-</p>
+Trailbrake is a fork of **[Marble Trace](https://github.com/mvoof/Marble-Trace)** by voof (GPL-3.0) that adds the
+brake-point countdown and Garage 61 reference laps of **[Input Telemetry Overlay](https://github.com/mitchwarrenburg/input-telemetry-overlay)**
+by Mitch Warrenburg (MIT). It is not the official Marble Trace project and is not affiliated with either author,
+with iRacing or with Garage 61.
 
 ---
 
-## Why Marble Trace?
+## What it adds to Marble Trace
 
-Most iRacing overlays are either bloated desktop apps or locked behind subscriptions. **Marble Trace** is different:
+- **Reference lap from Garage 61, automatically.** When a session starts, Trailbrake reads the track and car from
+  iRacing, finds them on Garage 61 by their iRacing IDs, and downloads the **fastest clean lap of the current season**
+  with telemetry. No CSV to export, no file to drop. Laps are kept in a local library and reused offline.
+- **Brake Point widget.** Counts **3 · 2 · 1 · BRAKE** into each of the reference lap's brake points on the reference's own
+  clock, shows the zone's target pressure next to your pedal, and grades your brake-on: perfect, good, early, late,
+  very early/late, no brake — with the miss in seconds and metres and a pip per zone.
+- **Input Trace with the reference behind your pedals.** The reference's throttle and brake are drawn as filled areas at
+  the same place on the lap, so the gap between fill and line is what you are giving away.
+- **Lap library.** Garage 61 downloads and imported Garage 61 CSV exports in one list; pin one, or let the session pick.
+- **The coach and delta follow the same reference.** Whatever reference is active — Garage 61, library or your own best —
+  is the one the Coach, Delta and Corner Speeds compare against.
 
-- **Rust core** — a tiny Rust backend reads telemetry directly via [kerb](https://github.com/mvoof/kerb), our own multi-sim shared-memory telemetry library; the UI is a transparent frameless window that floats above the sim.
-- **Fully modular** — enable only the widgets you need. Every widget is positioned, scaled and styled on its own inside a single transparent overlay that spans all of your monitors.
-- **Layouts for every session** — build as many layouts as you race disciplines, arrange them across your monitors in a visual editor, and switch between them by key or automatically per session type.
-- **Any screen you own** — a layout can also feed a phone, a tablet or a second PC over your local network, with nothing to install on the device.
-- **Free & Open Source** — licensed under GPLv3, free to use, modify, and contribute to.
-- **Modern stack** — Tauri v2 + React 19 + MobX + Ant Design. Fast and type-safe.
+Everything else is Marble Trace: 35 widgets, layouts per session type, remote screens, Voice Crew, stream chat.
 
 ---
 
@@ -60,7 +53,7 @@ Every widget is independently positioned, resized, and styled — drag it anywhe
 
 Cockpit cluster combining a gear ring, speed readout, lap/position/RPM stats, a live driving-coach tab, and a dedicated pit-lane mode.
 
-<img src="site/assets/widgets/race-dash.png" alt="Race Dash" width="418">
+<img src="docs/assets/widgets/race-dash.png" alt="Race Dash" width="418">
 
 ---
 
@@ -68,7 +61,7 @@ Cockpit cluster combining a gear ring, speed readout, lap/position/RPM stats, a 
 
 A windscreen projection instead of a panel: the engine column and gear on the left, position and lap on the right, and nothing in the middle, so the road stays clear.
 
-<img src="site/assets/widgets/invisible-dash.png" alt="Invisible Dash" width="900">
+<img src="docs/assets/widgets/invisible-dash.png" alt="Invisible Dash" width="900">
 
 ---
 
@@ -76,7 +69,7 @@ A windscreen projection instead of a panel: the engine column and gear on the le
 
 Standalone shift-light LED bar driven by engine RPM, with configurable colour zones and pit-limiter animations.
 
-<img src="site/assets/widgets/rpm-lights.png" alt="RPM Lights" width="360">
+<img src="docs/assets/widgets/rpm-lights.png" alt="RPM Lights" width="360">
 
 ---
 
@@ -84,7 +77,7 @@ Standalone shift-light LED bar driven by engine RPM, with configurable colour zo
 
 Liquid temperatures, oil pressure, voltage, and live system adjustments — ABS, traction control, brake bias, and engine map — in one compact strip.
 
-<img src="site/assets/widgets/engine.png" alt="Engine Panel" width="480">
+<img src="docs/assets/widgets/engine.png" alt="Engine Panel" width="480">
 
 ---
 
@@ -92,7 +85,7 @@ Liquid temperatures, oil pressure, voltage, and live system adjustments — ABS,
 
 Hybrid battery charge, what the MGU-K is doing with it — deploying or harvesting, and how hard — and the energy spent on the lap. On cars that expose a deploy-mode selector, the current mode is lit.
 
-<img src="site/assets/widgets/battery.png" alt="Battery" width="280">
+<img src="docs/assets/widgets/battery.png" alt="Battery" width="280">
 
 ---
 
@@ -100,7 +93,7 @@ Hybrid battery charge, what the MGU-K is doing with it — deploying or harvesti
 
 Drag reduction system state at a glance: armed past the detection point, ready inside the zone, open.
 
-<img src="site/assets/widgets/drs.png" alt="DRS" width="216">
+<img src="docs/assets/widgets/drs.png" alt="DRS" width="216">
 
 ---
 
@@ -108,7 +101,7 @@ Drag reduction system state at a glance: armed past the detection point, ready i
 
 The ABS setting from the cockpit, 0 to 12, beside a badge that lights yellow while ABS is working and stays a quiet grey otherwise. Switch the level off to keep only the badge; on a car with no ABS adjustment the widget hides itself.
 
-<img src="site/assets/widgets/abs.png" alt="ABS" width="150">
+<img src="docs/assets/widgets/abs.png" alt="ABS" width="150">
 
 ---
 
@@ -118,7 +111,15 @@ Watch your throttle, brake, and clutch inputs scroll in real time. The horizonta
 
 The steering block draws either the built-in dial or one of several wheel silhouettes, with your choice of gear, speed, angle or nothing at all in the middle. Adding another wheel is a traced product photo — see [docs/steering-wheel-assets.md](docs/steering-wheel-assets.md).
 
-<img src="site/assets/widgets/input-trace.png" alt="Input Trace" width="530">
+With **Show reference** on (the default), the active reference lap's throttle and brake are filled in behind your lines at the same place on the lap.
+
+<img src="docs/assets/widgets/input-trace.png" alt="Input Trace" width="530">
+
+---
+
+### Brake Point
+
+A countdown bar into each brake point of the reference lap: it fills in three steps (3, 2, 1) and turns solid red on **BRAKE** at the moment the reference driver got on the brake, measured on the reference lap's clock at your position — a slower straight stretches the counts, but BRAKE always lands on the reference brake point. Beside it, the zone's target peak pressure in gold and your pedal; under it, your grade (perfect ±30 ms, good ±80 ms, early/late, very early/late, no brake) with the miss in seconds and metres, and a pip per zone for the lap. Countdown length, reaction allowance, light-zone threshold and grading windows are settings. The reference comes from Garage 61 automatically (see [First run with Garage 61](#first-run-with-garage-61)) or from your own best lap.
 
 ---
 
@@ -126,7 +127,7 @@ The steering block draws either the built-in dial or one of several wheel silhou
 
 Friction circle visualising lateral and longitudinal G-forces in real time. Three display modes — **Trail** (fading line history), **Fading** (decaying envelope), **Peak** (static max-G envelope) — with three colour modes: **Mono**, **Simple** (red brake / green accel / cyan turn), and **Advanced** (smooth gradient blending). Adjustable scale from 2 G to 5 G.
 
-<img src="site/assets/widgets/g-metr.png" alt="G-Meter" width="240">
+<img src="docs/assets/widgets/g-metr.png" alt="G-Meter" width="240">
 
 ---
 
@@ -134,7 +135,7 @@ Friction circle visualising lateral and longitudinal G-forces in real time. Thre
 
 Live braking and throttle coaching against your stored best lap. The call row tells you what to do right now — **BRAKE** with the distance left to the braking point, or a corner-exit **GAS** call — with an urgency bar that fills as the marker approaches. Underneath, a rolling speed trace plots your current lap against the reference lap in a configurable window (in metres), coloured green where you are gaining time and red where you are losing it. Footer shows current vs reference speed, the reference lap time and the track condition. Both rows can be switched off independently, and every colour is configurable.
 
-<img src="site/assets/widgets/coach.png" alt="Coach" width="360">
+<img src="docs/assets/widgets/coach.png" alt="Coach" width="360">
 
 ---
 
@@ -144,7 +145,7 @@ Live braking and throttle coaching against your stored best lap. The call row te
 
 Full race standings table with multi-class support, SOF, qualify deltas, brand & tire info, and a configurable row budget. All columns visible at once or stripped to essentials. Switch between the combined leaderboard and a single-class group view with its own SOF and field size.
 
-<img src="site/assets/widgets/standings.png" alt="Standings" width="796">
+<img src="docs/assets/widgets/standings.png" alt="Standings" width="796">
 
 ---
 
@@ -152,7 +153,7 @@ Full race standings table with multi-class support, SOF, qualify deltas, brand &
 
 Relative timing sorted by F2Time — player always centred. Closing/gap trend arrows, lap status (lapping/lapped), class stripes.
 
-<img src="site/assets/widgets/relative.png" alt="Relative" width="422">
+<img src="docs/assets/widgets/relative.png" alt="Relative" width="422">
 
 ---
 
@@ -160,7 +161,7 @@ Relative timing sorted by F2Time — player always centred. Closing/gap trend ar
 
 Compact 1-D track map showing relative car positions along the lap. Horizontal or vertical.
 
-<img src="site/assets/widgets/relative-map.png" alt="Relative Map" width="410">
+<img src="docs/assets/widgets/relative-map.png" alt="Relative Map" width="410">
 
 ---
 
@@ -168,8 +169,8 @@ Compact 1-D track map showing relative car positions along the lap. Horizontal o
 
 Live delta bar that compares your current lap against a configurable reference — your personal best (PB), your personal optimal (PO, best sectors combined), session best (SB), session optimal (SO), or the previous lap in the session (SL). The bar fills green when you are ahead and red when behind. When you cross the finish line a lap flash card appears (top, bottom, left, or right of the widget) showing the completed lap time and its delta. Card display duration is adjustable.
 
-<img src="site/assets/widgets/delta.png" alt="Delta" width="296">
-<img src="site/assets/widgets/delta-best.png" alt="Delta Best" width="200">
+<img src="docs/assets/widgets/delta.png" alt="Delta" width="296">
+<img src="docs/assets/widgets/delta-best.png" alt="Delta Best" width="200">
 
 ---
 
@@ -177,7 +178,7 @@ Live delta bar that compares your current lap against a configurable reference �
 
 Grid of sector times for the current lap with color-coded delta chips (green = faster than personal best, red = slower). Header shows live delta and predicted finish time. Reference for the live delta and predicted time is configurable; sector chips always compare vs your personal best.
 
-<img src="site/assets/widgets/sector-matrix.png" alt="Sector Matrix" width="320">
+<img src="docs/assets/widgets/sector-matrix.png" alt="Sector Matrix" width="320">
 
 ---
 
@@ -185,7 +186,7 @@ Grid of sector times for the current lap with color-coded delta chips (green = f
 
 Rolling history of your completed laps — lap number, lap time, and delta vs personal best for each row. The live row at the top shows the current lap's real-time delta using the configured reference (PB / PO / SB / SO / SL). Historical rows always compare vs personal best.
 
-<img src="site/assets/widgets/lap-log.png" alt="Lap Log" width="220">
+<img src="docs/assets/widgets/lap-log.png" alt="Lap Log" width="220">
 
 ---
 
@@ -193,7 +194,7 @@ Rolling history of your completed laps — lap number, lap time, and delta vs pe
 
 Session clock with laps-to-go, estimated total laps, and optional real-time clocks.
 
-<img src="site/assets/widgets/timer.png" alt="Timer" width="240">
+<img src="docs/assets/widgets/timer.png" alt="Timer" width="240">
 
 ---
 
@@ -203,8 +204,8 @@ Session clock with laps-to-go, estimated total laps, and optional real-time cloc
 
 SVG overhead track map with every car's position, class-coloured dots, P1 / YOU labels, class legend, and sector markers — recorded from your own lap data.
 
-<img src="site/assets/widgets/map.png" alt="Track Map" width="600">
-<img src="site/assets/widgets/map-record.png" alt="Track Map Recording" width="600">
+<img src="docs/assets/widgets/map.png" alt="Track Map" width="600">
+<img src="docs/assets/widgets/map-record.png" alt="Track Map Recording" width="600">
 
 ---
 
@@ -212,7 +213,7 @@ SVG overhead track map with every car's position, class-coloured dots, P1 / YOU 
 
 Circular radar centred on your car with a configurable render range, bumper-to-bumper gap labels, sector masks, and spotter cones.
 
-<img src="site/assets/widgets/proximity-radar.png" alt="Proximity Radar" width="180">
+<img src="docs/assets/widgets/proximity-radar.png" alt="Proximity Radar" width="180">
 
 ---
 
@@ -220,7 +221,7 @@ Circular radar centred on your car with a configurable render range, bumper-to-b
 
 Full-width edge indicators for side-by-side situations — a quick-glance signal for cars in your blind spot.
 
-<img src="site/assets/widgets/radar-bar.png" alt="Radar Bar" width="800">
+<img src="docs/assets/widgets/radar-bar.png" alt="Radar Bar" width="800">
 
 ---
 
@@ -228,7 +229,7 @@ Full-width edge indicators for side-by-side situations — a quick-glance signal
 
 Who is talking on the radio, in place of the sim's own indicator: the car number in its class colour, the channel the sim names — all, drivers, team, race control, admin, private or one of your own — in the opposite corner, and the driver's name large over a wave in the channel's colour, the surname on its own line or shortened to "First L.". Your own voice shows too, while you hold push-to-talk. With nobody on the air the plate shows your channel alone — for a moment after you switch, or all the time if you want it on screen.
 
-<img src="site/assets/widgets/radio.png" alt="Radio" width="180">
+<img src="docs/assets/widgets/radio.png" alt="Radio" width="180">
 
 ---
 
@@ -236,7 +237,7 @@ Who is talking on the radio, in place of the sim's own indicator: the car number
 
 The voice engineer's side of the radio: what you said while holding push-to-talk, the engineer's reply while it is spoken and a moment after, and a ✓ or ✗ beside a pit command once the sim took it or refused it. It shows the current line alone or the last few, and can leave your own lines out.
 
-<img src="site/assets/widgets/crew-radio.png" alt="Crew Radio" width="320">
+<img src="docs/assets/widgets/crew-radio.png" alt="Crew Radio" width="320">
 
 ---
 
@@ -246,7 +247,7 @@ The cars actually fighting you, drawn on a vertical distance axis instead of a l
 
 Each plate carries the car number, the class on its livery panel, the driver, the distance and the gap; cars landing on the same spot share one plate that names both of them rather than shoving each other aside. Plates shrink with distance, and the road glows red behind you or blue ahead as a car closes in.
 
-<img src="site/assets/widgets/close-battle.png" alt="Close Battle" width="440">
+<img src="docs/assets/widgets/close-battle.png" alt="Close Battle" width="440">
 
 ---
 
@@ -254,7 +255,7 @@ Each plate carries the car number, the class on its livery panel, the driver, th
 
 You and your nearest rival side by side: each car's number, position and name, its speed against yours, and the gap between you.
 
-<img src="site/assets/widgets/wheel-to-wheel.png" alt="Wheel to Wheel" width="620">
+<img src="docs/assets/widgets/wheel-to-wheel.png" alt="Wheel to Wheel" width="620">
 
 ---
 
@@ -262,9 +263,9 @@ You and your nearest rival side by side: each car's number, position and name, i
 
 LED matrix and flat banner-style flag indicators with green, yellow, red, blue, white, checkered, and meatball flag support.
 
-<img src="site/assets/widgets/led-flag-dual.png" alt="LED Flags" width="300">
-<img src="site/assets/widgets/led-flag-one.png" alt="LED Flags Single" width="200">
-<img src="site/assets/widgets/flat-flag.png" alt="Flat Flags" width="300">
+<img src="docs/assets/widgets/led-flag-dual.png" alt="LED Flags" width="300">
+<img src="docs/assets/widgets/led-flag-one.png" alt="LED Flags Single" width="200">
+<img src="docs/assets/widgets/flat-flag.png" alt="Flat Flags" width="300">
 
 ---
 
@@ -276,7 +277,7 @@ Everything about the stop in one plate: live pit-lane speed against the pit limi
 
 Optional automation adds fuel for you and orders new tires once wear drops below a configurable threshold. Blocks (speed, fuel, tires, repairs, footer) are toggled individually.
 
-<img src="site/assets/widgets/pit-service.png" alt="Pit Service" width="236">
+<img src="docs/assets/widgets/pit-service.png" alt="Pit Service" width="236">
 
 ---
 
@@ -284,7 +285,7 @@ Optional automation adds fuel for you and orders new tires once wear drops below
 
 Pit lane speed against the limit, and the roll to your stall — as a vertical or a horizontal rail.
 
-<img src="site/assets/widgets/pit-line.png" alt="Pit Line" width="90">
+<img src="docs/assets/widgets/pit-line.png" alt="Pit Line" width="90">
 
 ---
 
@@ -296,8 +297,8 @@ Lap-by-lap consumption graph, laps remaining, add-fuel suggestion, and tank fill
 - **EST. FINISH:** Projected fuel balance (surplus or deficit in liters) at the end of the race.
 - **PIT WARNING:** Appears when you need to refuel, showing exactly how many liters to add (including a +1 lap buffer) to reach the finish.
 
-<img src="site/assets/widgets/fuel.png" alt="Fuel" width="240">
-<img src="site/assets/widgets/fuel-pit-stop.png" alt="Fuel Pit Stop" width="240">
+<img src="docs/assets/widgets/fuel.png" alt="Fuel" width="240">
+<img src="docs/assets/widgets/fuel-pit-stop.png" alt="Fuel Pit Stop" width="240">
 
 ---
 
@@ -305,7 +306,7 @@ Lap-by-lap consumption graph, laps remaining, add-fuel suggestion, and tank fill
 
 Wind direction compass, temperature, humidity, and forecast strip for dynamic weather sessions.
 
-<img src="site/assets/widgets/weather.png" alt="Weather" width="380">
+<img src="docs/assets/widgets/weather.png" alt="Weather" width="380">
 
 ---
 
@@ -313,7 +314,7 @@ Wind direction compass, temperature, humidity, and forecast strip for dynamic we
 
 Your incidents against the session limit, the drive-throughs served and how many points are left before the next one, and an estimate of where your Safety Rating lands at the flag — with the clean corners it would take to break even. Two compact tiers; the penalty column is left out in a session that hands out none. The rating is an estimate from a community model (see [Credits](#credits)); a session that does not move it shows **OFF**.
 
-<img src="site/assets/widgets/incident-tracker.png" alt="Incident Tracker" width="180">
+<img src="docs/assets/widgets/incident-tracker.png" alt="Incident Tracker" width="180">
 
 ---
 
@@ -323,7 +324,7 @@ Your incidents against the session limit, the drive-throughs served and how many
 
 Twitch and YouTube live chat merged into a single feed on top of the sim, so you can read your stream without alt-tabbing. Messages carry a platform glyph and role badges (moderator, VIP, subscriber) as compact text plates or the original badge artwork. Channel events — raids, subs, cheers and donations — appear as highlighted rows, and the footer strip shows viewer counts, message rate and totals. Row density, message limit and auto-expiry are configurable, and every block can be turned off.
 
-<img src="site/assets/widgets/stream-chat.png" alt="Stream Chat" width="380">
+<img src="docs/assets/widgets/stream-chat.png" alt="Stream Chat" width="380">
 
 ---
 
@@ -339,7 +340,7 @@ Layouts are independent of each other — build one for endurance, one for quali
 
 ### Remote Screens
 
-A layout can also contain screens with **no monitor behind them**. Marble Trace serves those screens over your local network, so a phone, a tablet or a second PC opens one in its browser and shows live widgets — the same widgets, settings and telemetry as the overlay, with nothing to install on the device.
+A layout can also contain screens with **no monitor behind them**. Trailbrake serves those screens over your local network, so a phone, a tablet or a second PC opens one in its browser and shows live widgets — the same widgets, settings and telemetry as the overlay, with nothing to install on the device.
 
 - **Scan and go** — every remote screen has a QR code in Settings. Point the device's camera at it instead of typing an IP by hand, then add it to the home screen to run it full-screen.
 - **Fit to the device** — the device reports the viewport it actually has, and one click resizes the screen to match, carrying its widgets with it.
@@ -363,7 +364,7 @@ Bindings are app-wide, not per layout. Devices are matched by their DirectInput 
 
 ## Performance
 
-The overlay is a transparent window over the sim, and every time its content changes Windows composes a new frame on the same GPU the game is drawing on. So Marble Trace redraws the overlay on **one clock** — 30 times a second by default, nothing animating in between — while the telemetry behind it is still computed at the sim's full rate. Tables, fuel and weather update at their own slower rates on the same clock.
+The overlay is a transparent window over the sim, and every time its content changes Windows composes a new frame on the same GPU the game is drawing on. So Trailbrake redraws the overlay on **one clock** — 30 times a second by default, nothing animating in between — while the telemetry behind it is still computed at the sim's full rate. Tables, fuel and weather update at their own slower rates on the same clock.
 
 - **Tunable** — Settings → Overlay → Overlay update rate: 60, 30, 20 or 15 Hz. 60 is the smoothest motion and costs the game the most frames.
 - **Measured, not guessed** — on an iRacing replay with every widget on screen, the overlay costs about 8% of the average frame rate; going from 60 Hz with animated bars to the 30 Hz clock raised the 1% low by 40% and cut stutters by two thirds.
@@ -374,15 +375,26 @@ How it is measured: [docs/perf-methodology.md](docs/perf-methodology.md). Why it
 
 ## Installation
 
-Download **`Marble Trace_<version>_x64-setup.exe`** from the [latest release](https://github.com/mvoof/Marble-Trace/releases/latest) and run it. There is nothing else to install.
+Download **`trailbrake_<version>_x64-setup.exe`** from the [latest release](https://github.com/HalkaTolstaya/marble-trace-plus/releases/latest), check it against `SHA256SUMS.txt`, and run it.
 
-> [!IMPORTANT]
-> **Do not use the `.msi` file, and do not keep an installation made from it.**
-> The `.msi` is no longer published as of v0.25.0 — only `-setup.exe` is. The two are separate installers that track their installation separately, so an `.msi` install and an `-setup.exe` install can sit side by side in different folders: the updater only ever reaches the `-setup.exe` one, while your shortcut may keep launching the other, outdated copy.
->
-> If you installed from an `.msi`, remove Marble Trace through Windows **Apps & features**, then install once from `-setup.exe`. Your settings, layouts and bindings are kept — they live in `%APPDATA%\com.voof.marble-trace`, not in the installation folder.
->
-> Until v0.29.0 the app detects this situation at startup and names both copies. From v0.29.0 that warning is gone and only `-setup.exe` installs are supported.
+> [!NOTE]
+> Until the installer is signed with a code-signing certificate, Windows SmartScreen shows
+> _Windows protected your PC_ on first run: choose **More info → Run anyway**. Updates are protected separately: the
+> app installs only updates signed with this project's updater key.
+
+Trailbrake installs alongside an existing Marble Trace; the two keep separate settings
+(`%APPDATA%\io.github.halkatolstaya.trailbrake`) and never update each other.
+
+### First run with Garage 61
+
+1. In Garage 61, create a **personal access token** in your account's developer settings (scope: driving data).
+2. In Trailbrake: **Settings → Data → Reference laps**, paste the token and press **Save**. It goes straight into the
+   Windows Credential Manager and is never shown again.
+3. Add the **Brake Point** widget to a layout (and leave _Show reference_ on in **Input Trace**).
+4. Get in the car. The status line in _Reference laps_ says which lap was downloaded and from whom.
+
+Garage 61 shows a token your own laps and your teammates' laps; other drivers' telemetry needs a Garage 61 Pro plan.
+Without a token (or without a lap this season) Trailbrake uses the library or your own recorded best.
 
 ---
 
@@ -399,15 +411,20 @@ Prerequisites, every script, the workflow and the environment variables are in
 
 ---
 
-## Analytics & Privacy
+## Privacy
 
-Marble Trace uses [Aptabase](https://github.com/aptabase/aptabase) — an open-source, privacy-first analytics platform. No personal data is collected. The following anonymous events are tracked:
+Trailbrake runs on your PC only. There is no server, no account and **no analytics** (the upstream Aptabase
+integration is removed).
 
-| Event         | When                                                                                       |
-| ------------- | ------------------------------------------------------------------------------------------ |
-| `app_started` | On every launch — includes primary monitor resolution, scale factor, system locale and DPI |
+| What leaves your PC                    | Where                              | When                                                                             |
+| -------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------- |
+| Garage 61 token, iRacing track/car IDs | `garage61.net` (HTTPS)             | When a session starts and the cached lap is older than 6 h, or you press refresh |
+| Version check                          | GitHub Releases of this repository | Auto-update check (can be switched off)                                          |
+| Voice model download                   | the pinned model hosts             | Only when you install a Voice Crew component                                     |
+| Twitch / YouTube chat                  | Twitch / YouTube                   | Only if you connect stream chat                                                  |
 
-Aptabase automatically captures: OS, app version, country (from IP), and locale. No user IDs, no file paths, no telemetry data from iRacing.
+The microphone is only open while push-to-talk is held; audio is recognised locally and never written to disk or sent.
+Telemetry, laps and settings stay in `%APPDATA%`. Details: [docs/threat-model.md](docs/threat-model.md).
 
 ---
 
@@ -426,30 +443,31 @@ See [CHANGELOG.md](CHANGELOG.md) for the full release history.
 
 ## Credits
 
-Marble Trace's Safety Rating estimate comes from the community, not from iRacing — iRacing does not publish the formula, and the widget shows the number as an estimate.
-
-- **Safety Rating** — the model reconstructed by [Nishizumi-SR](https://github.com/nishizumi-maho/Nishizumi-SR) (MIT) from iRacing's official before/after CPI on 123k race sessions.
+- **[Marble Trace](https://github.com/mvoof/Marble-Trace)** by voof — the application this is a fork of (GPL-3.0-or-later).
+- **[Input Telemetry Overlay](https://github.com/mitchwarrenburg/input-telemetry-overlay)** by Mitch Warrenburg — the
+  Garage 61 CSV parser, auto-blip removal, brake zones, lap matching and the brake-point countdown were ported from it
+  (MIT; notice in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and in each derived file). The bundled test lap is
+  ITO's anonymised Garage 61 sample.
+- **Safety Rating** — the model reconstructed by [Nishizumi-SR](https://github.com/nishizumi-maho/Nishizumi-SR) (MIT).
+- [Garage 61](https://garage61.net) provides the reference laps through its public API.
 
 ---
 
 ## Trademarks
 
-<!-- Keep this list in step with the names the README actually uses, and with
-     the footer of site/index.html (footer-legal), which lists the names the
-     site uses: a newly named product goes into both. -->
+Marble Trace™ and the Marble Trace logo are trademarks of voof; Trailbrake does not use them as its name or logo.
+iRacing is a trademark of iRacing.com Motorsport Simulations, LLC. Garage 61 is the property of its owners. TAURI is a
+trademark of The Tauri Programme within the Commons Conservancy. Rust is a trademark of the Rust Foundation. Windows is a
+trademark of the Microsoft group of companies. GitHub is a trademark of GitHub, Inc. Twitch is a trademark of Twitch
+Interactive, Inc. YouTube is a trademark of Google LLC.
 
-Marble Trace™ and the Marble Trace logo are trademarks of voof. iRacing is a trademark of iRacing.com Motorsport Simulations, LLC. TAURI is trademark of The Tauri Programme within the Commons Conservancy. Rust is a trademark of the Rust Foundation. Windows is a trademark of the Microsoft group of companies. GitHub is a trademark of GitHub, Inc. Discord is a trademark of Discord Inc. Twitch is a trademark of Twitch Interactive, Inc. YouTube is a trademark of Google LLC.
-
-All other names, Aptabase among them, are the property of their respective owners.
-
-**Marble Trace is an independent open-source project. It is not made by iRacing, has no connection to iRacing.com Motorsport Simulations, LLC, and is not affiliated with, sponsored or endorsed by it or by any of the companies above.**
+**Trailbrake is an independent open-source project. It is not made by, affiliated with, sponsored or endorsed by voof
+(Marble Trace), Mitch Warrenburg (Input Telemetry Overlay), iRacing.com Motorsport Simulations, LLC or Garage 61.**
 
 ---
 
 ## License
 
-The Marble Trace source code is licensed under the [GNU General Public License v3.0 (GPL-3.0)](LICENSE). © 2026 voof
-
-The Marble Trace name, logo, and other branding are not licensed under the GPL-3.0. Permission to use, modify, and distribute the source code does not grant permission to use the Marble Trace name or logo in a way that suggests an official or endorsed version.
-
-Forks and derivative works that are distributed (conveyed, in the GPL's terms) must comply with the GPL-3.0 license; private modifications you do not distribute carry no such obligations. If you distribute a modified version under a different name or branding, please make it clear that it is not the official Marble Trace project.
+[GNU General Public License v3.0 or later](LICENSE). Marble Trace © 2026 voof (GPL-3.0-or-later); the parts derived from
+Input Telemetry Overlay © 2026 Mitch Warrenburg are also available under the MIT licence, reproduced in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Changes in this fork © 2026 their contributors, GPL-3.0-or-later.
