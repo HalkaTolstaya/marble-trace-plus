@@ -176,6 +176,7 @@ export const RadarScope = observer(() => {
           alpha: scope.carOpacity,
           pxPerMeter,
           carLengthM: carLength,
+          cabin: true,
         });
 
         ctx.restore();
