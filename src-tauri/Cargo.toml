@@ -1,6 +1,6 @@
 [package]
 name = "marble-trace"
-version = "0.28.2"
+version = "0.28.3"
 description = "Trailbrake - iRacing overlay with Garage 61 reference laps (fork of Marble Trace)"
 authors = ["mvoof"]
 license = "GPL-3.0-or-later"

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.3] — 2026-11-15
+
+### Added
+
+- **Configure overlays button:** one click in the main window brings every overlay up on the real screen at its real size — the screen dims behind an alignment grid, widgets glow green, drag to move, pull a corner to resize, **Done** to finish. No miniature canvas to aim at.
+- **Load Garage 61 lap button** in the main window header, and Garage 61 CSVs can be dropped anywhere on the main window: they are copied to the laps folder and imported.
+
+### Changed
+
+- **New overlay look:** dark glass panels with a faint green edge and a soft shadow; widgets fade and rise in when they appear.
+
 ## [0.28.2] — 2026-11-15
 
 ### Added
