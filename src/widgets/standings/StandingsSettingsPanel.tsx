@@ -54,6 +54,7 @@ type BoolSetting = {
 const ROW_LAYOUT: ReadonlyArray<{ setting: BoolSetting; label: string }> = [
   { setting: 'showCarNumber', label: 'carNumber' },
   { setting: 'showCountryFlag', label: 'countryFlag' },
+  { setting: 'showBrand', label: 'carBrand' },
   { setting: 'showLicBadge', label: 'license' },
   { setting: 'showIRating', label: 'iRating' },
   { setting: 'showIrChange', label: 'eloChange' },
@@ -309,7 +310,6 @@ export const StandingsSettingsPanel = observer(() => {
 
       <Card title={t('settingsPanels.common.dataColumns')}>
         <Row setting="showLivePosChange" />
-        <Row setting="showBrand" />
         <Row setting="licBadgeStyle" dependsOn="showLicBadge" />
         <Row setting="showLicenseLetter" dependsOn="showLicBadge" />
         <Row setting="abbreviateIRating" dependsOn="showIRating" />

@@ -209,7 +209,8 @@
       "gapDecimalsShort": "Знаки гэпа",
       "lapTimeDecimalsShort": "Знаки времени круга",
       "layoutTitle": "Макет",
-      "layout_realTimeClock": "Часы"
+      "layout_realTimeClock": "Часы",
+      "layout_carBrand": "Марка машины"
     },
     "delta": {
       "deltaReference": "Эталон дельты",
@@ -624,7 +625,8 @@
       "showColumnHeaders": "Заголовки колонок",
       "showTableHeader": "Шапка таблицы",
       "showTableFooter": "Подвал таблицы",
-      "showRealTimeClock": "Часы"
+      "showRealTimeClock": "Часы",
+      "showBrand": "Марка машины"
     },
     "rpmLights": {
       "shiftLights": "Огни переключения",

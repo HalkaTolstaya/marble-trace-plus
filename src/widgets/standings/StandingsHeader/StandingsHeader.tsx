@@ -33,6 +33,8 @@ export const StandingsHeader = observer(() => {
 
       {settings.showCountryFlag && <StandingsHeaderCell> </StandingsHeaderCell>}
 
+      {settings.showBrand && <StandingsHeaderCell> </StandingsHeaderCell>}
+
       <StandingsHeaderCell>Driver</StandingsHeaderCell>
 
       {settings.showLicBadge && (
@@ -78,10 +80,6 @@ export const StandingsHeader = observer(() => {
 
       {settings.showStintLaps && (
         <StandingsHeaderCell align="center">Stint</StandingsHeaderCell>
-      )}
-
-      {settings.showBrand && (
-        <StandingsHeaderCell align="center">Brand</StandingsHeaderCell>
       )}
 
       {settings.showTire && (

@@ -209,7 +209,8 @@
       "gapDecimalsShort": "Gap Decimals",
       "lapTimeDecimalsShort": "Lap Time Decimals",
       "layoutTitle": "Layout",
-      "layout_realTimeClock": "Real Time Clock"
+      "layout_realTimeClock": "Real Time Clock",
+      "layout_carBrand": "Car Brand"
     },
     "delta": {
       "deltaReference": "Delta Reference",
@@ -624,7 +625,8 @@
       "showColumnHeaders": "Column headers",
       "showTableHeader": "Table Header",
       "showTableFooter": "Table Footer",
-      "showRealTimeClock": "Real Time Clock"
+      "showRealTimeClock": "Real Time Clock",
+      "showBrand": "Car Brand"
     },
     "rpmLights": {
       "shiftLights": "Shift Lights",

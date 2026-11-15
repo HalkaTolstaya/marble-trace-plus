@@ -13,6 +13,7 @@ import { getContrastTextColor, playerRowStyle } from '@shared/lib/colors';
 import { CountryFlag } from '@shared/ui/CountryFlag/CountryFlag';
 import { DriverFlagBadge } from '@shared/ui/DriverFlagBadge/DriverFlagBadge';
 import { RatingPill } from '@shared/ui/RatingPill/RatingPill';
+import { BrandMark } from '@shared/ui/BrandMark/BrandMark';
 import { formatIr } from '@shared/ui/RatingBadge/LicBadge.utils';
 import {
   buildRelativeGridTemplate,
@@ -239,6 +240,12 @@ export const DriverRow = observer(({ carIdx, index }: DriverRowProps) => {
       {settings.showCountryFlag && (
         <div className={styles.countryFlagCell}>
           <CountryFlag flairId={driver.flairId} isAi={driver.isAi} />
+        </div>
+      )}
+
+      {settings.showBrand && (
+        <div className={styles.cellCenter}>
+          <BrandMark carScreenName={driver.carScreenName} />
         </div>
       )}
 
