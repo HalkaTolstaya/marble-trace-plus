@@ -393,8 +393,16 @@ Trailbrake installs alongside an existing Marble Trace; the two keep separate se
 3. Add the **Brake Point** widget to a layout (and leave _Show reference_ on in **Input Trace**).
 4. Get in the car. The status line in _Reference laps_ says which lap was downloaded and from whom.
 
-Garage 61 shows a token your own laps and your teammates' laps; other drivers' telemetry needs a Garage 61 Pro plan.
-Without a token (or without a lap this season) Trailbrake uses the library or your own recorded best.
+Garage 61 gives a personal access token your own laps and your team's laps only (searching every driver's laps needs
+an application Garage 61 has approved). For the fastest lap of anyone, export it yourself and let Trailbrake pick it up:
+
+- In the Garage 61 search, open the lap and choose **Export → CSV**.
+- Save or move the file into the **`laps` folder next to Trailbrake** (`%LOCALAPPDATA%\Trailbrake\laps` for the default
+  install; **Settings → Data → Reference laps → Open folder** opens it).
+- Within a few seconds it is in the lap library, and whenever you drive that track and car it is the reference if it is
+  the fastest one there.
+
+Without a token, or without a lap this season, Trailbrake uses the library or your own recorded best.
 
 ---
 

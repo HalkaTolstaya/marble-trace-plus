@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Laps folder:** Garage 61 CSV exports saved into the `laps` folder next to the app are imported automatically and used as the reference for their track and car whenever they are the fastest lap there — the way to drive against anyone's lap from the Garage 61 search, which a personal access token cannot reach. Settings → Reference laps shows the folder and opens it.
+
+### Changed
+
+- **Automatic reference:** the fastest matching lap wins, whether it came from the Garage 61 API or from an imported CSV.
+
 ## [0.28.1] — 2026-11-14
 
 First Trailbrake release: Marble Trace 0.28.0 with the features of Input Telemetry Overlay 0.1.7.
