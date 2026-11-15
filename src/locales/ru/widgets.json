@@ -395,7 +395,17 @@
       "showReference": "Показывать эталон",
       "showReferenceDesc": "Рисовать газ и тормоз активного эталонного круга под вашими линиями в той же точке круга.",
       "referenceOpacity": "Прозрачность эталона",
-      "referenceOpacityDesc": "Насколько плотно залиты области эталона."
+      "referenceOpacityDesc": "Насколько плотно залиты области эталона.",
+      "revLights": "Огни оборотов",
+      "revLightsHint": "В игре полоса становится синей, когда включён пит-лимитер.",
+      "comparison": "Сравнение",
+      "comparisonHint": "Ваш газ и тормоз против эталонного круга в той же точке круга.",
+      "showRevLights": "Огни оборотов",
+      "revLightsGlow": "Свечение",
+      "showPitLimiterLights": "Огни пит-лимитера",
+      "compareThrottle": "Газ",
+      "compareBrake": "Тормоз",
+      "showDistance": "Дистанция"
     },
     "linearMap": {
       "moduleLayout": "Расположение модуля",

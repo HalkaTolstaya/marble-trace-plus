@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.0] — 2026-11-15
+
+### Added
+
+- **Standings, multiclass:** in the By Class view (now the default) your class shows its leaders and the cars around you — 10 rows: the top 3, then 3 ahead, you and 3 behind — and every other class its top 3. _Visible Rows - Your Class_, _Leader Rows_, _Visible Rows - Other Classes_ and _Show other classes_ set it.
+- **Standings:** interval column (red to the cars ahead of you in your class, green to those behind), average lap (_Recent pace_: last five clean laps, or _Session average_), laps in stint, and gap / lap-time decimals.
+- **Relative:** position change, lap number, iRating change, best / last / average lap, tyre and stint columns; a header with temperatures, SoF, incidents and the clock; column titles; a footer with your laps and the timer; _Ahead_ / _Behind_ counts; driver name format (J. Smith / Smith / John Smith); text size; density.
+- **Input Telemetry:** rev lights across the top (zone colours, LED glow, blue while the pit limiter is on), the comparison with the reference lap's throttle and brake chosen separately, and the lap distance over the graph.
+- **Live preview:** the widget preview runs a race over a drawn track — cars lap, trade places and close laps, the pedals and wheel move — so every table shows its overtakes, intervals and lap times working.
+- Compact settings blocks for these widgets: checkbox grids, − N + steppers and radio choices on one page.
+
+### Changed
+
+- **Standings and Relative look:** separate cards over the game (session bar, weather, each class's header and table), no row dividers, the position cell fading from the class colour, your row in a fading green, licence + iRating + change in one outlined pill in the licence colour, heavy white times with the class best in purple. The tables use Manrope (SIL OFL), bundled.
+- The gap reads like the lap times; the relative's gaps are red ahead and green behind.
+
 ## [0.28.4] — 2026-11-15
 
 ### Changed

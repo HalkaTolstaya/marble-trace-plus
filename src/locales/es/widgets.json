@@ -395,7 +395,17 @@
       "showReference": "Mostrar referencia",
       "showReferenceDesc": "Dibuja el acelerador y el freno de la vuelta de referencia activa detrás de tus líneas, en el mismo punto de la vuelta.",
       "referenceOpacity": "Opacidad de la referencia",
-      "referenceOpacityDesc": "Intensidad del relleno de las áreas de referencia."
+      "referenceOpacityDesc": "Intensidad del relleno de las áreas de referencia.",
+      "revLights": "Luces de revoluciones",
+      "revLightsHint": "En el juego la barra se vuelve azul con el limitador de boxes activado.",
+      "comparison": "Comparación",
+      "comparisonHint": "Tu acelerador y freno frente a la vuelta de referencia en el mismo punto.",
+      "showRevLights": "Mostrar luces",
+      "revLightsGlow": "Brillo LED",
+      "showPitLimiterLights": "Luces de limitador",
+      "compareThrottle": "Acelerador",
+      "compareBrake": "Freno",
+      "showDistance": "Mostrar distancia"
     },
     "linearMap": {
       "moduleLayout": "Disposición del módulo",

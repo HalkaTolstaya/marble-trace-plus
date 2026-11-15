@@ -14,3 +14,15 @@
   // attribute (backing-store size), which overflows once the widget is taller.
   height: 100%;
 }
+
+.distanceTag {
+  position: absolute;
+  top: ws(3);
+  left: ws(6);
+  font-family: $font-table;
+  font-size: fs(xxs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: $widget-text-secondary;
+  pointer-events: none;
+}

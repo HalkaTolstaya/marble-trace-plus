@@ -335,9 +335,13 @@ export const drawInputTrace = (
   };
 
   if (settings.showReference && state.refBuffer.length > 0) {
-    if (settings.showThrottle) drawReference(pass, 0, settings.throttleColor);
+    if (settings.showThrottle && settings.compareThrottle) {
+      drawReference(pass, 0, settings.throttleColor);
+    }
 
-    if (settings.showBrake) drawReference(pass, 1, settings.brakeColor);
+    if (settings.showBrake && settings.compareBrake) {
+      drawReference(pass, 1, settings.brakeColor);
+    }
   }
 
   for (let channelIndex = 0; channelIndex < channels.length; channelIndex++) {

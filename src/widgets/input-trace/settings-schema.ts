@@ -85,6 +85,18 @@ export const INPUT_TRACE_SETTINGS = defineSettings('inputTrace', {
    * live lines, at the lap distance the car was at (ADR-0014).
    */
   showReference: bool(true),
+  /** In the comparison: the reference lap's throttle trace. */
+  compareThrottle: bool(true),
+  /** In the comparison: the reference lap's brake trace. */
+  compareBrake: bool(true),
+  /** The lap distance in metres over the graph. */
+  showDistance: bool(false),
+  /** The revs as a strip of lights across the top. */
+  showRevLights: bool(true),
+  /** Lit rev lights bloom. */
+  revLightsGlow: bool(true),
+  /** The rev strip turns blue while the pit limiter is on. */
+  showPitLimiterLights: bool(true),
   referenceOpacity: num(0.3, { min: 0.05, max: 0.8, step: 0.05 }),
   historySeconds: num(5, { min: 1, max: 60, step: 1 }),
   lineWidth: num(3.5, { min: 1, max: 10, step: 0.5 }),

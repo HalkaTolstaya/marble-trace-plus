@@ -395,7 +395,17 @@
       "showReference": "显示参考",
       "showReferenceDesc": "在你的曲线后方，按圈内相同位置绘制当前参考圈的油门和刹车。",
       "referenceOpacity": "参考不透明度",
-      "referenceOpacityDesc": "参考区域的填充强度。"
+      "referenceOpacityDesc": "参考区域的填充强度。",
+      "revLights": "转速灯",
+      "revLightsHint": "游戏中开启维修区限速时，灯条变为蓝色。",
+      "comparison": "对比",
+      "comparisonHint": "在同一圈位置对比你与参考圈的油门和刹车。",
+      "showRevLights": "显示转速灯",
+      "revLightsGlow": "LED 光晕",
+      "showPitLimiterLights": "限速灯",
+      "compareThrottle": "油门",
+      "compareBrake": "刹车",
+      "showDistance": "显示距离"
     },
     "linearMap": {
       "moduleLayout": "模块布局",

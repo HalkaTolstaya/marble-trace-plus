@@ -395,7 +395,17 @@
       "showReference": "Show reference",
       "showReferenceDesc": "Draw the active reference lap's throttle and brake behind your lines, at the same place on the lap.",
       "referenceOpacity": "Reference opacity",
-      "referenceOpacityDesc": "How strongly the reference areas are filled."
+      "referenceOpacityDesc": "How strongly the reference areas are filled.",
+      "revLights": "Rev Lights",
+      "revLightsHint": "In a game the strip turns blue whenever your pit limiter is on.",
+      "comparison": "Comparison",
+      "comparisonHint": "Your throttle and brake against the reference lap, at the same point of the lap.",
+      "showRevLights": "Show rev lights",
+      "revLightsGlow": "LED glow",
+      "showPitLimiterLights": "Pit limiter lights",
+      "compareThrottle": "Throttle",
+      "compareBrake": "Brake",
+      "showDistance": "Show distance"
     },
     "linearMap": {
       "moduleLayout": "Module Layout",
