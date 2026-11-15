@@ -49,6 +49,8 @@ interface TrackMapSvgProps {
 }
 
 const MIN_ZOOM_LEVEL = 1;
+/** The lit hairline along each edge of the track surface, in screen px. */
+const TRACK_EDGE_LIGHT_PX = 1;
 /** Lap fraction sampled ahead of the player to read the travel direction. */
 const HEADING_SAMPLE_PCT = 0.004;
 /** Screen "up" in SVG coordinates, where the Y axis grows downwards. */
@@ -399,26 +401,27 @@ export const TrackMapSvg = observer(
         style={circleStyle}
       >
         <g className={styles.content}>
-          {/* Track border */}
+          {/* The ribbon, widest first: a dark casing that holds on any
+              ground, a hairline of light on both edges, the surface. */}
           <path
             d={svgPath}
-            fill="none"
-            stroke="#252525"
-            strokeWidth={trackBorderPx * renderScale}
-            strokeLinejoin="round"
-            strokeLinecap="round"
-            opacity="0.6"
+            className={styles.trackCasing}
+            strokeWidth={(trackStrokePx + trackBorderPx * 2) * renderScale}
           />
 
-          {/* Track surface */}
+          <path
+            d={svgPath}
+            className={styles.trackEdge}
+            strokeWidth={
+              (trackStrokePx + TRACK_EDGE_LIGHT_PX * 2) * renderScale
+            }
+          />
+
           <path
             ref={pathRef}
             d={svgPath}
-            fill="none"
-            stroke="#272727"
+            className={styles.trackSurface}
             strokeWidth={trackStrokePx * renderScale}
-            strokeLinejoin="round"
-            strokeLinecap="round"
           />
 
           {/* Sector colored arcs */}
@@ -468,7 +471,8 @@ export const TrackMapSvg = observer(
                   angle={angle}
                   trackCenterX={trackCenter.x}
                   trackCenterY={trackCenter.y}
-                  scale={zoomActive ? 1 / zoomLevel : 1}
+                  trackWidth={trackStrokePx * renderScale}
+                  scale={renderScale}
                 />
               );
             })()}
@@ -523,6 +527,7 @@ export const TrackMapSvg = observer(
                     label={label}
                     labelIsPlayer={car.isPlayer}
                     playerColor={playerDotColor}
+                    playerHalo
                   />
                 </g>
               );

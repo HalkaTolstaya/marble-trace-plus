@@ -230,3 +230,14 @@ $widget-chip-bevel:
 // white, so the cap reads as light on the bar rather than a second colour.
 $widget-cap-positive: color-mix(in srgb, $race-green 45%, #ffffff);
 $widget-cap-danger: color-mix(in srgb, $race-red 45%, #ffffff);
+
+// Track map — the circuit as a dark ribbon drawn straight on the game: a
+// casing that holds its edge on any ground, a hairline of light, the surface.
+$map-track-casing: rgba(6, 7, 9, 0.78);
+$map-track-edge: rgba(255, 255, 255, 0.3);
+$map-track-surface: #1c1e24;
+// A car's marker: the disc the number sits on, and the ring that singles out
+// the player's own.
+$map-dot-surface: #101216;
+$map-dot-casing: rgba(6, 7, 9, 0.85);
+$map-player-halo: rgba(46, 230, 128, 0.75);

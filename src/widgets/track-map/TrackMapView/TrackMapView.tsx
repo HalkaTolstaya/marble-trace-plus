@@ -142,7 +142,13 @@ export const TrackMapView = observer(
       ];
     });
 
-    const cars: CarOnTrack[] = [...competitorCars, ...paceCars];
+    // Markers paint in list order, so the player's goes last: in a pack it is
+    // the one dot that must not end up under another.
+    const cars: CarOnTrack[] = [
+      ...competitorCars.filter((car) => !car.isPlayer),
+      ...paceCars,
+      ...competitorCars.filter((car) => car.isPlayer),
+    ];
 
     if (!rotatedTrackData) {
       return (

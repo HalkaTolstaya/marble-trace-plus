@@ -30,7 +30,26 @@
   );
 }
 
+.trackCasing,
+.trackEdge,
+.trackSurface {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.trackCasing {
+  stroke: $map-track-casing;
+}
+
+.trackEdge {
+  stroke: $map-track-edge;
+}
+
+.trackSurface {
+  stroke: $map-track-surface;
+}
+
 .sectorArc {
   pointer-events: none;
-  opacity: 0.8;
 }
