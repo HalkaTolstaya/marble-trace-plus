@@ -1,4 +1,5 @@
 import {
+  AVG_LAP_MODE,
   LAP_COUNTER,
   LIC_BADGE_STYLE,
   ROW_PADDING,
@@ -23,6 +24,7 @@ import {
 } from './standings-utils';
 
 const PLAYER_WINDOW = { min: 0, max: 5, step: 1 };
+const TIMING_DECIMALS = { min: 0, max: 3, step: 1 };
 
 /**
  * The settings that change the table's width: each one re-measures it, so
@@ -41,6 +43,8 @@ const COLUMNS = {
     { label: 'common.nameColumnWidth' }
   ),
   showPosChange: bool(true),
+  /** Car number badge, in its own column after the position change. */
+  showCarNumber: bool(true),
   /** Driver's profile country flag, in its own column before the name. */
   showCountryFlag: bool(false),
   showBrand: bool(true),
@@ -66,9 +70,19 @@ const COLUMNS = {
   showIrChange: bool(true),
   /** Gap to the leader of the table's current reference (overall or class). */
   showGap: bool(true),
-  showLastLap: bool(true),
+  /** Gap to the car ahead in the same class. */
+  showInterval: bool(true),
   showBestLap: bool(true),
-  showLapsCompleted: bool(true),
+  showLastLap: bool(true),
+  /** Average lap, as `avgLapMode` says (LapPaceTracker). */
+  showAvgLap: bool(true),
+  /** Laps since the car last left pit road. */
+  showStintLaps: bool(false),
+  showLapsCompleted: bool(false),
+  /** Digits after the point in the gap and the interval. */
+  gapDecimals: num(3, TIMING_DECIMALS),
+  /** Digits after the point in lap times. */
+  lapTimeDecimals: num(3, TIMING_DECIMALS),
 } as const;
 
 export const STANDINGS_COLUMN_KEYS = Object.keys(COLUMNS) as Array<
@@ -77,7 +91,21 @@ export const STANDINGS_COLUMN_KEYS = Object.keys(COLUMNS) as Array<
 
 export const STANDINGS_SETTINGS = defineSettings('standings', {
   rowPadding: choice(ROW_PADDING, 'narrow', { label: 'common.rowPadding' }),
-  viewMode: choice(STANDINGS_VIEW_MODE, 'all'),
+  viewMode: choice(STANDINGS_VIEW_MODE, 'grouped'),
+  /** Grouped view: every class, or the player's own class alone. */
+  showOtherClasses: bool(true),
+  /** Grouped view: rows of the player's class. */
+  ownClassRows: num(10, { min: 1, max: 30, step: 1 }),
+  /**
+   * Grouped view: the class leaders kept at the top once the player is further
+   * back than the rows allow; the rest go to the cars around the player. 0
+   * gives every row to them.
+   */
+  leaderRows: num(3, { min: 0, max: 10, step: 1 }),
+  /** Grouped view: rows of every other class, its leaders. */
+  otherClassRows: num(3, { min: 1, max: 20, step: 1 }),
+  /** Which laps the average-lap column averages. */
+  avgLapMode: choice(AVG_LAP_MODE, 'session'),
   /** Seconds of inactivity after which a manual scroll returns to the automatic view (0 = keep it). */
   scrollResetSeconds: num(8, { min: 0, max: 30 }),
   ...COLUMNS,
@@ -92,8 +120,6 @@ export const STANDINGS_SETTINGS = defineSettings('standings', {
   driversAhead: num(0, PLAYER_WINDOW),
   /** Rows shown behind the player when they no longer fit in the top block. */
   driversBehind: num(0, PLAYER_WINDOW),
-  /** Driver rows each class gets in grouped view (0 = split the widget height evenly between classes). */
-  groupedRowsPerClass: num(0, { min: 0, max: 30, step: 1 }),
   showColumnHeaders: bool(true),
   /** The whole bar above the table: session type, field, SOF, track, laps and clock. */
   showSessionHeader: bool(true),

@@ -102,17 +102,31 @@ export function formatGear(gear: number): string {
   return gear.toString();
 }
 
-export function formatLapTime(seconds: number | null): string {
-  if (seconds === null || seconds <= 0) return '--:--.---';
+const LAP_TIME_DECIMALS = 3;
 
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
+/** "1:46.000"; `decimals` from 0 to 3 drops digits after the point. */
+export function formatLapTime(
+  seconds: number | null,
+  decimals: number = LAP_TIME_DECIMALS
+): string {
+  const digits = Math.max(0, Math.min(LAP_TIME_DECIMALS, Math.round(decimals)));
 
-  if (mins > 0) {
-    return `${mins}:${secs.toFixed(3).padStart(6, '0')}`;
+  if (seconds === null || seconds <= 0) {
+    return digits > 0 ? `--:--.${'-'.repeat(digits)}` : '--:--';
   }
 
-  return secs.toFixed(3);
+  // Rounded once, so 59.9996 becomes "1:00.000" and not "0:60.000".
+  const scale = 10 ** digits;
+  const rounded = Math.round(seconds * scale) / scale;
+  const mins = Math.floor(rounded / 60);
+  const secs = rounded - mins * 60;
+  const secondsWidth = digits > 0 ? 3 + digits : 2;
+
+  if (mins > 0) {
+    return `${mins}:${secs.toFixed(digits).padStart(secondsWidth, '0')}`;
+  }
+
+  return secs.toFixed(digits);
 }
 
 export function formatSessionTime(seconds: number | null): string {

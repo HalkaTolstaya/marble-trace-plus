@@ -337,11 +337,28 @@
 .gapValue {
   font-family: $font-mono;
   font-size: fs(md);
-  font-weight: 400;
+  // Read like the lap times beside it, not as a secondary number.
+  font-weight: 900;
   color: $widget-text-primary;
 }
 
 // Lap time columns
+.interval {
+  font-family: $font-mono;
+  font-size: fs(md);
+  font-weight: 900;
+  color: $widget-text-primary;
+}
+
+// The car the player is chasing, and the one chasing the player.
+.intervalAhead {
+  color: $widget-status-danger;
+}
+
+.intervalBehind {
+  color: $widget-status-positive;
+}
+
 .lastLap {
   font-family: $font-mono;
   font-size: fs(md);

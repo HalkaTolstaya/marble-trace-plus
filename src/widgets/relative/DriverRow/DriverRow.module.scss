@@ -217,13 +217,72 @@
 }
 
 .f2Positive {
-  color: $widget-status-danger;
+  // A car behind the player: green, as the interval in Standings.
+  color: $widget-status-positive;
 }
 
 .f2Negative {
-  color: $widget-status-info;
+  // A car ahead of the player: red, the one to chase.
+  color: $widget-status-danger;
 }
 
 .f2Player {
   color: $widget-status-caution;
+}
+
+.cellCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cellRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.lapTime {
+  font-family: $font-mono;
+  font-size: fs(md);
+  font-weight: 900;
+  color: $widget-text-primary;
+}
+
+.lapTimeBest {
+  color: $widget-text-best-lap;
+}
+
+.lapChip {
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: $font-mono;
+  font-size: fs(sm);
+  font-weight: 700;
+  color: $widget-text-secondary;
+  background: $widget-surface-raised;
+  box-shadow: inset 0 0 0 1px $widget-border-subtle;
+}
+
+.changeUp,
+.changeDown,
+.changeNeutral {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  font-family: $font-mono;
+  font-size: fs(sm);
+  font-weight: 700;
+}
+
+.changeUp {
+  color: $widget-status-positive;
+}
+
+.changeDown {
+  color: $widget-status-danger;
+}
+
+.changeNeutral {
+  color: $widget-text-muted;
 }

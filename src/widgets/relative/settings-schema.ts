@@ -1,5 +1,9 @@
 import {
+  AVG_LAP_MODE,
+  CLOCK_FORMAT,
   LIC_BADGE_STYLE,
+  NAME_FORMAT,
+  RACE_TIMER,
   QUALIFYING_VISIBILITY,
   ROW_PADDING,
 } from '@shared/contracts/widget-choices';
@@ -20,6 +24,9 @@ import {
   NAME_COLUMN_MAX_PX,
   NAME_COLUMN_MIN_PX,
 } from './relative-utils';
+
+const TIMING_DECIMALS = { min: 0, max: 3, step: 1 };
+const DRIVERS_SHOWN = { min: 0, max: 8, step: 1 };
 
 /**
  * The settings that change the table's width: each one re-measures it, so
@@ -50,6 +57,23 @@ const COLUMNS = {
   abbreviateIRating: bool(true),
   /** Driver's profile country flag, in its own column before the name. */
   showCountryFlag: bool(false),
+  /** Places gained (▲) or lost (▼) in the class since the start. */
+  showPosChange: bool(true),
+  /** Projected iRating change. */
+  showIrChange: bool(true),
+  /** The lap the car is on, "L29". */
+  showLapNumber: bool(true),
+  showBestLap: bool(true),
+  showLastLap: bool(true),
+  /** Average lap, as `avgLapMode` says (LapPaceTracker). */
+  showAvgLap: bool(true),
+  showTire: bool(false),
+  /** Laps since the car last left pit road. */
+  showStintLaps: bool(false),
+  /** Digits after the point in the relative gap. */
+  gapDecimals: num(1, TIMING_DECIMALS),
+  /** Digits after the point in lap times. */
+  lapTimeDecimals: num(2, TIMING_DECIMALS),
 } as const;
 
 export const RELATIVE_COLUMN_KEYS = Object.keys(COLUMNS) as Array<
@@ -69,8 +93,25 @@ export const RELATIVE_SETTINGS = defineSettings('relative', {
   showPitIndicator: bool(true, { label: 'common.showPitIndicator' }),
   /** Mic beside the driver on the radio, in the channel's colour. */
   showRadioMark: bool(true, { label: 'common.showRadioMark' }),
-  abbreviateNames: bool(true),
+  /** "J. Smith", "Smith" or "John Smith". */
+  nameFormat: choice(NAME_FORMAT, 'initial'),
   showDriverFlags: bool(true),
+  /** Cars shown in front of the player. */
+  driversAhead: num(3, DRIVERS_SHOWN),
+  /** Cars shown behind the player. */
+  driversBehind: num(3, DRIVERS_SHOWN),
+  /** Which laps the average-lap column averages. */
+  avgLapMode: choice(AVG_LAP_MODE, 'session'),
+  showColumnHeaders: bool(true),
+  /** The strip above the table: temperatures, SoF, incidents and the clock. */
+  showTableHeader: bool(true),
+  /** The strip under the table: the player's lap and the session timer. */
+  showTableFooter: bool(true),
+  /** What the footer's session timer shows. */
+  raceTimer: choice(RACE_TIMER, 'timeAndLaps'),
+  /** The time of day in the footer. */
+  showRealTimeClock: bool(false),
+  clockFormat: choice(CLOCK_FORMAT, '24h'),
   /** Highlight color for the player's own row. */
   playerRowColor: color(DEFAULT_PLAYER_ROW_COLOR, {
     label: 'common.playerRowColor',

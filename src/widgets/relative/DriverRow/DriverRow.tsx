@@ -2,7 +2,6 @@ import { useWidgetSettings } from '@entities/layout/useWidgetSettings';
 import type { CSSProperties } from 'react';
 import { observer } from 'mobx-react-lite';
 import {
-  abbreviateName,
   formatCarNumber,
   TRACK_SURFACE_IN_PIT_STALL,
   TRACK_SURFACE_OFF_TRACK,
@@ -17,8 +16,17 @@ import { LicBadge } from '@shared/ui/RatingBadge/LicBadge';
 import { formatIr } from '@shared/ui/RatingBadge/LicBadge.utils';
 import {
   buildRelativeGridTemplate,
+  classPlacesGained,
+  formatDriverName,
   resolveRowPosition,
 } from '@widgets/relative/relative-utils';
+import { formatLapTime } from '@shared/lib/telemetry-format';
+import { formatAverageLap } from '@entities/cars/lap-pace';
+import { hasRaceStarted } from '@shared/lib/timer-utils';
+import { TireBadge } from '@shared/ui/TireBadge/TireBadge';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useSessionStore } from '@entities/session/session-context';
+import { useRelativeWidgetStore } from '@widgets/relative/relative.store';
 import { useReactiveDomWrite } from '@shared/hooks/useReactiveDomWrite';
 
 import styles from './DriverRow.module.scss';
@@ -38,6 +46,8 @@ interface DriverRowProps {
  */
 export const DriverRow = observer(({ carIdx, index }: DriverRowProps) => {
   const computed = useBackendComputedStore();
+  const relativeWidget = useRelativeWidgetStore();
+  const { session } = useSessionStore();
 
   const settings = useWidgetSettings<RelativeWidgetSettings>('relative');
 
@@ -62,10 +72,10 @@ export const DriverRow = observer(({ carIdx, index }: DriverRowProps) => {
 
       const gapText =
         relativeGap > 0
-          ? `+${relativeGap.toFixed(1)}`
+          ? `+${relativeGap.toFixed(settings.gapDecimals)}`
           : relativeGap < 0
-            ? relativeGap.toFixed(1)
-            : '0.0';
+            ? relativeGap.toFixed(settings.gapDecimals)
+            : (0).toFixed(settings.gapDecimals);
 
       const gapClass = liveDriver.isPlayer
         ? styles.f2Player
@@ -105,7 +115,7 @@ export const DriverRow = observer(({ carIdx, index }: DriverRowProps) => {
         }
       });
     },
-    [computed, carIdx]
+    [computed, carIdx, settings.gapDecimals]
   );
 
   if (!driver) {
@@ -139,6 +149,50 @@ export const DriverRow = observer(({ carIdx, index }: DriverRowProps) => {
 
   const formattedCarNumber = formatCarNumber(driver.carNumber);
 
+  const placesGained = hasRaceStarted(session?.session_state ?? null)
+    ? classPlacesGained(
+        driver.startPosClass,
+        settings.useLivePositions
+          ? driver.liveClassPosition
+          : driver.classPosition
+      )
+    : null;
+
+  const posChangeMark =
+    placesGained === null || placesGained === 0 ? (
+      <span className={styles.changeNeutral}>–</span>
+    ) : placesGained > 0 ? (
+      <span className={styles.changeUp}>
+        <ChevronUp size={11} />
+        {placesGained}
+      </span>
+    ) : (
+      <span className={styles.changeDown}>
+        <ChevronDown size={11} />
+        {-placesGained}
+      </span>
+    );
+
+  const irDelta = settings.useLivePositions
+    ? driver.estimatedIrDeltaLive
+    : driver.estimatedIrDeltaOfficial;
+  const roundedIrDelta = irDelta === null ? null : Math.round(irDelta);
+
+  const irChangeMark =
+    roundedIrDelta === null || roundedIrDelta === 0 ? (
+      <span className={styles.changeNeutral}>–</span>
+    ) : (
+      <span
+        className={roundedIrDelta > 0 ? styles.changeUp : styles.changeDown}
+      >
+        {roundedIrDelta > 0 ? `+${roundedIrDelta}` : roundedIrDelta}
+      </span>
+    );
+
+  const isClassBest =
+    driver.bestLapTime !== null &&
+    relativeWidget.classBestLaps.get(driver.carClassId) === driver.bestLapTime;
+
   const gridTemplate = buildRelativeGridTemplate(settings);
 
   const rowFill = playerRowStyle(driver.isPlayer, settings.playerRowColor);
@@ -163,6 +217,10 @@ export const DriverRow = observer(({ carIdx, index }: DriverRowProps) => {
           {position}
         </span>
       </div>
+
+      {settings.showPosChange && (
+        <div className={styles.cellCenter}>{posChangeMark}</div>
+      )}
 
       {settings.showCarNumber && (
         <div className={styles.carNumberCell}>
@@ -197,9 +255,7 @@ export const DriverRow = observer(({ carIdx, index }: DriverRowProps) => {
             .filter(Boolean)
             .join(' ')}
         >
-          {settings.abbreviateNames
-            ? abbreviateName(driver.userName)
-            : driver.userName}
+          {formatDriverName(driver.userName, settings.nameFormat)}
         </span>
 
         {settings.showRadioMark && (
@@ -217,6 +273,12 @@ export const DriverRow = observer(({ carIdx, index }: DriverRowProps) => {
         />
       </div>
 
+      {settings.showLapNumber && (
+        <div className={styles.cellCenter}>
+          <span className={styles.lapChip}>L{driver.lap}</span>
+        </div>
+      )}
+
       {settings.showLicBadge ? (
         <div className={styles.colLic}>
           <LicBadge
@@ -232,6 +294,53 @@ export const DriverRow = observer(({ carIdx, index }: DriverRowProps) => {
           <span>{formatIr(driver.iRating, settings.abbreviateIRating)}</span>
         </div>
       ) : null}
+
+      {settings.showIrChange && (
+        <div className={styles.cellCenter}>{irChangeMark}</div>
+      )}
+
+      {settings.showBestLap && (
+        <div className={styles.cellRight}>
+          <span
+            className={`${styles.lapTime} ${isClassBest ? styles.lapTimeBest : ''}`}
+          >
+            {formatLapTime(driver.bestLapTime, settings.lapTimeDecimals)}
+          </span>
+        </div>
+      )}
+
+      {settings.showLastLap && (
+        <div className={styles.cellRight}>
+          <span className={styles.lapTime}>
+            {formatLapTime(driver.lastLapTime, settings.lapTimeDecimals)}
+          </span>
+        </div>
+      )}
+
+      {settings.showAvgLap && (
+        <div className={styles.cellRight}>
+          <span className={styles.lapTime}>
+            {formatAverageLap(
+              relativeWidget.lapPace.averageLap(carIdx, settings.avgLapMode),
+              settings.lapTimeDecimals
+            )}
+          </span>
+        </div>
+      )}
+
+      {settings.showStintLaps && (
+        <div className={styles.cellCenter}>
+          <span className={styles.lapTime}>
+            {relativeWidget.lapPace.stintLaps(carIdx, driver.lap)}
+          </span>
+        </div>
+      )}
+
+      {settings.showTire && (
+        <div className={styles.cellCenter}>
+          <TireBadge tire={driver.tireCompound} />
+        </div>
+      )}
 
       <div className={styles.f2Block}>
         <span ref={gapRef} className={styles.f2Time} />

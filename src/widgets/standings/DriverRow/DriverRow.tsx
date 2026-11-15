@@ -2,6 +2,7 @@
 import type { CSSProperties } from 'react';
 import { observer } from 'mobx-react-lite';
 import { formatLapTime } from '@shared/lib/telemetry-format';
+import { formatAverageLap } from '@entities/cars/lap-pace';
 import {
   abbreviateName,
   formatBrand,
@@ -87,7 +88,8 @@ export const DriverRow = observer(
           liveLeader,
           isRaceSession,
           leads,
-          calculateLapsBehind(liveLeader, liveDriver)
+          calculateLapsBehind(liveLeader, liveDriver),
+          { decimals: settings.gapDecimals, signed: true }
         );
 
         scheduleWrite(() => {
@@ -96,6 +98,42 @@ export const DriverRow = observer(
           element.classList.toggle(styles.gapLeader, isMuted);
           element.classList.toggle(styles.gapValue, !isMuted);
           element.textContent = gapInfo.value;
+        });
+      },
+      [computed, standingsWidget, session, settings, carIdx]
+    );
+
+    // Interval: the same measure as the gap, against the car ahead in the
+    // class instead of its leader. A class leader has nothing ahead.
+    const intervalRef = useReactiveDomWrite<HTMLSpanElement>(
+      (element, scheduleWrite) => {
+        const liveDriver = computed.driverEntryOf(carIdx);
+        const aheadIdx = standingsWidget.carAheadInClass.get(carIdx);
+        const liveAhead =
+          aheadIdx === undefined ? null : computed.driverEntryOf(aheadIdx);
+
+        if (!liveDriver) {
+          return;
+        }
+
+        const sessions = session.sessionInfo?.sessions;
+        const isRaceSession =
+          sessions?.[session.sessionInfo?.currentSessionNum ?? 0]
+            ?.sessionType === 'Race';
+
+        const intervalInfo = liveAhead
+          ? getStandingsGap(
+              liveDriver,
+              liveAhead,
+              isRaceSession,
+              false,
+              calculateLapsBehind(liveAhead, liveDriver),
+              { decimals: settings.gapDecimals, signed: true }
+            )
+          : null;
+
+        scheduleWrite(() => {
+          element.textContent = intervalInfo?.value ?? '';
         });
       },
       [computed, standingsWidget, session, settings, carIdx]
@@ -171,6 +209,16 @@ export const DriverRow = observer(
 
     const bestLap = resolveBestLapDisplay(driver);
 
+    // Within the player's class: a car ahead reads its interval in red, one
+    // behind in green; every other car keeps the plain colour.
+    const playerSide = standingsWidget.sideOfPlayer.get(carIdx);
+    const intervalSideClass =
+      playerSide === 'ahead'
+        ? styles.intervalAhead
+        : playerSide === 'behind'
+          ? styles.intervalBehind
+          : '';
+
     // One switch mutes every informational column at once, so the row's accent
     // is left to the position, the name and the best lap.
     const dimClass = settings.dimSecondaryColumns ? styles.cellDimmed : '';
@@ -184,21 +232,23 @@ export const DriverRow = observer(
       >
         <PositionCell carIdx={carIdx} />
 
-        <div className={`${styles.cell} ${styles.carNumberCell}`}>
-          <span
-            className={styles.carNumber}
-            style={{
-              backgroundColor: driver.carClassColor,
-              color: getContrastTextColor(driver.carClassColor),
-            }}
-          >
-            {formattedCarNumber}
-          </span>
-        </div>
-
         {settings.showPosChange && (
           <div className={`${styles.cell} ${styles.cellCenter}`}>
             <PosChange carIdx={carIdx} />
+          </div>
+        )}
+
+        {settings.showCarNumber && (
+          <div className={`${styles.cell} ${styles.carNumberCell}`}>
+            <span
+              className={styles.carNumber}
+              style={{
+                backgroundColor: driver.carClassColor,
+                color: getContrastTextColor(driver.carClassColor),
+              }}
+            >
+              {formattedCarNumber}
+            </span>
           </div>
         )}
 
@@ -278,11 +328,12 @@ export const DriverRow = observer(
           </div>
         )}
 
-        {settings.showLastLap && (
+        {settings.showInterval && (
           <div className={`${styles.cell} ${styles.cellRight}`}>
-            <span className={`${styles.lastLap} ${dimClass}`}>
-              {isPit ? '-' : formatLapTime(driver.lastLapTime)}
-            </span>
+            <span
+              ref={intervalRef}
+              className={`${styles.interval} ${intervalSideClass}`}
+            />
           </div>
         )}
 
@@ -291,7 +342,36 @@ export const DriverRow = observer(
             <span
               className={`${styles.bestLap} ${isClassBestLap ? styles.bestLapFastest : ''} ${bestLap.isQualifying ? styles.bestLapQualifying : ''}`}
             >
-              {formatLapTime(bestLap.time)}
+              {formatLapTime(bestLap.time, settings.lapTimeDecimals)}
+            </span>
+          </div>
+        )}
+
+        {settings.showLastLap && (
+          <div className={`${styles.cell} ${styles.cellRight}`}>
+            <span className={`${styles.lastLap} ${dimClass}`}>
+              {isPit
+                ? '-'
+                : formatLapTime(driver.lastLapTime, settings.lapTimeDecimals)}
+            </span>
+          </div>
+        )}
+
+        {settings.showAvgLap && (
+          <div className={`${styles.cell} ${styles.cellRight}`}>
+            <span className={`${styles.lastLap} ${dimClass}`}>
+              {formatAverageLap(
+                standingsWidget.lapPace.averageLap(carIdx, settings.avgLapMode),
+                settings.lapTimeDecimals
+              )}
+            </span>
+          </div>
+        )}
+
+        {settings.showStintLaps && (
+          <div className={`${styles.cell} ${styles.cellCenter}`}>
+            <span className={`${styles.lapsCompleted} ${dimClass}`}>
+              {standingsWidget.lapPace.stintLaps(carIdx, driver.lap)}
             </span>
           </div>
         )}

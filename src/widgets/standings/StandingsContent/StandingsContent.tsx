@@ -13,7 +13,10 @@ import { useAppSettingsStore } from '@entities/app-settings/app-settings-context
 import { useBackendComputedStore } from '@entities/cars/computed-context';
 import { useSimStore } from '@entities/sim/sim-context';
 import { useStandingsWidgetStore } from '@widgets/standings/standings.store';
-import { buildVisibleRows } from '@widgets/standings/standings-utils';
+import {
+  buildVisibleRows,
+  multiclassRows,
+} from '@widgets/standings/standings-utils';
 import { computeClassSof } from '@shared/lib/driver';
 import { SINGLE_LIST_SCROLL_KEY } from '@widgets/standings/standings.store';
 import type { ScrollMetrics } from '@shared/lib/canvas';
@@ -83,28 +86,28 @@ export const StandingsContent = observer(() => {
   );
 
   // Classes below the widget height are cut off, so the drawn set starts at the
-  // class the scroll has raised to the top.
+  // class the scroll has raised to the top. Without the other classes the
+  // player's own is the only one drawn.
+  const shownClassGroups = settings.showOtherClasses
+    ? allClassGroups
+    : allClassGroups.filter((group) =>
+        group.drivers.some((driver) => driver.isPlayer)
+      );
+
   const drawnClassGroups = isGrouped
-    ? allClassGroups.slice(standingsWidget.groupScrollIndex)
-    : allClassGroups;
+    ? shownClassGroups.slice(standingsWidget.groupScrollIndex)
+    : shownClassGroups;
 
-  const rowsPerGroupedClass = (() => {
-    if (!isGrouped || drawnClassGroups.length === 0) {
-      return 0;
-    }
+  // The player's class gets its own row count; every other class its leaders.
+  const rowsForGroup = (group: DriverGroup) =>
+    group.drivers.some((driver) => driver.isPlayer)
+      ? settings.ownClassRows
+      : settings.otherClassRows;
 
-    if (settings.groupedRowsPerClass > 0) {
-      return settings.groupedRowsPerClass;
-    }
-
-    const classHeaderRows = drawnClassGroups.length;
-    const rowsLeftForDrivers = Math.max(1, visibleRowCount - classHeaderRows);
-
-    return Math.max(
-      1,
-      Math.floor(rowsLeftForDrivers / drawnClassGroups.length)
-    );
-  })();
+  const rowsPerGroupedClass =
+    isGrouped && drawnClassGroups.length > 0
+      ? Math.max(...drawnClassGroups.map(rowsForGroup))
+      : 0;
 
   const clampedClassIndex = Math.min(
     activeClassIndex,
@@ -121,7 +124,7 @@ export const StandingsContent = observer(() => {
     ? new Map(
         drawnClassGroups.map((group) => [
           group.classId,
-          { total: group.drivers.length, windowSize: rowsPerGroupedClass },
+          { total: group.drivers.length, windowSize: rowsForGroup(group) },
         ])
       )
     : new Map([
@@ -281,9 +284,9 @@ export const StandingsContent = observer(() => {
                   key={group.classId}
                   group={{
                     ...group,
-                    ...visibleRows(
+                    ...multiclassRows(
                       group.drivers,
-                      rowsPerGroupedClass,
+                      settings,
                       standingsWidget.scrollOffsetFor(group.classId)
                     ),
                   }}

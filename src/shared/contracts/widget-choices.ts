@@ -50,6 +50,25 @@ export type LapDeltaReference = (typeof LAP_DELTA_REFERENCE)[number];
 export const FLAG_ZONE_STYLE = ['filled', 'outline'] as const;
 export type FlagZoneStyle = (typeof FLAG_ZONE_STYLE)[number];
 
+/**
+ * What the average-lap column averages. `recent`: each car's last five clean
+ * laps (no pit, no unusually slow lap). `session`: every lap it has completed.
+ */
+export const AVG_LAP_MODE = ['recent', 'session'] as const;
+export type AvgLapMode = (typeof AVG_LAP_MODE)[number];
+
+/** How a driver's name is written: "J. Smith", "Smith" or "John Smith". */
+export const NAME_FORMAT = ['initial', 'last', 'full'] as const;
+export type NameFormat = (typeof NAME_FORMAT)[number];
+
+/** What a session timer shows: the clock and the laps, or one of them. */
+export const RACE_TIMER = ['timeAndLaps', 'time', 'laps'] as const;
+export type RaceTimer = (typeof RACE_TIMER)[number];
+
+/** A wall clock in 24-hour or 12-hour form. */
+export const CLOCK_FORMAT = ['24h', '12h'] as const;
+export type ClockFormat = (typeof CLOCK_FORMAT)[number];
+
 /** The standings table's view — cycled by a hotkey, in this order. */
 export const STANDINGS_VIEW_MODE = ['all', 'grouped', 'cycling'] as const;
 export type StandingsViewMode = (typeof STANDINGS_VIEW_MODE)[number];

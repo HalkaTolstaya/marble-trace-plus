@@ -1,3 +1,5 @@
+import { computeRelativeDesignWidth } from './relative-utils';
+import { RELATIVE_SETTINGS } from './settings-schema';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import type { RendererCore } from '@app/roots/renderer-core';
@@ -111,7 +113,11 @@ const meta: Meta<StoryArgs> = {
   title: 'Widgets/RelativeWidget',
   ...defineWidgetStories<StoryArgs>({
     widget: RelativeWidget,
-    size: { width: 406, height: 400 },
+    // As wide as the default columns need: the widget sizes itself the same way.
+    size: {
+      width: computeRelativeDesignWidth(RELATIVE_SETTINGS.defaults),
+      height: 400,
+    },
     seedSnapshot: true,
     seed: (store, args, scenarioId) => {
       // A scenario has already spaced the field the way it means to show it, so
@@ -163,7 +169,7 @@ export const MinimalView: Story = {
 };
 
 export const AbbreviatedNames: Story = {
-  args: { settings: { abbreviateNames: true } },
+  args: { settings: { nameFormat: 'initial' } },
 };
 
 export const WithPitBadges: Story = {

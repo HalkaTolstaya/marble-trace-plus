@@ -1,3 +1,5 @@
+import { computeStandingsDesignWidth } from './standings-utils';
+import { STANDINGS_SETTINGS } from './settings-schema';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import type { StandingsWidgetStore } from './standings.store';
@@ -40,7 +42,11 @@ const meta: Meta<StoryArgs> = {
   title: 'Widgets/StandingsWidget',
   ...defineWidgetStories<StoryArgs>({
     widget: StandingsWidget,
-    size: { width: 796, height: 500 },
+    // As wide as the default columns need: the widget sizes itself the same way.
+    size: {
+      width: computeStandingsDesignWidth(STANDINGS_SETTINGS.defaults),
+      height: 560,
+    },
     seedSnapshot: true,
     seed: (store, args, scenarioId) => {
       // A scenario has already spaced the field the way it means to show it, so

@@ -23,6 +23,7 @@ import type { BackendComputedStore } from '@entities/cars/computed.store';
 import type { LiveWidgetsView } from '@entities/layout/live-widgets.store';
 import type { SessionStore } from '@entities/session/session.store';
 import type { PlayerPositionStore } from '@entities/player/player-position.store';
+import { LapPaceTracker } from '@entities/cars/lap-pace';
 import type { StandingsWidgetSettings } from './settings-schema';
 
 interface StandingsDeps {
@@ -145,6 +146,9 @@ export class StandingsWidgetStore implements StandingsHotkeyTarget {
 
   // Wired in the constructor rather than an init() step: the arrows compare
   // consecutive telemetry frames, so the very first frame must already be seen.
+  /** Each car's laps as the overlay saw them: the average and stint columns. */
+  readonly lapPace = new LapPaceTracker();
+
   constructor({ core, instanceId }: WidgetInstanceContext<StandingsDeps>) {
     this.root = core;
     this.instanceId = instanceId;
@@ -161,6 +165,7 @@ export class StandingsWidgetStore implements StandingsHotkeyTarget {
       this,
       {
         root: false,
+        lapPace: false,
         previousPositions: false,
         pendingPositions: false,
         changeTimers: false,
@@ -179,6 +184,7 @@ export class StandingsWidgetStore implements StandingsHotkeyTarget {
         (entries) => {
           this.settleOrder(entries);
           this.trackPositionChanges(entries);
+          this.lapPace.record(entries, this.lapPaceSessionKey);
         }
       )
     );
@@ -470,6 +476,63 @@ export class StandingsWidgetStore implements StandingsHotkeyTarget {
         });
       }, delayMs)
     );
+  }
+
+  /** A new session (or a subsession) starts every car's lap history over. */
+  private get lapPaceSessionKey(): string {
+    const info = this.root.session.sessionInfo;
+
+    return `${info?.currentSessionNum ?? -1}`;
+  }
+
+  /**
+   * The car ahead of each car in its own class, as the table draws them — the
+   * interval column measures against it. A class leader has none.
+   */
+  get carAheadInClass(): Map<number, number> {
+    const result = new Map<number, number>();
+    const lastInClass = new Map<number, number>();
+
+    for (const entry of this.orderedEntries) {
+      const ahead = lastInClass.get(entry.carClassId);
+
+      if (ahead !== undefined) {
+        result.set(entry.carIdx, ahead);
+      }
+
+      lastInClass.set(entry.carClassId, entry.carIdx);
+    }
+
+    return result;
+  }
+
+  /**
+   * Where a car sits against the player within the player's class: `ahead` and
+   * `behind` colour its interval, any other car (another class, the player)
+   * keeps the plain colour.
+   */
+  get sideOfPlayer(): Map<number, 'ahead' | 'behind'> {
+    const result = new Map<number, 'ahead' | 'behind'>();
+    const player = this.orderedEntries.find((entry) => entry.isPlayer);
+
+    if (!player) {
+      return result;
+    }
+
+    let passedPlayer = false;
+
+    for (const entry of this.orderedEntries) {
+      if (entry.carIdx === player.carIdx) {
+        passedPlayer = true;
+        continue;
+      }
+
+      if (entry.carClassId === player.carClassId) {
+        result.set(entry.carIdx, passedPlayer ? 'behind' : 'ahead');
+      }
+    }
+
+    return result;
   }
 
   get driverMap(): Map<number, CarIdentity> {
