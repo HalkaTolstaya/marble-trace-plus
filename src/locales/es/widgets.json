@@ -405,7 +405,9 @@
       "showPitLimiterLights": "Luces de limitador",
       "compareThrottle": "Acelerador",
       "compareBrake": "Freno",
-      "showDistance": "Mostrar distancia"
+      "showDistance": "Eje de distancia",
+      "distanceWindow": "Ventana de distancia",
+      "distanceWindowDesc": "Metros de pista que cubre el gráfico cuando se traza por distancia: por detrás del coche y por delante, en total."
     },
     "linearMap": {
       "moduleLayout": "Disposición del módulo",

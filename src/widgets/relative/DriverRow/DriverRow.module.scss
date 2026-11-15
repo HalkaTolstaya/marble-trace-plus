@@ -203,8 +203,9 @@
 
 .f2Time {
   font-family: $font-table;
-  font-weight: 900;
-  font-size: fs(md);
+  font-weight: 800;
+  // The one number the table is for, a step over everything beside it.
+  font-size: fs(lg);
   text-align: right;
 }
 
@@ -290,11 +291,32 @@
 
 .posBlock {
   justify-content: center;
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--row-class-marker, transparent) 55%, transparent),
-    transparent
-  );
+}
+
+$class-fade-reach: 92;
+
+// The class colour opens the row: densest on the card's edge, through the
+// position and gone before the driver's name. It belongs to the row, not to
+// the position cell, so its reach does not depend on that column's width.
+.driverRow {
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: -1;
+    width: ws($class-fade-reach);
+    border-bottom-left-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--row-class-marker, transparent) 70%, transparent),
+      color-mix(in srgb, var(--row-class-marker, transparent) 26%, transparent)
+        48%,
+      transparent
+    );
+    pointer-events: none;
+  }
 }
 
 .driverPosition {

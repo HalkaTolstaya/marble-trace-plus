@@ -1,10 +1,6 @@
 import { WIDGET_CANVAS_FONT_FAMILY } from '@shared/lib/canvas';
 import type { UnitSystem } from '@shared/contracts/domain';
-import {
-  fillFixedDigits,
-  measureFixedDigits,
-  strokeFixedDigits,
-} from '@shared/lib/canvas';
+import { fillFixedDigits, measureFixedDigits } from '@shared/lib/canvas';
 import {
   displayDistanceToMeters,
   metersToDisplayDistance,
@@ -62,7 +58,8 @@ const OPPONENT_INK = 'rgba(250, 250, 250, 0.82)';
 const PLAYER_INK = 'rgba(250, 250, 250, 0.9)';
 const LABEL_ON_LIGHT = 'rgba(8, 9, 10, 0.92)';
 const LABEL_ON_DARK = 'rgba(250, 250, 250, 0.92)';
-const RIM_LABEL_OUTLINE = 'rgba(0, 0, 0, 0.9)';
+/** Manrope's figures sit a touch high of the em box's middle. */
+const RIM_LABEL_BASELINE_NUDGE = 0.04;
 /** Numbers and counts on a body are read at a glance, so they are bold. */
 const BODY_TEXT_WEIGHT = 700;
 
@@ -607,10 +604,24 @@ const BEAM_RAMP_SHARE = 0.35;
 /** The rim line's alpha against the beam's, and what it keeps on the edge. */
 const RIM_LINE_GAIN = 2.5;
 const RIM_LINE_FLOOR = 0.6;
-const RIM_LINE_WIDTH_PX = 2;
+const RIM_LINE_WIDTH_PX = 3;
 
 /** Where the beam's wash starts, as a share of the radius from the centre. */
 const BEAM_WASH_START = 0.1;
+
+/**
+ * The wash gathers into a band of light just inside the rim — the one glow on
+ * the scope, and a gradient rather than a blur. Where the band starts, and how
+ * far the wash has risen by then, as shares of the radius and of the rim's
+ * alpha.
+ */
+const BEAM_BAND_START = 0.78;
+const BEAM_BAND_START_GAIN = 0.4;
+const BEAM_RIM_GAIN = 1.5;
+
+/** The two straight sides of the sector, drawn as hairlines that fade inwards. */
+const BEAM_SIDE_WIDTH_PX = 1;
+const BEAM_SIDE_GAIN = 1.6;
 
 /**
  * 0 while the car is on or beyond the rim, rising to 1 once it is a ramp's
@@ -630,10 +641,12 @@ export const beamPresence = (
 
 /**
  * The sector that follows an opponent, and the arc that closes it on the rim.
- * The wash is clear at our car and densest at the rim, so the scope around us
- * stays readable; the arc is the beam's edge and fades with it. A car past the
- * rim keeps only the arc — that is the edge marker, the same mark the beam
- * grows out of as the car comes in.
+ * The wash is clear at our car and gathers into a band at the rim, so the
+ * scope around us stays readable; its two sides are hairlines that fade the
+ * same way, which is what makes it a drawn sector and not a smudge. The arc is
+ * the beam's edge and fades with it. A car past the rim keeps only the arc —
+ * that is the edge marker, the same mark the beam grows out of as the car
+ * comes in.
  */
 export const drawBeam = (
   ctx: CanvasRenderingContext2D,
@@ -647,17 +660,42 @@ export const drawBeam = (
   ctx.rotate(span.center);
 
   if (fill && presence > 0) {
-    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, radiusPx);
+    const washAlpha = opacity * presence;
+    const wash = ctx.createRadialGradient(0, 0, 0, 0, 0, radiusPx);
 
-    gradient.addColorStop(BEAM_WASH_START, withAlpha(color, 0));
-    gradient.addColorStop(1, withAlpha(color, opacity * presence));
+    wash.addColorStop(BEAM_WASH_START, withAlpha(color, 0));
+    wash.addColorStop(
+      BEAM_BAND_START,
+      withAlpha(color, washAlpha * BEAM_BAND_START_GAIN)
+    );
+    wash.addColorStop(
+      1,
+      withAlpha(color, Math.min(1, washAlpha * BEAM_RIM_GAIN))
+    );
 
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, radiusPx, start, end);
     ctx.closePath();
-    ctx.fillStyle = gradient;
+    ctx.fillStyle = wash;
     ctx.fill();
+
+    const sides = ctx.createRadialGradient(0, 0, 0, 0, 0, radiusPx);
+
+    sides.addColorStop(BEAM_WASH_START, withAlpha(color, 0));
+    sides.addColorStop(
+      1,
+      withAlpha(color, Math.min(1, washAlpha * BEAM_SIDE_GAIN))
+    );
+
+    ctx.strokeStyle = sides;
+    ctx.lineWidth = BEAM_SIDE_WIDTH_PX;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(Math.cos(start) * radiusPx, Math.sin(start) * radiusPx);
+    ctx.moveTo(0, 0);
+    ctx.lineTo(Math.cos(end) * radiusPx, Math.sin(end) * radiusPx);
+    ctx.stroke();
   }
 
   if (!edge) {
@@ -679,10 +717,21 @@ export const drawBeam = (
 };
 
 /** Rim label size as a share of the scope radius, and its floor. */
-const RIM_LABEL_RADIUS_SHARE = 0.19;
-const MIN_RIM_LABEL_PX = 11;
-const RIM_LABEL_INSET_PX = 1;
-const RIM_LABEL_OUTLINE_PX = 1.5;
+const RIM_LABEL_RADIUS_SHARE = 0.15;
+const MIN_RIM_LABEL_PX = 10;
+const RIM_LABEL_INSET_PX = 2;
+
+/**
+ * The chip the distance is written on: a dark pill outlined in the beam's
+ * color. Its padding is a share of the font size, so the chip scales with the
+ * label it carries.
+ */
+const RIM_CHIP_PADDING_X_SHARE = 0.5;
+const RIM_CHIP_PADDING_Y_SHARE = 0.28;
+const RIM_CHIP_OUTLINE_PX = 1;
+const RIM_CHIP_FILL = 'rgba(9, 10, 13, 0.9)';
+/** The beam's color let into the chip's ground, as the IR pill does. */
+const RIM_CHIP_TINT_ALPHA = 0.16;
 
 interface RimLabelInput {
   text: string;
@@ -714,8 +763,9 @@ export const labelDistanceInside = (
 
 /**
  * A distance written at the beam's edge, just inside the rim on the beam's
- * bearing, in the beam's color — outlined in black, since it sits over the
- * wash, the plate and whatever the stream shows through it.
+ * bearing: light digits on a dark chip outlined in the beam's color. The chip
+ * is what holds the number over the wash, the plate and whatever the stream
+ * shows through it; the outline is what ties it to its beam.
  */
 export const drawRimLabel = (
   ctx: CanvasRenderingContext2D,
@@ -727,26 +777,70 @@ export const drawRimLabel = (
   );
 
   ctx.save();
-  ctx.font = `700 ${fontPx}px ${WIDGET_CANVAS_FONT_FAMILY}`;
+  ctx.font = `800 ${fontPx}px ${WIDGET_CANVAS_FONT_FAMILY}`;
+
+  const chipWidth =
+    measureFixedDigits(ctx, text) + fontPx * RIM_CHIP_PADDING_X_SHARE * 2;
+  const chipHeight = fontPx * (1 + RIM_CHIP_PADDING_Y_SHARE * 2);
 
   const distancePx = labelDistanceInside(
     radiusPx - RIM_LINE_WIDTH_PX - RIM_LABEL_INSET_PX,
     bearing,
-    measureFixedDigits(ctx, text) / 2 + RIM_LABEL_OUTLINE_PX,
-    fontPx / 2 + RIM_LABEL_OUTLINE_PX
+    chipWidth / 2,
+    chipHeight / 2
   );
   const x = Math.sin(bearing) * distancePx;
   const y = -Math.cos(bearing) * distancePx;
 
+  ctx.beginPath();
+  ctx.roundRect(
+    x - chipWidth / 2,
+    y - chipHeight / 2,
+    chipWidth,
+    chipHeight,
+    chipHeight / 2
+  );
+  ctx.fillStyle = RIM_CHIP_FILL;
+  ctx.fill();
+  ctx.fillStyle = withAlpha(color, RIM_CHIP_TINT_ALPHA);
+  ctx.fill();
+  ctx.lineWidth = RIM_CHIP_OUTLINE_PX;
+  ctx.strokeStyle = color;
+  ctx.stroke();
+
   ctx.textBaseline = 'middle';
-  ctx.lineJoin = 'round';
-  ctx.lineWidth = RIM_LABEL_OUTLINE_PX;
-  ctx.strokeStyle = RIM_LABEL_OUTLINE;
-  strokeFixedDigits(ctx, text, x, y);
-  ctx.fillStyle = color;
-  fillFixedDigits(ctx, text, x, y);
+  ctx.fillStyle = LABEL_ON_DARK;
+  fillFixedDigits(ctx, text, x, y + fontPx * RIM_LABEL_BASELINE_NUDGE);
   ctx.restore();
 };
+
+/**
+ * The body is a car seen from above, not a block: the nose is rounder than the
+ * tail, the paint falls off slightly towards the tail, and a dark hairline
+ * keeps it apart from a beam's wash. Lengths in meters of body.
+ */
+const CAR_NOSE_RADIUS_M = 0.6;
+const CAR_BODY_OUTLINE = 'rgba(0, 0, 0, 0.55)';
+const CAR_BODY_OUTLINE_PX = 1;
+/** How much of the paint is left at the tail. */
+const CAR_TAIL_SHADE = 0.8;
+
+/**
+ * Our own car alone carries glass — the cabin seen from above — so it reads as
+ * the car and the others as traffic. An opponent's body is kept clear for the
+ * number written on it. Shares of the body's width and length, nose first; the
+ * roof is the cabin less a margin of glass, wider at the windscreen.
+ */
+const CABIN_WIDTH_SHARE = 0.66;
+const CABIN_START_SHARE = 0.3;
+const CABIN_END_SHARE = 0.76;
+const CABIN_CORNER_SHARE = 0.3;
+const ROOF_SIDE_GLASS_SHARE = 0.1;
+const ROOF_WINDSCREEN_SHARE = 0.26;
+const ROOF_REAR_GLASS_SHARE = 0.16;
+const ROOF_CORNER_SHARE = 0.18;
+const CABIN_GLASS = 'rgba(12, 14, 18, 0.88)';
+const CABIN_ROOF = 'rgba(250, 250, 250, 0.9)';
 
 interface CarInput {
   x: number;
@@ -755,27 +849,75 @@ interface CarInput {
   alpha: number;
   pxPerMeter: number;
   carLengthM: number;
+  /** Draw the cabin glass: our own car. */
+  cabin?: boolean;
 }
+
+const shade = (color: string, share: number): string => {
+  const [red, green, blue] = parseChannels(color);
+
+  return `rgb(${Math.round(red * share)}, ${Math.round(green * share)}, ${Math.round(blue * share)})`;
+};
 
 export const drawCar = (
   ctx: CanvasRenderingContext2D,
-  { x, y, color, alpha, pxPerMeter, carLengthM }: CarInput
+  { x, y, color, alpha, pxPerMeter, carLengthM, cabin = false }: CarInput
 ): void => {
   const width = CAR_WIDTH_M * pxPerMeter;
   const height = carLengthM * pxPerMeter;
+  const left = x - width / 2;
+  const top = y - height / 2;
+  const noseRadius = Math.min(CAR_NOSE_RADIUS_M * pxPerMeter, width / 2);
+  const tailRadius = CAR_CORNER_RADIUS_M * pxPerMeter;
+  const paint = ctx.createLinearGradient(0, top, 0, top + height);
+
+  paint.addColorStop(0, color);
+  paint.addColorStop(1, shade(color, CAR_TAIL_SHADE));
 
   ctx.save();
   ctx.globalAlpha = alpha;
-  ctx.fillStyle = color;
   ctx.beginPath();
-  ctx.roundRect(
-    x - width / 2,
-    y - height / 2,
-    width,
-    height,
-    CAR_CORNER_RADIUS_M * pxPerMeter
-  );
+  ctx.roundRect(left, top, width, height, [
+    noseRadius,
+    noseRadius,
+    tailRadius,
+    tailRadius,
+  ]);
+  ctx.fillStyle = paint;
   ctx.fill();
+  ctx.lineWidth = CAR_BODY_OUTLINE_PX;
+  ctx.strokeStyle = CAR_BODY_OUTLINE;
+  ctx.stroke();
+
+  if (cabin) {
+    const cabinWidth = width * CABIN_WIDTH_SHARE;
+    const cabinLeft = x - cabinWidth / 2;
+    const cabinTop = top + height * CABIN_START_SHARE;
+    const cabinHeight = height * (CABIN_END_SHARE - CABIN_START_SHARE);
+
+    ctx.beginPath();
+    ctx.roundRect(
+      cabinLeft,
+      cabinTop,
+      cabinWidth,
+      cabinHeight,
+      cabinWidth * CABIN_CORNER_SHARE
+    );
+    ctx.fillStyle = CABIN_GLASS;
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.roundRect(
+      cabinLeft + cabinWidth * ROOF_SIDE_GLASS_SHARE,
+      cabinTop + cabinHeight * ROOF_WINDSCREEN_SHARE,
+      cabinWidth * (1 - ROOF_SIDE_GLASS_SHARE * 2),
+      cabinHeight * (1 - ROOF_WINDSCREEN_SHARE - ROOF_REAR_GLASS_SHARE),
+      cabinWidth * ROOF_CORNER_SHARE
+    );
+    ctx.fillStyle = CABIN_ROOF;
+    ctx.fill();
+  }
+
   ctx.restore();
 };
 

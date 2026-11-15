@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import type { MockTrafficCar } from '@features/preview/mocks/traffic';
 import { mockProximity } from '@features/preview/mocks/traffic';
+import { SCOPE_APPEARANCE_DEFAULTS } from './manifest';
 import { ProximityRadarWidget } from './ProximityRadarWidget';
 import {
   defineWidgetStories,
@@ -28,8 +29,10 @@ const meta: Meta<StoryArgs> = {
     size: {
       width: 180,
       height: 180,
-      background: 'transparent',
-      border: 'none',
+      // The disc the overlay's frame clips and paints for the scope.
+      background: SCOPE_APPEARANCE_DEFAULTS.backgroundColor,
+      border: `1px solid ${SCOPE_APPEARANCE_DEFAULTS.borderColor}`,
+      borderRadius: '50%',
     },
     seed: (store, args) => {
       store.appSettings.dragMode = true;

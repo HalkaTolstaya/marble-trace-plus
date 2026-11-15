@@ -69,16 +69,17 @@ $badge-slot: 32 + 8;
 .badgeText {
   font-family: $font-widget;
   font-size: fs(sm);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
   letter-spacing: 0.06em;
-  color: $widget-text-secondary;
+  color: $widget-label;
 }
 
 .delta {
   font-family: $font-mono;
   font-size: fs(xxxl);
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   line-height: 1.2;
   font-variant-numeric: tabular-nums;
   text-align: center;
@@ -86,7 +87,7 @@ $badge-slot: 32 + 8;
   // `pre` keeps that padding so the glyphs never move or shrink, and the box
   // reserves the widest possible reading up front.
   white-space: pre;
-  padding-block: sp(sm);
+  padding-block: sp(xs);
 }
 
 .ahead {

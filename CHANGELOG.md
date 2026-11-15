@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Input Telemetry, distance axis:** with _Distance axis_ on, the graph is plotted against lap distance — metres along the bottom, a "now" line, the reference lap as soft hills over the whole window, the stretch still ahead of the car included, and your pedals as lines up to "now". _Distance window_ sets how much track it covers.
+
+### Changed
+
+- **Delta:** the number sits on a glass pill with a wash of its state colour; the bar is a ruled track with a lit leading edge, a zero mark and the active range written at both ends.
+- **Radar:** cars are drawn as bodies with a nose, our own with cabin glass; a beam gathers into a band of light at the rim; the distance is written on a dark chip outlined in the beam's colour.
+- **Track map:** the circuit is a dark ribbon with lit edges that holds on any background; dots have a dark casing, your own is drawn on top with a halo and a pointer; start/finish is a line across the track with a checkered tile.
+- **Input Telemetry:** the plot and pedal tracks are sunk wells, pedal fills carry a lit cap, lines get a soft fall of colour and a marker on the newest sample, and the rev lights glow as a ring rather than a blur. The reference is no longer stepped.
+- **Standings and Relative:** the class colour runs from the card's edge through the position, PIT / PIT IN / PIT OUT / TOW are glass chips in the status colour, the pit tile beside a row arrives with a slight spring, and the relative gap is a size larger.
+
 ## [0.29.0] — 2026-11-15
 
 ### Added

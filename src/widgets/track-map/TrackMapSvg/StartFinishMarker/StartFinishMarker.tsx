@@ -7,9 +7,27 @@ interface StartFinishMarkerProps {
   angle: number;
   trackCenterX: number;
   trackCenterY: number;
-  /** Keeps the marker at a constant on-screen size when the map is zoomed. */
+  /** The drawn width of the track, in the map's own units. */
+  trackWidth: number;
+  /** Map units per screen pixel: the marker is drawn in pixels at this scale. */
   scale?: number;
 }
+
+/** How far out of the track the flag tile stands, in screen pixels. */
+const CALLOUT_LENGTH = 22;
+/** How far the finish line overhangs each edge of the track. */
+const LINE_OVERHANG = 3;
+
+const TILE_CELLS = 3;
+const TILE_CELL_SIZE = 6;
+const TILE_SIZE = TILE_CELLS * TILE_CELL_SIZE;
+const TILE_CORNER = 3;
+const TILE_CLIP_ID = 'start-finish-tile-clip';
+
+const TILE_CELL_INDEXES = Array.from(
+  { length: TILE_CELLS * TILE_CELLS },
+  (_unused, cellIndex) => cellIndex
+);
 
 export const StartFinishMarker = observer(
   ({
@@ -18,90 +36,96 @@ export const StartFinishMarker = observer(
     angle,
     trackCenterX,
     trackCenterY,
+    trackWidth,
     scale = 1,
   }: StartFinishMarkerProps) => {
-    // Convert angle to radians to calculate the local Y-axis direction in global coordinates
+    // The marker's own Y axis, across the track, in the map's coordinates.
     const rad = (angle * Math.PI) / 180;
-    const lyx = -Math.sin(rad);
-    const lyy = Math.cos(rad);
+    const acrossX = -Math.sin(rad);
+    const acrossY = Math.cos(rad);
 
-    // Calculate two perpendicular test points to see which goes towards the outside
-    const testDist = 10;
-    const pPlusX = x + lyx * testDist;
-    const pPlusY = y + lyy * testDist;
-    const pMinusX = x - lyx * testDist;
-    const pMinusY = y - lyy * testDist;
+    // Of the two ways across the track, the one that leads away from the
+    // circuit's centre of mass is the outside of the loop — the tile goes
+    // there, clear of the infield.
+    const distanceTowards = (direction: 1 | -1): number =>
+      Math.hypot(
+        x + acrossX * direction - trackCenterX,
+        y + acrossY * direction - trackCenterY
+      );
+    const outward = distanceTowards(1) > distanceTowards(-1) ? 1 : -1;
 
-    // Measure distance from both test points to the track's center of mass
-    const distPlus =
-      Math.pow(pPlusX - trackCenterX, 2) + Math.pow(pPlusY - trackCenterY, 2);
-    const distMinus =
-      Math.pow(pMinusX - trackCenterX, 2) + Math.pow(pMinusY - trackCenterY, 2);
-
-    // The side further away from the track center is the "outside" of the loop
-    const isPlusOutside = distPlus > distMinus;
-    const calloutLength = 50; // Made even longer (50px) as requested
-    const offset = isPlusOutside ? calloutLength : -calloutLength;
+    const halfLine = trackWidth / scale / 2 + LINE_OVERHANG;
+    const tileOffset = outward * (halfLine + CALLOUT_LENGTH);
 
     return (
       <g transform={`translate(${x},${y}) rotate(${angle}) scale(${scale})`}>
-        {/* Thin perpendicular technical callout line */}
-        <line x1="0" y1="0" x2="0" y2={offset} className={styles.markerLine} />
+        <line
+          x1="0"
+          y1={outward * halfLine}
+          x2="0"
+          y2={tileOffset}
+          className={styles.callout}
+        />
 
-        {/* Tiny anchor dot directly on the track line */}
-        <circle cx="0" cy="0" r="2" className={styles.markerAnchor} />
+        {/* The line itself, painted across the track as it is on the asphalt. */}
+        <line
+          x1="0"
+          y1={-halfLine}
+          x2="0"
+          y2={halfLine}
+          className={styles.finishLineCasing}
+        />
+        <line
+          x1="0"
+          y1={-halfLine}
+          x2="0"
+          y2={halfLine}
+          className={styles.finishLine}
+        />
 
-        {/* Checkered flag HUD icon */}
-        <g transform={`translate(0, ${offset})`}>
-          {/* Counter-rotate by -angle to stay upright relative to screen */}
+        <g transform={`translate(0, ${tileOffset})`}>
           {/* The map's own rotation is undone from a variable the draw reaction
-            writes, so heading-up mode keeps the flag upright without a render. */}
+              writes, so heading-up mode keeps the tile upright without a render. */}
           <g className={styles.screenUpright}>
-            <g
-              transform={`rotate(${-angle})`}
-              className="transition-transform duration-500 ease-in-out"
-            >
-              <g className={styles.flagContainer}>
-                {/* 2x2 Chess cells (20x20px total size) */}
+            <g transform={`rotate(${-angle})`}>
+              <clipPath id={TILE_CLIP_ID}>
                 <rect
-                  x="-10"
-                  y="-10"
-                  width="10"
-                  height="10"
-                  className={styles.flagWhite}
+                  x={-TILE_SIZE / 2}
+                  y={-TILE_SIZE / 2}
+                  width={TILE_SIZE}
+                  height={TILE_SIZE}
+                  rx={TILE_CORNER}
                 />
-                <rect
-                  x="0"
-                  y="-10"
-                  width="10"
-                  height="10"
-                  className={styles.flagDark}
-                />
-                <rect
-                  x="-10"
-                  y="0"
-                  width="10"
-                  height="10"
-                  className={styles.flagDark}
-                />
-                <rect
-                  x="0"
-                  y="0"
-                  width="10"
-                  height="10"
-                  className={styles.flagWhite}
-                />
+              </clipPath>
 
-                {/* Outer rounded frame */}
-                <rect
-                  x="-11"
-                  y="-11"
-                  width="22"
-                  height="22"
-                  className={styles.flagBorder}
-                  rx="2"
-                />
+              <g clipPath={`url(#${TILE_CLIP_ID})`}>
+                {TILE_CELL_INDEXES.map((cellIndex) => (
+                  <rect
+                    key={cellIndex}
+                    x={
+                      -TILE_SIZE / 2 + (cellIndex % TILE_CELLS) * TILE_CELL_SIZE
+                    }
+                    y={
+                      -TILE_SIZE / 2 +
+                      Math.floor(cellIndex / TILE_CELLS) * TILE_CELL_SIZE
+                    }
+                    width={TILE_CELL_SIZE}
+                    height={TILE_CELL_SIZE}
+                    className={
+                      cellIndex % 2 === 0 ? styles.tileLight : styles.tileDark
+                    }
+                  />
+                ))}
               </g>
+
+              <rect
+                x={-TILE_SIZE / 2}
+                y={-TILE_SIZE / 2}
+                width={TILE_SIZE}
+                height={TILE_SIZE}
+                rx={TILE_CORNER}
+                className={styles.tileCasing}
+              />
             </g>
           </g>
         </g>

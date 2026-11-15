@@ -12,8 +12,9 @@
   justify-content: flex-end;
   flex: 1 1 0;
   min-height: 0;
-  background: rgba(255, 255, 255, $opacity-subtle);
+  background: $widget-surface-well;
   border-radius: $bar-border-radius;
+  box-shadow: $widget-well-bevel;
   overflow: hidden;
 }
 
@@ -34,7 +35,19 @@
   display: block;
   width: 100%;
   height: var(--bar-fill, 0%);
-  background: var(--bar-color, #{$widget-text-accent});
+  // Densest at the top, where the level is read, with a lit cap on it; the
+  // column below thins out so three bars side by side do not read as a block.
+  background: linear-gradient(
+    to top,
+    color-mix(
+      in srgb,
+      var(--bar-color, #{$widget-text-accent}) 55%,
+      transparent
+    ),
+    var(--bar-color, #{$widget-text-accent}) 85%
+  );
+  box-shadow: inset 0 2px 0
+    color-mix(in srgb, var(--bar-color, #{$widget-text-accent}) 50%, #ffffff);
   border-radius: $bar-border-radius;
 }
 

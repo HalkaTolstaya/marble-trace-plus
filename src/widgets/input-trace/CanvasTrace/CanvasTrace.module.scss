@@ -1,9 +1,12 @@
+// The plot is a well sunk into the panel: darker than the plate around it,
+// with the shadow of its own top lip — the opposite bevel to the plate's.
 .container {
   display: block;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: $bar-border-radius;
+  background: $widget-surface-well;
+  border-radius: radius(lg);
+  box-shadow: $widget-well-bevel;
   overflow: hidden;
 }
 
@@ -13,16 +16,4 @@
   // Without this the element height falls back to the pixel-buffer `height`
   // attribute (backing-store size), which overflows once the widget is taller.
   height: 100%;
-}
-
-.distanceTag {
-  position: absolute;
-  top: ws(3);
-  left: ws(6);
-  font-family: $font-table;
-  font-size: fs(xxs);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: $widget-text-secondary;
-  pointer-events: none;
 }

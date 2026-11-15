@@ -2,36 +2,38 @@
   transform: rotate(calc(-1 * var(--screen-rotation, 0deg)));
 }
 
-.markerLine {
-  stroke: rgba(255, 255, 255, 0.45);
+.callout {
+  stroke: $widget-text-secondary;
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
 
-.markerAnchor {
-  fill: #ffffff;
-  opacity: 0.85;
+// Light on dark, as every mark on the map is: the casing keeps the line
+// readable where it leaves the track and crosses the game.
+.finishLineCasing {
+  stroke: $map-dot-casing;
+  stroke-width: 5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
-.flagContainer {
-  // Expose checkered flag size configuration in SCSS.
-  // Adjust this single variable to change the HUD icon size dynamically!
-  --flag-size: 26px;
-
-  // Mathematically scale the base 20x20px SVG vector around its (0, 0) center.
-  transform: scale(calc(var(--flag-size) / 20px));
+.finishLine {
+  stroke: $widget-text-primary;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
 }
 
-.flagWhite {
-  fill: #ffffff;
+.tileLight {
+  fill: $flag-band-white;
 }
 
-.flagDark {
-  fill: #18181b;
+.tileDark {
+  fill: $map-dot-surface;
 }
 
-.flagBorder {
+.tileCasing {
   fill: none;
-  stroke: #ffffff;
-  stroke-width: 2px;
+  stroke: $map-dot-casing;
+  stroke-width: 1.5;
 }

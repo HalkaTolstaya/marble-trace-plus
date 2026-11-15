@@ -17,8 +17,10 @@ import type {
   CarDynamicsFrame,
   CarInputsFrame,
   InputSample,
+  ReferenceLapSample,
 } from '@shared/contracts/generated/bindings';
 import type { TraceSample } from './CanvasTrace/canvas-trace-render';
+import { referencePedalsAt } from './reference-pedals';
 
 interface InputTraceDeps {
   player: PlayerStore;
@@ -74,6 +76,12 @@ export class InputTraceWidgetStore {
   // whatever the clock is.
   frameSamples: TraceSample[] = [];
 
+  /**
+   * Where on the lap the car is as of the last frame, 0-1; null off track.
+   * The trace's distance axis is centred on it.
+   */
+  lapPct: number | null = null;
+
   private readonly disposers: IReactionDisposer[] = [];
 
   /** The car's lap position at the previous frame, to spread a frame's samples. */
@@ -118,7 +126,7 @@ export class InputTraceWidgetStore {
           ];
 
           const lapPct = this.playerLapPct();
-          const referenceAt = this.referenceAlong(lapPct, samples.length);
+          const positionAt = this.positionAlong(lapPct, samples.length);
 
           // Smoothed tick by tick, so the filter keeps the strength it has at
           // the sim's rate whatever the overlay clock is.
@@ -142,11 +150,12 @@ export class InputTraceWidgetStore {
               absActive: sample.brakeAbsActive,
               steeringWheelAngle: sample.steeringWheelAngle,
               sliding: Math.abs(sample.bodySlipDeg ?? 0) >= SLIDE_ANGLE_DEG,
-              ...referenceAt(sampleIndex),
+              ...this.referenceAt(positionAt(sampleIndex)),
             };
           });
 
           this.previousLapPct = lapPct;
+          this.lapPct = lapPct;
           this.frameTick++;
         }
       )
@@ -166,20 +175,15 @@ export class InputTraceWidgetStore {
   }
 
   /**
-   * The reference's pedals for each of this frame's samples: the frame's
-   * samples are spread evenly between the previous frame's lap position and
-   * this one's, wrapping at the line.
+   * Where on the lap each of this frame's samples was taken: the samples are
+   * spread evenly between the previous frame's lap position and this one's,
+   * wrapping at the line.
    */
-  private referenceAlong(
+  private positionAlong(
     lapPct: number | null,
     sampleCount: number
-  ): (sampleIndex: number) => {
-    refThrottle: number | null;
-    refBrake: number | null;
-  } {
-    const none = () => ({ refThrottle: null, refBrake: null });
-
-    if (lapPct === null || !this.root.referenceLap.data) return none;
+  ): (sampleIndex: number) => number | null {
+    if (lapPct === null) return () => null;
 
     const start = this.previousLapPct ?? lapPct;
     // Across start/finish the position falls by almost a whole lap.
@@ -188,13 +192,36 @@ export class InputTraceWidgetStore {
 
     return (sampleIndex) => {
       const fraction = sampleCount <= 1 ? 1 : (sampleIndex + 1) / sampleCount;
-      const pct = tooFar ? lapPct : (start + span * fraction) % 1;
-      const reference = this.root.referenceLap.getSampleAtDistPct(pct);
 
-      return reference
-        ? { refThrottle: reference.throttle, refBrake: reference.brake }
-        : { refThrottle: null, refBrake: null };
+      return tooFar ? lapPct : (start + span * fraction) % 1;
     };
+  }
+
+  /** A sample's place on the lap, and the reference's pedals there. */
+  private referenceAt(lapPct: number | null): {
+    lapPct: number | null;
+    refThrottle: number | null;
+    refBrake: number | null;
+  } {
+    const samples = this.referenceSamples;
+    const reference =
+      lapPct === null || !samples ? null : referencePedalsAt(samples, lapPct);
+
+    return {
+      lapPct,
+      refThrottle: reference?.throttle ?? null,
+      refBrake: reference?.brake ?? null,
+    };
+  }
+
+  /** The reference lap's buckets, for the stretch of track still ahead. */
+  get referenceSamples(): readonly ReferenceLapSample[] | null {
+    return this.root.referenceLap.data?.samples ?? null;
+  }
+
+  /** The lap's length in metres; null until the session says. */
+  get trackLengthM(): number | null {
+    return this.root.session.sessionInfo?.trackLengthM || null;
   }
 
   // Called when the instance unmounts; the reaction otherwise outlives it.
@@ -212,6 +239,7 @@ export class InputTraceWidgetStore {
     this.frameTick = 0;
     this.frameSamples = [];
     this.previousLapPct = null;
+    this.lapPct = null;
   }
 }
 

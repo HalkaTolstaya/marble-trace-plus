@@ -75,8 +75,7 @@
 // First row of the "around the player" block — detaches it from the top block
 .driverRowWindowStart {
   margin-top: sp(sm);
-  border-top: 1px solid $widget-border-default;
-  box-shadow: 0 -4px 6px -4px rgba(0, 0, 0, 0.6);
+  border-top: 1px solid $widget-border-subtle;
 }
 
 // Rows the wheel is about to scroll — the cursor sits on this class. No highlight
@@ -399,12 +398,30 @@
   background-color: rgba(255, 255, 255, 0.02);
 }
 
-.posCell {
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--row-class-marker, transparent) 55%, transparent),
-    transparent
-  );
+$class-fade-reach: 92;
+
+// The class colour opens the row: densest on the card's edge, through the
+// position and gone before the driver's name. It belongs to the row, not to
+// the position cell, so its reach does not depend on that column's width.
+.driverRow {
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: -1;
+    width: ws($class-fade-reach);
+    border-bottom-left-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--row-class-marker, transparent) 70%, transparent),
+      color-mix(in srgb, var(--row-class-marker, transparent) 26%, transparent)
+        48%,
+      transparent
+    );
+    pointer-events: none;
+  }
 }
 
 .posNumber {
@@ -443,6 +460,9 @@
 }
 
 // ── Pit pills, outside the table on the right ──────────────────────────────
+// A tile of the same glass hanging off the row's end. It arrives once, out of
+// the row's edge with a slight spring — a car entering the pits is a change of
+// state; its seconds then tick without any motion (ADR-0009).
 
 .pitPill {
   position: absolute;
@@ -462,13 +482,36 @@
   white-space: nowrap;
   color: $widget-text-primary;
   pointer-events: none;
+  animation: pitPillIn 0.34s $ease-spring both;
 }
 
-// On pit road now: the pit colour on the edge.
+@keyframes pitPillIn {
+  from {
+    opacity: 0;
+    transform: translate(#{ws(-10)}, -50%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pitPill {
+    animation: none;
+  }
+}
+
+// On pit road now: the pit colour as a wash from the tile's leading edge and
+// a bar on it.
 .pitPillLive {
+  background:
+    linear-gradient(90deg, $widget-wash-pit, transparent 70%), var(--widget-bg);
   box-shadow:
     $widget-panel-bevel,
-    inset 0 0 0 1px #{rgba($widget-pit-entry, 0.6)};
+    inset 3px 0 0 $widget-pit-entry;
+  padding-left: ws(10);
 }
 
 // Being towed: a large yellow plate, dark type.
