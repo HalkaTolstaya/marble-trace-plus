@@ -34,6 +34,7 @@ pub fn invoke_handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static 
         reflaps::reflaps_refresh,
         reflaps::reflaps_delete,
         reflaps::reflaps_import_csv,
+        reflaps::reflaps_open_inbox,
         reflaps::brake_cue_configure,
         voice::configure_voice_crew,
         voice::voice_status,

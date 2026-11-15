@@ -637,7 +637,9 @@
         "differentCar": "Other car",
         "differentTrack": "Other track",
         "unknown": "—"
-      }
+      },
+      "folderDesc": "Drop Garage 61 CSV exports into this folder (Export → CSV on a lap in the Garage 61 search). They are imported within seconds and used for the matching track and car whenever they are faster.",
+      "openFolder": "Open folder"
     }
   },
   "bindings": {

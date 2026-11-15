@@ -42,6 +42,8 @@ pub struct ReflapsOverview {
     pub policy: ReferencePolicy,
     pub status: Option<ReflapsStatus>,
     pub laps: Vec<LibraryLapView>,
+    /// The folder Garage 61 CSV exports are picked up from.
+    pub inbox_folder: String,
 }
 
 fn check_policy(policy: &ReferencePolicy) -> Result<(), String> {
@@ -83,6 +85,7 @@ pub async fn reflaps_overview(
         policy: reflaps.policy.lock().await.clone(),
         status: reflaps.last_status.lock().await.clone(),
         laps,
+        inbox_folder: reflaps.inbox.display().to_string(),
     })
 }
 
@@ -219,4 +222,19 @@ pub async fn brake_cue_configure(
     });
 
     Ok(())
+}
+
+/// Opens the laps folder in Explorer. The path comes from Rust, never from
+/// the webview.
+#[tauri::command]
+pub async fn reflaps_open_inbox(
+    app: AppHandle,
+    reflaps: State<'_, Arc<ReflapsState>>,
+) -> Result<(), String> {
+    use tauri_plugin_opener::OpenerExt;
+
+    std::fs::create_dir_all(&reflaps.inbox).map_err(|error| error.to_string())?;
+    app.opener()
+        .open_path(reflaps.inbox.display().to_string(), None::<&str>)
+        .map_err(|error| error.to_string())
 }

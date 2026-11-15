@@ -117,4 +117,6 @@ export interface ReflapsOverview {
   policy: ReferencePolicy;
   status: ReflapsStatus | null;
   laps: LibraryLap[];
+  /** Folder whose Garage 61 CSV exports are imported automatically. */
+  inboxFolder: string;
 }

@@ -635,7 +635,9 @@
         "differentCar": "其他车辆",
         "differentTrack": "其他赛道",
         "unknown": "—"
-      }
+      },
+      "folderDesc": "把 Garage 61 导出的 CSV 放进这个文件夹（在 Garage 61 搜索中对某圈 Export → CSV）。几秒内即会导入，并在更快时用于匹配的赛道和车辆。",
+      "openFolder": "打开文件夹"
     }
   },
   "bindings": {
