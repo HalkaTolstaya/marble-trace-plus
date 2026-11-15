@@ -294,28 +294,46 @@ jobs:
 
   e2e:
     name: E2E (Windows, WebView2 CDP)
-    needs: build
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
+          cache: npm
+      - run: npm ci
+      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
         with:
-          name: windows-app-exe
-          path: e2e/bin
+          toolchain: stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2
+        with:
+          workspaces: src-tauri -> target
+          key: build
+      # wry always hands WebView2 its own AdditionalBrowserArguments, so the
+      # DevTools port cannot come from the environment: a test build adds it to
+      # the main window's arguments (wry's defaults kept). The release exe is
+      # not changed.
+      - name: Build the e2e variant (DevTools port on the main window)
+        shell: bash
+        run: |
+          node -e '
+            const fs = require("fs");
+            const conf = JSON.parse(fs.readFileSync("src-tauri/tauri.conf.json", "utf8"));
+            const windows = conf.app.windows.map((window, index) => index === 0
+              ? { ...window, additionalBrowserArgs: "--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --remote-debugging-port=9333" }
+              : window);
+            fs.writeFileSync(process.env.RUNNER_TEMP + "/tauri.e2e.json", JSON.stringify({ app: { windows } }));
+          '
+          npx tauri build --ci --no-bundle --config "$RUNNER_TEMP/tauri.e2e.json" -- --locked
       - name: Install the e2e runner
         working-directory: e2e
         run: npm ci --ignore-scripts
-      # The exe is driven over the WebView2 DevTools protocol (Playwright
-      # connectOverCDP); no iRacing, no Garage 61 token.
-      - name: Smoke test the release exe
+      - name: Smoke test the e2e exe
         working-directory: e2e
         shell: bash
         run: |
-          app="$GITHUB_WORKSPACE/e2e/bin/trailbrake.exe"
-          [ -f "$app" ] || app="$GITHUB_WORKSPACE/e2e/bin/marble-trace.exe"
+          app="$GITHUB_WORKSPACE/src-tauri/target/release/trailbrake.exe"
+          [ -f "$app" ] || app="$GITHUB_WORKSPACE/src-tauri/target/release/marble-trace.exe"
           APP_PATH="$app" npm test
       - name: App logs on failure
         if: failure()

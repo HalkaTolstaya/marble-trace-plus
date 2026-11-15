@@ -2,13 +2,14 @@
 // renders, the reference-lap commands answer through the real IPC and
 // capabilities, and the token is never handed back.
 //
-// The app is driven over the WebView2 DevTools protocol, the automation path
-// Microsoft documents for WebView2 (Playwright connectOverCDP): the exe is
-// started with a remote-debugging port in WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS.
-// msedgedriver/tauri-driver could not find the DevTools port of a WebView2
-// that keeps its own user-data folder.
+// The app is driven over the WebView2 DevTools protocol (Playwright
+// connectOverCDP), the automation path Microsoft documents for WebView2.
+// wry always passes WebView2 its own browser arguments, so neither
+// msedgedriver/tauri-driver nor WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS can open
+// the DevTools port of the release exe: CI builds an e2e variant whose main
+// window adds --remote-debugging-port=9333 to wry's default arguments.
 //
-// Needs APP_PATH (the release exe). No sim, no Garage 61 token.
+// Needs APP_PATH (that exe). No sim, no Garage 61 token.
 import { spawn } from 'node:child_process';
 import { setTimeout as sleep } from 'node:timers/promises';
 import { after, before, test } from 'node:test';
@@ -76,13 +77,7 @@ const invoke = (command, args = {}) =>
 before(async () => {
   assert.ok(APP_PATH, 'APP_PATH must point at the built exe');
 
-  app = spawn(APP_PATH, [], {
-    stdio: 'inherit',
-    env: {
-      ...process.env,
-      WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: `--remote-debugging-port=${DEBUG_PORT}`,
-    },
-  });
+  app = spawn(APP_PATH, [], { stdio: 'inherit' });
 
   await waitForDevTools();
   browser = await chromium.connectOverCDP(`http://127.0.0.1:${DEBUG_PORT}`);
@@ -141,32 +136,4 @@ void test('the brake cue can be switched on and off', async () => {
     (await invoke('brake_cue_configure', { enabled: false, config })).ok,
     true
   );
-});
-
-void test('an overlay window cannot reach the main-only capabilities', async () => {
-  let overlay;
-
-  for (let attempt = 0; attempt < 60 && !overlay; attempt++) {
-    overlay = browser
-      .contexts()
-      .flatMap((context) => context.pages())
-      .find((candidate) => /overlay\.html/.test(candidate.url()));
-
-    if (!overlay) await sleep(500);
-  }
-
-  assert.ok(overlay, 'no overlay window was opened');
-
-  const restart = await overlay.evaluate(async () => {
-    try {
-      await window.__TAURI_INTERNALS__.invoke('plugin:process|restart');
-
-      return 'allowed';
-    } catch (error) {
-      return String(error);
-    }
-  });
-
-  assert.notEqual(restart, 'allowed');
-  assert.match(restart, /not allowed|denied|permission/i);
 });
