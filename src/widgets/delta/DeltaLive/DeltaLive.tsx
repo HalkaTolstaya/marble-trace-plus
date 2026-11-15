@@ -95,7 +95,10 @@ export const DeltaLive = observer(() => {
 
   return (
     <div className={styles.root}>
-      <DeltaPlate className={announcing ? styles.plateAnnouncing : ''}>
+      <DeltaPlate
+        tone={getDeltaState(delta)}
+        className={announcing ? styles.plateAnnouncing : ''}
+      >
         {/* The badge stays mounted and only opens its box, so an announcement
             widens the plate once and a second press inside it changes two
             letters and nothing else — no height moves either way. */}

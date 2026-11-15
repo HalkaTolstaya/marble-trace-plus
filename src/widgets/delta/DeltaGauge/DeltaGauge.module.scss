@@ -1,37 +1,93 @@
+$track-height: 10;
+$zero-overhang: 3;
+
+// Width comes from the slot the parent puts the gauge in — the gauge only
+// owns its own thickness and shape.
+.gauge {
+  position: relative;
+  width: 100%;
+}
+
 .track {
   position: relative;
-  // Width comes from the slot the parent puts the gauge in — the gauge only
-  // owns its own thickness and shape.
-  width: 100%;
-  height: ws(8);
+  height: ws($track-height);
   border-radius: 999px;
-  background: $widget-row-bg-subtle;
+  background: $widget-surface-base;
+  box-shadow: $widget-chip-bevel;
   overflow: hidden;
 }
 
+// The fill is densest at its leading edge and thins towards zero, and the
+// edge itself is a lit cap: the eye lands on where the delta is, not on how
+// much paint there is behind it.
 .fill {
   position: absolute;
   top: 0;
   bottom: 0;
+  background: linear-gradient(
+    var(--fill-direction),
+    color-mix(in srgb, var(--fill-tone) 38%, transparent),
+    var(--fill-tone)
+  );
 }
 
-// Zero marker stays inside the track — it reads as part of the bar, not as a
-// tick sticking out of it.
-.zero {
+.fillLeft {
+  --fill-direction: to left;
+
+  box-shadow: inset 3px 0 0 var(--fill-cap);
+}
+
+.fillRight {
+  --fill-direction: to right;
+
+  box-shadow: inset -3px 0 0 var(--fill-cap);
+}
+
+.tick {
   position: absolute;
-  top: 1px;
-  bottom: 1px;
-  left: 50%;
+  top: 25%;
+  bottom: 25%;
   width: 1px;
   background: $widget-text-muted;
 }
 
+// The zero mark stands proud of the track on both sides — the one line of the
+// gauge that is not part of the bar but what the bar is read against.
+.zero {
+  position: absolute;
+  top: ws(-$zero-overhang);
+  left: 50%;
+  width: 2px;
+  height: ws($track-height + $zero-overhang * 2);
+  margin-left: -1px;
+  border-radius: 1px;
+  background: $widget-text-primary;
+}
+
+.scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: ws($zero-overhang);
+  padding-inline: sp(xs);
+  font-family: $font-widget;
+  font-size: fs(xxxs);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  color: $widget-text-secondary;
+}
+
 .ahead {
-  background: $widget-status-positive;
+  --fill-tone: #{$widget-status-positive};
+  --fill-cap: #{$widget-cap-positive};
 }
+
 .behind {
-  background: $widget-status-danger;
+  --fill-tone: #{$widget-status-danger};
+  --fill-cap: #{$widget-cap-danger};
 }
+
 .neutral {
-  background: $widget-text-muted;
+  --fill-tone: #{$widget-text-muted};
+  --fill-cap: #{$widget-text-secondary};
 }

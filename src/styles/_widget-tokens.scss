@@ -213,3 +213,20 @@ $widget-tire-wet-bg: rgba($race-blue, 0.1);
 // of its own and simply follows, so the two numbers stack in one column instead
 // of the eye hunting for each of them in turn.
 $pit-readout-seam: 82%;
+
+// A state colour coming in from an edge of a dark plate and fading out before
+// the text it announces (the delta plate).
+$widget-wash-positive: rgba($race-green, 0.34);
+$widget-wash-danger: rgba($race-red, 0.34);
+$widget-wash-reach: 58%;
+
+// The bevel for a plate too thin for $widget-panel-bevel's soft falls — a bar,
+// a chip: only the lit top edge and the dark lip.
+$widget-chip-bevel:
+  inset 0 1px 0 rgba(255, 255, 255, 0.14),
+  inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+
+// The lit leading edge of a state-coloured fill: the same hue pulled towards
+// white, so the cap reads as light on the bar rather than a second colour.
+$widget-cap-positive: color-mix(in srgb, $race-green 45%, #ffffff);
+$widget-cap-danger: color-mix(in srgb, $race-red 45%, #ffffff);

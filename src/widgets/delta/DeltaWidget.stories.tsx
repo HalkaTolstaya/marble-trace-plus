@@ -6,6 +6,7 @@ import {
   defineWidgetStories,
   previewScenario,
 } from '@/storybook/define-widget-stories';
+import { PANEL_APPEARANCE_DEFAULTS } from '@widgets/widget-manifest';
 import type { DeltaWidgetSettings } from './settings-schema';
 import type { LapDeltaReference } from '@shared/contracts/widget-choices';
 
@@ -26,6 +27,10 @@ const meta: Meta<StoryArgs> = {
       height: 100,
       background: 'transparent',
       border: 'none',
+      // The plate is the widget's own, painted from its appearance settings.
+      widgetBg: PANEL_APPEARANCE_DEFAULTS.backgroundColor,
+      widgetBorder: PANEL_APPEARANCE_DEFAULTS.borderColor,
+      overflow: 'visible',
     },
     seed: (store, args) => {
       store.liveWidgets.updateUserSettings('delta', {
