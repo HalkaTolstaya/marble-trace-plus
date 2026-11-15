@@ -1,3 +1,4 @@
+import { WIDGET_CANVAS_FONT_FAMILY } from '@shared/lib/canvas';
 import type { UnitSystem } from '@shared/contracts/domain';
 import {
   fillFixedDigits,
@@ -499,7 +500,7 @@ export const drawGrid = (
   );
 
   ctx.save();
-  ctx.font = `600 ${fontPx}px Rajdhani, sans-serif`;
+  ctx.font = `600 ${fontPx}px ${WIDGET_CANVAS_FONT_FAMILY}`;
 
   const labels =
     showAxes && showAxisLabels
@@ -726,7 +727,7 @@ export const drawRimLabel = (
   );
 
   ctx.save();
-  ctx.font = `700 ${fontPx}px Rajdhani, sans-serif`;
+  ctx.font = `700 ${fontPx}px ${WIDGET_CANVAS_FONT_FAMILY}`;
 
   const distancePx = labelDistanceInside(
     radiusPx - RIM_LINE_WIDTH_PX - RIM_LABEL_INSET_PX,
@@ -811,11 +812,11 @@ export const drawBodyText = (
   // A body 1.8 m wide is narrow at any sane widget size, so the label earns its
   // place by shrinking first — down to MIN_LABEL_PX, never past it.
   let size = fontPx;
-  ctx.font = `${weight} ${size}px Rajdhani, sans-serif`;
+  ctx.font = `${weight} ${size}px ${WIDGET_CANVAS_FONT_FAMILY}`;
 
   while (ctx.measureText(text).width > available && size > MIN_LABEL_PX) {
     size -= 1;
-    ctx.font = `${weight} ${size}px Rajdhani, sans-serif`;
+    ctx.font = `${weight} ${size}px ${WIDGET_CANVAS_FONT_FAMILY}`;
   }
 
   if (ctx.measureText(text).width > available) {

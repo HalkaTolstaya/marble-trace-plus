@@ -4,7 +4,9 @@
 
 .carNumber {
   font-family: $font-widget;
-  font-weight: 700;
+  font-weight: 800;
+  // Two figures inside a small dot: closed up so they stay inside it.
+  letter-spacing: -0.08em;
   fill: var(--car-dot-text, #ffffff);
   pointer-events: none;
 }

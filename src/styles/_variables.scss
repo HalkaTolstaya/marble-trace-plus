@@ -1,10 +1,13 @@
 @use 'functions' as *;
 
 // Typography
-$font-mono: 'Consolas', monospace;
-$font-widget: 'Rajdhani', sans-serif;
-// Timing tables (Standings, Relative): a grotesque with tabular figures.
+// Every widget speaks one typeface: Manrope, a grotesque whose figures are
+// set tabular (WidgetPanel, the widget frame), so a number that changes keeps
+// its width. The names stay apart so a widget can still say which role a
+// piece of text plays.
 $font-table: 'Manrope', 'Segoe UI', sans-serif;
+$font-mono: $font-table;
+$font-widget: $font-table;
 // Main window UI chrome only (not widgets, which stay on $font-widget until localized)
 $font-app: 'Exo 2', 'Noto Sans SC', sans-serif;
 $font-size-widget: rem(13);

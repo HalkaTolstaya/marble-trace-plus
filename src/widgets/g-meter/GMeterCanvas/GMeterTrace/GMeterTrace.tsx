@@ -1,3 +1,4 @@
+import { WIDGET_CANVAS_FONT_FAMILY } from '@shared/lib/canvas';
 import { observer } from 'mobx-react-lite';
 import { useRef, useCallback, useLayoutEffect } from 'react';
 
@@ -143,7 +144,7 @@ const drawAxisBadges = (
     color,
   };
 
-  ctx.font = `700 ${fontSize}px 'Rajdhani', sans-serif`;
+  ctx.font = `700 ${fontSize}px ${WIDGET_CANVAS_FONT_FAMILY}`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
