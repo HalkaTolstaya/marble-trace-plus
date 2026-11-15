@@ -21,7 +21,7 @@
 }
 
 .rowOdd {
-  background-color: rgba(255, 255, 255, 0.035);
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 .driverRowPlayer {
@@ -285,6 +285,7 @@
   font-family: $font-table;
   font-weight: 800;
   border-bottom: 0;
+  min-height: ws(30);
 }
 
 .posBlock {

@@ -34,6 +34,8 @@ export const RELATIVE_MANIFEST: WidgetManifest = {
   deriveDesignWidth: (settings) =>
     computeRelativeDesignWidth(settings as unknown as RelativeWidgetSettings),
   requiredCapabilities: ['relative'],
+  // Header, table and footer draw their own cards, as in Standings.
+  transparentContainer: true,
   designWidth: RELATIVE_DESIGN_WIDTH,
   designHeight: 400,
   userSettings: {

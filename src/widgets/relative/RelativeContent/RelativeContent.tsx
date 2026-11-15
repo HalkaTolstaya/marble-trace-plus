@@ -92,15 +92,17 @@ export const RelativeContent = observer(() => {
   return (
     <>
       <RelativeHeader />
-      <RelativeColumnHeaders />
-      <div ref={driverListRef} className={styles.driverList}>
-        {displayRows.map((row, index) =>
-          row.isPaceCar ? (
-            <PaceCarRow key={row.carIdx} carIdx={row.carIdx} index={index} />
-          ) : (
-            <DriverRow key={row.carIdx} carIdx={row.carIdx} index={index} />
-          )
-        )}
+      <div className={styles.table}>
+        <RelativeColumnHeaders />
+        <div ref={driverListRef} className={styles.driverList}>
+          {displayRows.map((row, index) =>
+            row.isPaceCar ? (
+              <PaceCarRow key={row.carIdx} carIdx={row.carIdx} index={index} />
+            ) : (
+              <DriverRow key={row.carIdx} carIdx={row.carIdx} index={index} />
+            )
+          )}
+        </div>
       </div>
       <RelativeFooter />
     </>

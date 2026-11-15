@@ -6,7 +6,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  gap: sp(xs);
   overflow: hidden;
-  // Override WidgetPanel background so empty space below rows stays transparent
+  // The cards paint themselves; the space between them is the game.
   background: transparent !important;
 }
