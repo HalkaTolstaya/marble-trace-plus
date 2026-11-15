@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.4] — 2026-11-15
+
+### Changed
+
+- **Overlay panels have depth drawn inside them:** a lit top edge, a soft sheen and a dark bottom lip, instead of an outer shadow. A panel sits flush on the game, and nothing about it needs extra GPU work.
+- **Widgets come into focus when they appear:** out of a short blur, rising, with a slight spring.
+- **Standings:** a car that passes slides into its place with a slight spring, and its row flashes green; the car it passed flashes red. A car joining or leaving the list does not flash anyone.
+- **No game running:** widgets that stay on screen are dimmed, so the last session's values do not read as live ones.
+- All of the above is off when Windows asks for reduced motion.
+
 ## [0.28.3] — 2026-11-15
 
 ### Added

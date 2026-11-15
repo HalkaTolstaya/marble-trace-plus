@@ -23,6 +23,43 @@
     width: 3px;
     background: var(--row-class-marker, transparent);
   }
+
+  // The flash of a place won or lost (useRowMoveAnimation sets the
+  // attribute). Opacity on a layer of its own: a one-shot composited fade,
+  // not a repaint of the row.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &[data-row-flash='gain']::after {
+    background: $widget-flash-gain;
+    animation: rowFlash 1.4s ease-out both;
+  }
+
+  &[data-row-flash='loss']::after {
+    background: $widget-flash-loss;
+    animation: rowFlash 1.4s ease-out both;
+  }
+}
+
+@keyframes rowFlash {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .driverRow::after {
+    animation: none !important;
+  }
 }
 
 .rowOdd {

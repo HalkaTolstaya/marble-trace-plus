@@ -53,6 +53,18 @@ $widget-text-best-lap: $race-purple;
 $brand-accent: #2ee680;
 $brand-accent-glow: rgba(46, 230, 128, 0.35);
 
+// Ease with a slight overshoot: things settle with a spring, not a brake.
+$ease-spring: cubic-bezier(0.2, 0.85, 0.3, 1.05);
+
+// Panel bevel, all inset: an overlay sits flush on the game, so the depth is
+// drawn inside the plate (a lit top edge, a soft sheen, a dark bottom lip)
+// and never as an outer shadow or a blur that the GPU would have to compose.
+$widget-panel-bevel:
+  inset 0 1px 0 rgba(255, 255, 255, 0.14),
+  inset 0 8px 14px -10px rgba(255, 255, 255, 0.08),
+  inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+  inset 0 -10px 16px -12px rgba(0, 0, 0, 0.45);
+
 // Surfaces
 $widget-surface-base: plate(rgba(0, 0, 0, 0.75));
 $widget-surface-overlay: plate(rgba(0, 0, 0, 0.8));
@@ -102,6 +114,9 @@ $widget-tint-positive-subtle: rgba($race-green, 0.07);
 $widget-tint-danger: rgba($race-red, 0.12);
 $widget-tint-neutral: rgba($race-neutral, 0.1);
 $widget-tint-best-lap: rgba($race-purple, 0.1);
+// A row that just won or lost a place lights up once and fades back.
+$widget-flash-gain: rgba($race-green, 0.3);
+$widget-flash-loss: rgba($race-red, 0.3);
 
 // Status
 $widget-status-positive: $race-green;
