@@ -8,7 +8,11 @@
       "widgets": "小组件",
       "crew": "车队",
       "settings": "设置"
-    }
+    },
+    "configureOverlays": "配置叠加层",
+    "configureDone": "完成",
+    "loadLap": "加载 Garage 61 圈",
+    "loadLapHint": "选择 Garage 61 CSV，或将其拖到此窗口"
   },
   "appStatus": {
     "connectedTo": "已连接到 {{sim}}",
@@ -217,11 +221,13 @@
     "unavailable": "此模拟器不支持"
   },
   "overlayCanvas": {
-    "exitEditMode": "退出编辑模式",
+    "exitEditMode": "完成",
     "interactMode": "交互模式",
     "interactModeHold": "交互模式 — 松开 {{key}} 退出",
     "interactModeToggle": "交互模式 — 按 {{key}} 退出",
-    "layoutSwitched": "布局已切换为“{{layout}}”"
+    "layoutSwitched": "布局已切换为“{{layout}}”",
+    "configureTitle": "配置叠加层",
+    "configureHint": "拖动小部件以移动，拖动角落以调整大小"
   },
   "widgetSettingsPopup": {
     "ariaLabel": "{{label}} 设置",

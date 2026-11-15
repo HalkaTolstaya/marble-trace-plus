@@ -308,7 +308,7 @@ export const WidgetContainer = observer(
         >
           <ErrorBoundary>
             <div
-              className={`${styles.widgetInner} ${overflowVisible ? styles.overflowVisible : ''}`}
+              className={`${styles.widgetInner} ${overflowVisible ? styles.overflowVisible : ''} ${shouldHide ? '' : styles.enter}`}
               style={frameStyle}
             >
               <WidgetIdContext.Provider value={widgetId}>

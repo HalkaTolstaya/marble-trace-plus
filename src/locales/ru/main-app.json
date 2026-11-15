@@ -8,7 +8,11 @@
       "widgets": "Виджеты",
       "crew": "Экипаж",
       "settings": "Настройки"
-    }
+    },
+    "configureOverlays": "Настроить оверлеи",
+    "configureDone": "Готово",
+    "loadLap": "Загрузить круг Garage 61",
+    "loadLapHint": "Выберите CSV из Garage 61 или перетащите его в это окно"
   },
   "appStatus": {
     "connectedTo": "ПОДКЛЮЧЕНО К {{sim}}",
@@ -223,11 +227,13 @@
     "unavailable": "Недоступно в этом симуляторе"
   },
   "overlayCanvas": {
-    "exitEditMode": "Выйти из режима редактирования",
+    "exitEditMode": "Готово",
     "interactMode": "Режим взаимодействия",
     "interactModeHold": "Режим взаимодействия — отпустите {{key}} для выхода",
     "interactModeToggle": "Режим взаимодействия — {{key}} для выхода",
-    "layoutSwitched": "Раскладка переключена на «{{layout}}»"
+    "layoutSwitched": "Раскладка переключена на «{{layout}}»",
+    "configureTitle": "Настройка оверлеев",
+    "configureHint": "Тащите виджет мышкой, тяните за угол для размера"
   },
   "widgetSettingsPopup": {
     "ariaLabel": "Настройки {{label}}",

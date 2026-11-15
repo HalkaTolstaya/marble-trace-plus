@@ -18,9 +18,10 @@ export const COMMON_WIDGET_DEFAULTS = {
 
 // Most widgets render on an opaque panel; a few (radar, track map, delta,
 // flag widgets) draw directly over the overlay with no panel behind them.
+// Dark glass with a faint green edge (Trailbrake's look).
 export const PANEL_APPEARANCE_DEFAULTS = {
-  backgroundColor: 'rgba(21, 22, 26, 0.8)',
-  borderColor: 'rgba(255, 255, 255, 0.1)',
+  backgroundColor: 'rgba(10, 12, 15, 0.82)',
+  borderColor: 'rgba(46, 230, 128, 0.22)',
 };
 
 export const TRANSPARENT_APPEARANCE_DEFAULTS = {

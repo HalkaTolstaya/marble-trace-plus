@@ -61,3 +61,21 @@
   gap: rem(14);
   min-width: 0;
 }
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: rem(8);
+}
+
+// The way into configure mode: the overlays come up on the real screen.
+.configureButton {
+  background: $brand-accent !important;
+  border-color: $brand-accent !important;
+  color: #04110a !important;
+  font-weight: 700;
+}
+
+.doneButton {
+  font-weight: 700;
+}
