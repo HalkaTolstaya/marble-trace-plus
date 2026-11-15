@@ -329,6 +329,26 @@ jobs:
           Invoke-WebRequest -Uri "https://msedgedriver.microsoft.com/$version/edgedriver_win64.zip" -OutFile $zip
           Expand-Archive -Path $zip -DestinationPath $dir -Force
           "EDGEWEBDRIVER=$dir" >> $env:GITHUB_ENV
+      - name: Diagnostics - start the exe without a driver
+        shell: pwsh
+        run: |
+          $exe = Get-ChildItem e2e/bin -Filter *.exe | Select-Object -First 1
+          Write-Output "Starting $($exe.FullName)"
+          $proc = Start-Process -FilePath $exe.FullName -PassThru
+          Start-Sleep -Seconds 20
+          $proc.Refresh()
+          Write-Output "Exited: $($proc.HasExited)  ExitCode: $(if ($proc.HasExited) { $proc.ExitCode } else { '-' })"
+          Get-Process | Where-Object { $_.ProcessName -match 'trailbrake|marble|msedgewebview2' } | Format-Table ProcessName, Id, MainWindowTitle -AutoSize | Out-String | Write-Output
+          if (-not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
+          Get-Process msedgewebview2 -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          foreach ($root in @($env:APPDATA, $env:LOCALAPPDATA)) {
+            $dir = Join-Path $root 'io.github.halkatolstaya.trailbrake'
+            if (Test-Path $dir) {
+              Write-Output "== $dir"
+              Get-ChildItem $dir -Recurse -Depth 2 | Select-Object -First 40 | ForEach-Object { $_.FullName } | Write-Output
+              Get-ChildItem $dir -Recurse -Filter *.log | ForEach-Object { Write-Output "--- $($_.FullName)"; Get-Content $_.FullName -Tail 60 }
+            }
+          }
       - name: Install the e2e runner
         working-directory: e2e
         run: npm ci
@@ -340,6 +360,14 @@ jobs:
           [ -f "$app" ] || app="$GITHUB_WORKSPACE/e2e/bin/marble-trace.exe"
           APP_PATH="$app" npm test
       - name: App logs on failure
+        if: failure()
+        shell: pwsh
+        run: |
+          foreach ($root in @($env:APPDATA, $env:LOCALAPPDATA)) {
+            Get-ChildItem (Join-Path $root 'io.github.halkatolstaya.trailbrake') -Recurse -Filter *.log -ErrorAction SilentlyContinue |
+              ForEach-Object { Write-Output "--- $($_.FullName)"; Get-Content $_.FullName -Tail 80 }
+          }
+      - name: Upload app logs
         if: failure()
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
