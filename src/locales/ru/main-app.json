@@ -209,7 +209,8 @@
   },
   "widgetWorkbench": {
     "scenario": "Сценарий",
-    "noWidgets": "Нет доступных виджетов."
+    "noWidgets": "Нет доступных виджетов.",
+    "live": "Живое превью"
   },
   "layoutCanvas": {
     "move": "Перемещение",

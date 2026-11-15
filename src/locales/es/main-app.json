@@ -205,7 +205,8 @@
   },
   "widgetWorkbench": {
     "scenario": "Escenario",
-    "noWidgets": "No hay widgets disponibles."
+    "noWidgets": "No hay widgets disponibles.",
+    "live": "En vivo"
   },
   "layoutCanvas": {
     "move": "Mover",

@@ -14,11 +14,14 @@ import {
   DEFAULT_PREVIEW_SCENARIO_ID,
 } from '@features/preview/scenarios';
 import { seedInputHistory } from '@features/preview/preview-animator';
+import { LiveRacePreview } from '@features/preview/live-race';
 import styles from './WidgetPreview.module.scss';
 
 interface WidgetPreviewProps {
   widgetId: string;
   scenarioId?: string;
+  /** Run the race: cars lap, trade places and close laps; pedals move. */
+  live?: boolean;
 }
 
 // Renders a single widget the way the overlay would, but inside the main window
@@ -28,6 +31,7 @@ export const WidgetPreview = observer(
   ({
     widgetId,
     scenarioId = DEFAULT_PREVIEW_SCENARIO_ID,
+    live = false,
   }: WidgetPreviewProps) => {
     const editor = useWidgetEditor();
     const units = useUnitsStore();
@@ -50,6 +54,20 @@ export const WidgetPreview = observer(
     useEffect(() => {
       seedInputHistory(previewStore);
     }, [previewStore, scenarioId]);
+
+    // Started after the scenario is seeded, from the field it left; a new
+    // scenario starts a new race.
+    useEffect(() => {
+      if (!live) {
+        return;
+      }
+
+      const race = new LiveRacePreview(previewStore);
+
+      race.start();
+
+      return () => race.stop();
+    }, [previewStore, scenarioId, live]);
 
     // The preview store is its own world, units included — without this it
     // stays metric while the app is set to imperial, and every distance in the

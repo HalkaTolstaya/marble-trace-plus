@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
-import { Select } from 'antd';
+import { Select, Switch } from 'antd';
 import { WidgetPreview } from '../WidgetPreview/WidgetPreview';
 import { WidgetSettings } from '@features/widget-settings/WidgetSettings';
 import { DefaultsEditorProvider } from '@features/widget-settings/WidgetEditorContext';
@@ -75,6 +75,7 @@ export const WidgetWorkbench = observer(
       widgetId: string;
       scenarioId: string;
     } | null>(null);
+    const [live, setLive] = useState(true);
 
     if (!widgetId) {
       return (
@@ -94,27 +95,40 @@ export const WidgetWorkbench = observer(
       <DefaultsEditorProvider>
         <div className={styles.root}>
           <div className={styles.previewColumn}>
-            {scenarioOptions.length > 0 && (
-              <div className={styles.scenarioBar}>
-                <span className={styles.scenarioLabel}>
-                  {t('widgetWorkbench.scenario')}
-                </span>
-                <Select
-                  size="small"
-                  value={activeScenarioId}
-                  onChange={(scenarioId) => setPicked({ widgetId, scenarioId })}
-                  options={scenarioOptions}
-                  style={{ minWidth: 160 }}
-                  popupMatchSelectWidth={false}
-                />
-              </div>
-            )}
+            <div className={styles.scenarioBar}>
+              {scenarioOptions.length > 0 && (
+                <>
+                  <span className={styles.scenarioLabel}>
+                    {t('widgetWorkbench.scenario')}
+                  </span>
+                  <Select
+                    size="small"
+                    value={activeScenarioId}
+                    onChange={(scenarioId) =>
+                      setPicked({ widgetId, scenarioId })
+                    }
+                    options={scenarioOptions}
+                    style={{ minWidth: 160 }}
+                    popupMatchSelectWidth={false}
+                  />
+                </>
+              )}
 
-            <div className={styles.previewPane}>
+              <label className={styles.liveToggle}>
+                <Switch size="small" checked={live} onChange={setLive} />
+                <span className={styles.scenarioLabel}>
+                  {t('widgetWorkbench.live')}
+                </span>
+              </label>
+            </div>
+
+            {/* The widget over a drawn track, as it sits over the game. */}
+            <div className={`${styles.previewPane} ${styles.scene}`}>
               <WidgetPreview
                 key={widgetId}
                 widgetId={widgetId}
                 scenarioId={activeScenarioId}
+                live={live}
               />
             </div>
           </div>

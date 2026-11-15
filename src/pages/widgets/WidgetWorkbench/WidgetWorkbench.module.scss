@@ -58,3 +58,37 @@
   color: #8b8e98;
   font-family: $font-widget;
 }
+
+.liveToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: sp(xs);
+  margin-left: auto;
+  cursor: pointer;
+}
+
+// A track drawn in CSS behind the preview: an overcast sky, a tree line, and
+// a road running into the distance between red-and-white kerbs. Only so the
+// widget is judged against something like the game, not against flat black.
+.scene {
+  position: relative;
+  background:
+    // kerbs, left and right, in perspective
+    repeating-linear-gradient(62deg, #d33 0 18px, #eee 18px 36px) left 62% / 40%
+      14% no-repeat,
+    repeating-linear-gradient(-62deg, #d33 0 18px, #eee 18px 36px) right 62% /
+      40% 14% no-repeat,
+    // asphalt
+    linear-gradient(180deg, #2c2f33 0%, #1c1e21 100%) bottom / 100% 42%
+      no-repeat,
+    // grass verges
+    linear-gradient(180deg, #2f4a2a 0%, #1f3320 100%) center 64% / 100% 8%
+      no-repeat,
+    // tree line
+    radial-gradient(ellipse 20% 30% at 10% 52%, #23361f 60%, transparent 61%),
+    radial-gradient(ellipse 22% 34% at 32% 50%, #1e2f1b 60%, transparent 61%),
+    radial-gradient(ellipse 18% 28% at 58% 53%, #253a21 60%, transparent 61%),
+    radial-gradient(ellipse 24% 36% at 84% 49%, #1d2e1a 60%, transparent 61%),
+    // sky
+    linear-gradient(180deg, #9aa3ab 0%, #c3c8cc 45%, #8d9692 58%);
+}

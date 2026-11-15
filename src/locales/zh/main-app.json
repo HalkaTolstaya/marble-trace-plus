@@ -203,7 +203,8 @@
   },
   "widgetWorkbench": {
     "scenario": "场景",
-    "noWidgets": "没有可用的小组件。"
+    "noWidgets": "没有可用的小组件。",
+    "live": "实时"
   },
   "layoutCanvas": {
     "move": "移动",
