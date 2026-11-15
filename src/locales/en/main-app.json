@@ -8,7 +8,11 @@
       "widgets": "Widgets",
       "crew": "Crew",
       "settings": "Settings"
-    }
+    },
+    "configureOverlays": "Configure overlays",
+    "configureDone": "Done",
+    "loadLap": "Load Garage 61 lap",
+    "loadLapHint": "Choose a Garage 61 CSV, or drop it anywhere on this window"
   },
   "appStatus": {
     "connectedTo": "CONNECTED TO {{sim}}",
@@ -219,11 +223,13 @@
     "unavailable": "Not available in this sim"
   },
   "overlayCanvas": {
-    "exitEditMode": "Exit Edit Mode",
+    "exitEditMode": "Done",
     "interactMode": "Interact mode",
     "interactModeHold": "Interact mode — release {{key}} to exit",
     "interactModeToggle": "Interact mode — {{key}} to exit",
-    "layoutSwitched": "Layout switched to \"{{layout}}\""
+    "layoutSwitched": "Layout switched to \"{{layout}}\"",
+    "configureTitle": "Configure overlays",
+    "configureHint": "Drag a widget to move it, pull a corner to resize"
   },
   "widgetSettingsPopup": {
     "ariaLabel": "{{label}} settings",

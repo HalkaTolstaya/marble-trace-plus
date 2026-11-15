@@ -8,7 +8,11 @@
       "widgets": "Widgets",
       "crew": "Equipo",
       "settings": "Ajustes"
-    }
+    },
+    "configureOverlays": "Configurar overlays",
+    "configureDone": "Listo",
+    "loadLap": "Cargar vuelta de Garage 61",
+    "loadLapHint": "Elige un CSV de Garage 61 o suéltalo en esta ventana"
   },
   "appStatus": {
     "connectedTo": "CONECTADO A {{sim}}",
@@ -219,11 +223,13 @@
     "unavailable": "No disponible en este simulador"
   },
   "overlayCanvas": {
-    "exitEditMode": "Salir del modo edición",
+    "exitEditMode": "Listo",
     "interactMode": "Modo interacción",
     "interactModeHold": "Modo interacción — suelta {{key}} para salir",
     "interactModeToggle": "Modo interacción — pulsa {{key}} para salir",
-    "layoutSwitched": "Diseño cambiado a «{{layout}}»"
+    "layoutSwitched": "Diseño cambiado a «{{layout}}»",
+    "configureTitle": "Configurar overlays",
+    "configureHint": "Arrastra un widget para moverlo, tira de una esquina para el tamaño"
   },
   "widgetSettingsPopup": {
     "ariaLabel": "Ajustes de {{label}}",

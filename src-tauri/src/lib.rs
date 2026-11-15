@@ -192,6 +192,14 @@ fn on_window_event(window: &Window, event: &WindowEvent) {
         WindowEvent::ScaleFactorChanged { scale_factor, .. } => {
             tracing::info!(window = window.label(), scale_factor, "window DPI changed");
         }
+        // Garage 61 CSVs dropped on the settings window go to the laps folder,
+        // whose watcher imports them. The paths come from the OS drop, not
+        // from the webview.
+        WindowEvent::DragDrop(tauri::DragDropEvent::Drop { paths, .. })
+            if window.label() == MAIN_WINDOW_LABEL =>
+        {
+            reflaps::accept_dropped_files(window.app_handle(), paths);
+        }
         _ => {}
     }
 }

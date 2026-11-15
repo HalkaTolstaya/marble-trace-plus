@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'antd';
-import { X } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { WidgetPicker } from '@app/windows/overlay/components/WidgetPicker/WidgetPicker';
 import { useAppSettingsStore } from '@entities/app-settings/app-settings-context';
+import styles from './DragModeBar.module.scss';
 
 /**
  * The controls drag mode puts at the top of the overlay. Loaded lazily by
@@ -20,14 +21,21 @@ export const DragModeBar = observer(() => {
 
   return (
     <>
+      <div className={styles.title}>
+        <span className={styles.heading}>
+          {t('overlayCanvas.configureTitle')}
+        </span>
+        <span className={styles.hint}>{t('overlayCanvas.configureHint')}</span>
+      </div>
+
       <WidgetPicker />
 
       <Button
         type="primary"
-        danger
-        icon={<X size={16} />}
+        icon={<Check size={16} />}
         onClick={handleExitDragMode}
         size="large"
+        className={styles.done}
       >
         {t('overlayCanvas.exitEditMode')}
       </Button>

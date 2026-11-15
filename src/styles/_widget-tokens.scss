@@ -49,6 +49,10 @@ $widget-text-accent: $race-green;
 $widget-text-sof: $race-lilac;
 $widget-text-best-lap: $race-purple;
 
+// Trailbrake accent: the neon green of the configure mode and panel edges.
+$brand-accent: #2ee680;
+$brand-accent-glow: rgba(46, 230, 128, 0.35);
+
 // Surfaces
 $widget-surface-base: plate(rgba(0, 0, 0, 0.75));
 $widget-surface-overlay: plate(rgba(0, 0, 0, 0.8));

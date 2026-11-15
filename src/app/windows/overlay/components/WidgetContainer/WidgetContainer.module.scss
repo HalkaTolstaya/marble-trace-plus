@@ -26,6 +26,21 @@
   border-radius: rem(6);
   border: 2px solid;
   overflow: hidden;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+}
+
+// A widget fades and rises in when it appears (entering the car, a session
+// switching layouts) — a state-change transition, never a per-tick one
+// (ADR-0009).
+.enter {
+  animation: widgetEnter 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes widgetEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
+  }
 }
 
 .overflowVisible {
@@ -46,7 +61,10 @@
   // user can actually pull is drawn thick on top of it.
   inset: 0;
   box-sizing: border-box;
-  border: 1px solid color-mix(in srgb, $widget-text-accent 55%, transparent);
+  border: 1px solid $brand-accent;
+  box-shadow:
+    0 0 0 1px rgba(46, 230, 128, 0.25),
+    0 0 18px $brand-accent-glow;
   pointer-events: none;
   z-index: 50;
 }

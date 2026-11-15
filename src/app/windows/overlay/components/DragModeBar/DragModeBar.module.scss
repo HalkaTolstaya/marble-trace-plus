@@ -1,0 +1,27 @@
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: rem(2);
+  margin-right: rem(8);
+  line-height: 1.1;
+}
+
+.heading {
+  font-size: rem(14);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $brand-accent;
+}
+
+.hint {
+  font-size: rem(12);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.done {
+  background: $brand-accent !important;
+  border-color: $brand-accent !important;
+  color: #04110a !important;
+  font-weight: 700;
+}

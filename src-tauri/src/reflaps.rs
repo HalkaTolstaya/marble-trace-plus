@@ -224,6 +224,44 @@ pub fn spawn_inbox_watcher(app: &AppHandle) {
     });
 }
 
+/// Copies dropped `.csv` files (regular files, size-capped) into the laps
+/// folder; the folder watcher imports them on its next scan.
+pub fn accept_dropped_files(app: &AppHandle, paths: &[std::path::PathBuf]) {
+    let Some(state) = app.try_state::<Arc<ReflapsState>>() else {
+        return;
+    };
+    let inbox = state.inbox.clone();
+    let paths = paths.to_vec();
+
+    tauri::async_runtime::spawn_blocking(move || {
+        for path in paths {
+            let is_csv = path
+                .extension()
+                .and_then(|extension| extension.to_str())
+                .is_some_and(|extension| extension.eq_ignore_ascii_case("csv"));
+            let Ok(meta) = std::fs::symlink_metadata(&path) else {
+                continue;
+            };
+
+            if !is_csv
+                || !meta.file_type().is_file()
+                || meta.len() > mt_reflaps::lap::MAX_CSV_BYTES as u64
+            {
+                info!("dropped file ignored: not a lap CSV");
+                continue;
+            }
+
+            let Some(name) = path.file_name() else {
+                continue;
+            };
+
+            if let Err(error) = std::fs::copy(&path, inbox.join(name)) {
+                error!("could not copy the dropped lap into the laps folder: {error}");
+            }
+        }
+    });
+}
+
 /// Moves the scanner through a blocking scan and back.
 fn scanner_scan(
     mut scanner: InboxScanner,

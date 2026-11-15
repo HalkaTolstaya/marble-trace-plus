@@ -4,15 +4,15 @@
   z-index: 9999;
   overflow: hidden;
 
+  // Configure mode: the screen dims behind a faint alignment grid, so the
+  // widgets stand out at their real size and place over the game.
   &.dragActive {
-    background-color: rgba(0, 102, 255, 0.1);
-    background-image: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      rgba(255, 255, 255, 0.05) 10px,
-      rgba(255, 255, 255, 0.05) 11px
-    );
+    background-color: rgba(4, 6, 8, 0.6);
+    background-image:
+      linear-gradient(rgba(46, 230, 128, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(46, 230, 128, 0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: configureFadeIn 0.22s ease-out both;
   }
 }
 
@@ -23,11 +23,30 @@
   transform: translateX(-50%);
   z-index: 10000;
   pointer-events: auto;
-  font-weight: 600;
-  text-transform: uppercase;
   display: flex;
-  align-items: flex-start;
-  gap: sp(sm);
+  align-items: center;
+  gap: sp(md);
+  padding: rem(10) rem(12) rem(10) rem(20);
+  border-radius: rem(14);
+  background: rgba(12, 14, 17, 0.92);
+  border: 1px solid $brand-accent-glow;
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.55),
+    0 0 24px rgba(46, 230, 128, 0.12);
+  animation: configureSlideDown 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes configureFadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes configureSlideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
 }
 
 .toastContainer {

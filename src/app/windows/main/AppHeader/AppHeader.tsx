@@ -1,5 +1,8 @@
 import { observer } from 'mobx-react-lite';
-import { Segmented } from 'antd';
+import { Button, Segmented, Tooltip } from 'antd';
+import { Check, FileUp, Move } from 'lucide-react';
+import { useAppSettingsStore } from '@entities/app-settings/app-settings-context';
+import { useReferenceLapsStore } from '@features/reference-laps/reference-laps-context';
 import { useTranslation } from 'react-i18next';
 import { AppStatus } from '../AppStatus/AppStatus';
 import { HeaderTrace } from './HeaderTrace';
@@ -19,6 +22,8 @@ interface AppHeaderProps {
 export const AppHeader = observer(
   ({ activeSection, onSectionChange }: AppHeaderProps) => {
     const { t } = useTranslation('main-app');
+    const appSettings = useAppSettingsStore();
+    const referenceLaps = useReferenceLapsStore();
 
     const sectionOptions = [
       { label: t('appHeader.sections.layouts'), value: 'layouts' },
@@ -45,6 +50,37 @@ export const AppHeader = observer(
         </div>
 
         <div className={styles.status} data-tauri-drag-region>
+          <div className={styles.actions}>
+            <Tooltip title={t('appHeader.loadLapHint')}>
+              <Button
+                size="small"
+                icon={<FileUp size={14} />}
+                disabled={referenceLaps.busy}
+                onClick={() => void referenceLaps.importCsv()}
+              >
+                {t('appHeader.loadLap')}
+              </Button>
+            </Tooltip>
+
+            <Button
+              size="small"
+              type="primary"
+              className={
+                appSettings.dragMode
+                  ? styles.doneButton
+                  : styles.configureButton
+              }
+              icon={
+                appSettings.dragMode ? <Check size={14} /> : <Move size={14} />
+              }
+              onClick={() => appSettings.toggleDragMode()}
+            >
+              {appSettings.dragMode
+                ? t('appHeader.configureDone')
+                : t('appHeader.configureOverlays')}
+            </Button>
+          </div>
+
           <div className={styles.statusInfo} data-tauri-drag-region>
             <AppStatus />
           </div>
