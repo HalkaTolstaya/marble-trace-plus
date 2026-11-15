@@ -34,6 +34,10 @@ git tag -a vX.Y.Z -m "Trailbrake X.Y.Z"
 git push origin vX.Y.Z
 ```
 
+Or, where tags cannot be pushed, run **Actions → Release → Run workflow** on
+`main` (or `gh workflow run release.yml --ref main`): it releases the version in
+`package.json` and creates the tag itself.
+
 `release.yml` refuses a tag that is not on `main` or whose version or changelog
 entry is missing, runs the full CI again, then builds and publishes.
 

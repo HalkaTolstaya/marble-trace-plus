@@ -14,6 +14,9 @@ name: Release
 on:
   push:
     tags: ['v*']
+  # Run from main to release the version in package.json: the workflow creates
+  # the tag itself (for environments that cannot push tags).
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -32,7 +35,7 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           fetch-depth: 0
-      - name: The tag is on main
+      - name: The commit is on main
         run: |
           git fetch --no-tags origin main
           git merge-base --is-ancestor "$GITHUB_SHA" origin/main
@@ -40,7 +43,15 @@ jobs:
         id: version
         shell: bash
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            [ "$GITHUB_REF" = "refs/heads/main" ] || { echo "::error::dispatch only from main"; exit 1; }
+            version=$(node -p "require('./package.json').version")
+            if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null; then
+              echo "::error::v$version is already tagged"; exit 1
+            fi
+          else
+            version="${GITHUB_REF_NAME#v}"
+          fi
           package=$(node -p "require('./package.json').version")
           tauri=$(node -p "require('./src-tauri/tauri.conf.json').version")
           cargo=$(grep -m1 '^version = ' src-tauri/Cargo.toml | cut -d'"' -f2)
@@ -201,6 +212,9 @@ jobs:
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           name: Trailbrake ${{ env.VERSION }}
+          # Creates the tag on this commit when the run was dispatched.
+          tag_name: v${{ env.VERSION }}
+          target_commitish: ${{ github.sha }}
           body_path: notes/RELEASE_NOTES.md
           files: dist/*
           fail_on_unmatched_files: true
