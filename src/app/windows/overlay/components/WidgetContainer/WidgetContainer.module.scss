@@ -26,20 +26,52 @@
   border-radius: rem(6);
   border: 2px solid;
   overflow: hidden;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+  // Telemetry lost: the widget dims instead of freezing at full strength.
+  transition: opacity 0.25s ease;
 }
 
-// A widget fades and rises in when it appears (entering the car, a session
-// switching layouts) — a state-change transition, never a per-tick one
-// (ADR-0009).
+// The plate's depth, inset only (see $widget-panel-bevel). Not on a widget
+// without a plate, which draws straight on the game.
+.plate {
+  box-shadow: $widget-panel-bevel;
+}
+
+// No telemetry: what the widget shows is the last thing it got.
+.stale {
+  opacity: 0.5;
+}
+
+// A widget comes into focus when it appears (entering the car, a session
+// switching layouts): out of a blur, rising, with a slight spring. It runs
+// once on that change of state, never per tick (ADR-0009).
 .enter {
-  animation: widgetEnter 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: widgetEnter 0.42s $ease-spring both;
 }
 
 @keyframes widgetEnter {
   from {
     opacity: 0;
-    transform: translateY(6px) scale(0.985);
+    filter: blur(6px);
+    transform: translateY(8px) scale(0.97);
+  }
+
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+
+  to {
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter {
+    animation: none;
+  }
+
+  .widgetInner {
+    transition: none;
   }
 }
 

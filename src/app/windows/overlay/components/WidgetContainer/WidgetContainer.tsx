@@ -66,6 +66,11 @@ export const WidgetContainer = observer(
       (!isOnTrack && isConnected && !dragMode && hidesOffTrack) ||
       (!widgetAutoHide.isVisible(widgetId) && !dragMode);
 
+    // Shown without a game (the user keeps widgets up): dimmed, it still
+    // reads as the last session's values rather than live ones. Never while
+    // arranging them.
+    const isStale = !isConnected && !dragMode && !shouldHide;
+
     const x = widget?.userSettings.x ?? 100;
     const y = widget?.userSettings.y ?? 100;
 
@@ -308,7 +313,15 @@ export const WidgetContainer = observer(
         >
           <ErrorBoundary>
             <div
-              className={`${styles.widgetInner} ${overflowVisible ? styles.overflowVisible : ''} ${shouldHide ? '' : styles.enter}`}
+              className={[
+                styles.widgetInner,
+                overflowVisible && styles.overflowVisible,
+                !shouldHide && styles.enter,
+                !shouldHide && !transparentContainer && styles.plate,
+                isStale && styles.stale,
+              ]
+                .filter(Boolean)
+                .join(' ')}
               style={frameStyle}
             >
               <WidgetIdContext.Provider value={widgetId}>

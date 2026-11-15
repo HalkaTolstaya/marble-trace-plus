@@ -3,7 +3,14 @@ import { useLayoutEffect, useRef, useState, type RefCallback } from 'react';
 
 const ROW_SELECTOR = '[data-driver-row]';
 export const ROW_KEY_ATTRIBUTE = 'data-row-key';
-const MOVE_EASING = 'cubic-bezier(0.33, 0, 0.15, 1)';
+// A short overshoot: the passing row settles with a slight spring instead of
+// braking into place.
+const MOVE_EASING = 'cubic-bezier(0.2, 0.85, 0.3, 1.05)';
+// Set on a row that changed places, read by its stylesheet: `gain` when it
+// moved up, `loss` when it moved down. The flash is a one-shot animation on a
+// change of state, not on the telemetry (ADR-0009).
+export const ROW_FLASH_ATTRIBUTE = 'data-row-flash';
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 // Sub-pixel drift from rounding must not trigger a transition.
 const MIN_MOVE_PX = 1;
 
@@ -35,6 +42,47 @@ const currentShift = (row: HTMLElement): number => {
   return Number.isFinite(translateY) ? translateY : 0;
 };
 
+const prefersReducedMotion = (): boolean =>
+  typeof window.matchMedia === 'function' &&
+  window.matchMedia(REDUCED_MOTION_QUERY).matches;
+
+// Restarts the flash even when the row already carries it from a pass a moment
+// ago: the attribute is dropped, the style flushed, and set again.
+const flashRow = (row: HTMLElement, direction: 'gain' | 'loss') => {
+  row.removeAttribute(ROW_FLASH_ATTRIBUTE);
+  void row.offsetWidth;
+  row.setAttribute(ROW_FLASH_ATTRIBUTE, direction);
+};
+
+/**
+ * How many places each row rose (positive) or fell (negative), counted among
+ * the rows present in both orders only. A car joining or leaving the list
+ * pushes the rows around it without anyone passing anyone, so it must not
+ * read as a gain or a loss.
+ */
+export const changesOfPlace = (
+  before: readonly string[],
+  after: readonly string[]
+): Map<string, number> => {
+  const present = new Set(after);
+  const kept = before.filter((key) => present.has(key));
+  const keptSet = new Set(kept);
+  const placeBefore = new Map(kept.map((key, place) => [key, place]));
+  const changes = new Map<string, number>();
+  let place = 0;
+
+  for (const key of after) {
+    if (!keptSet.has(key)) {
+      continue;
+    }
+
+    changes.set(key, (placeBefore.get(key) ?? place) - place);
+    place += 1;
+  }
+
+  return changes;
+};
+
 const measureTops = (rows: HTMLElement[]): RowTops => {
   const tops: RowTops = new Map();
 
@@ -60,6 +108,7 @@ export const useRowMoveAnimation = <T extends HTMLElement>(
   const [container, setContainer] = useState<T | null>(null);
   const previousTops = useRef<RowTops>(new Map());
   const previousOrder = useRef('');
+  const previousKeys = useRef<string[]>([]);
   const frameId = useRef(0);
   const wasAnimating = useRef(animate);
 
@@ -80,10 +129,15 @@ export const useRowMoveAnimation = <T extends HTMLElement>(
 
     previousOrder.current = order;
 
+    const keysBefore = previousKeys.current;
+
+    previousKeys.current = rows.map(rowKey);
+
     // Skipped both while animation is off and on the first render after it comes
     // back on: the rows moved because the list itself moved, not because of a
     // pass, so sliding them would animate the scroll instead of an overtake.
-    const skipAnimation = !animate || !wasAnimating.current;
+    const skipAnimation =
+      !animate || !wasAnimating.current || prefersReducedMotion();
 
     wasAnimating.current = animate;
 
@@ -101,6 +155,7 @@ export const useRowMoveAnimation = <T extends HTMLElement>(
     }
 
     const tops = measureTops(rows);
+    const placeChanges = changesOfPlace(keysBefore, previousKeys.current);
     const moved: HTMLElement[] = [];
 
     for (const row of rows) {
@@ -122,6 +177,12 @@ export const useRowMoveAnimation = <T extends HTMLElement>(
       row.style.transition = 'none';
       row.style.transform = `translateY(${delta}px)`;
       moved.push(row);
+
+      const placeChange = placeChanges.get(rowKey(row)) ?? 0;
+
+      if (placeChange !== 0) {
+        flashRow(row, placeChange > 0 ? 'gain' : 'loss');
+      }
     }
 
     previousTops.current = tops;
