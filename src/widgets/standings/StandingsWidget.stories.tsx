@@ -154,8 +154,11 @@ export const ThirdClass: Story = {
   args: { settings: { viewMode: 'cycling' }, activeClassIndex: 2 },
 };
 
+// The pit pills hang off the rows' right end, outside the table, so the frame
+// lets them out as the overlay does.
 export const WithPitBadges: Story = {
   args: { rows: MOCK_PIT_ROWS },
+  parameters: { widgetFrame: { overflow: 'visible' } },
 };
 
 export const WithDriverFlags: Story = {

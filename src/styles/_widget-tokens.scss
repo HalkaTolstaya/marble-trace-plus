@@ -254,3 +254,14 @@ $widget-well-bevel:
 // A rev light that is off, and the lit edge of one that is on.
 $widget-led-off: rgba(255, 255, 255, 0.08);
 $widget-led-sheen: rgba(255, 255, 255, 0.5);
+
+// The pit colour coming in from the edge of a tile beside the table.
+$widget-wash-pit: rgba($widget-pit-entry, 0.3);
+
+// Driver status chips (PIT, PIT IN, OUT...): dark glass let the status colour
+// into — a tinted ground, an outline of the colour, lettering pulled towards
+// white — where a solid block of it would outshout the row it sits in.
+$status-chip-ground: rgba(9, 10, 13, 0.72);
+$status-chip-tint: 24%;
+$status-chip-outline: 75%;
+$status-chip-ink: 62%;
