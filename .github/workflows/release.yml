@@ -139,14 +139,15 @@ jobs:
           fi
           npx tauri build --ci --config "$config" -- --locked
 
+      # Not dist/: that is the frontend build tauri bundles.
       - name: Collect artifacts
         shell: bash
         run: |
-          mkdir -p dist
+          mkdir -p release-out
           installer=$(ls src-tauri/target/release/bundle/nsis/*-setup.exe | head -1)
-          cp "$installer" "dist/trailbrake_${VERSION}_x64-setup.exe"
+          cp "$installer" "release-out/trailbrake_${VERSION}_x64-setup.exe"
           if [ -f "$installer.sig" ]; then
-            cp "$installer.sig" "dist/trailbrake_${VERSION}_x64-setup.exe.sig"
+            cp "$installer.sig" "release-out/trailbrake_${VERSION}_x64-setup.exe.sig"
           fi
 
       - name: SBOM (CycloneDX, Rust + npm)
@@ -154,8 +155,8 @@ jobs:
         run: |
           cargo install --locked cargo-cyclonedx@0.5.7
           (cd src-tauri && cargo cyclonedx --format json --override-filename sbom)
-          cp src-tauri/sbom.json "dist/sbom-rust.cdx.json"
-          npx --yes @cyclonedx/cyclonedx-npm@4.0.2 --omit dev --output-format JSON --output-file dist/sbom-npm.cdx.json
+          cp src-tauri/sbom.json "release-out/sbom-rust.cdx.json"
+          npx --yes @cyclonedx/cyclonedx-npm@4.0.2 --omit dev --output-format JSON --output-file release-out/sbom-npm.cdx.json
 
       - name: latest.json for the updater
         if: steps.keys.outputs.updater == 'true'
@@ -169,12 +170,12 @@ jobs:
             const file = `trailbrake_${v}_x64-setup.exe`;
             const notes = (fs.readFileSync("CHANGELOG.md", "utf8").split(/^## \[/m)
               .find((s) => s.startsWith(v + "]")) || "").split("\n").slice(1).join("\n").trim();
-            fs.writeFileSync("dist/latest.json", JSON.stringify({
+            fs.writeFileSync("release-out/latest.json", JSON.stringify({
               version: v,
               notes,
               pub_date: new Date().toISOString(),
               platforms: { "windows-x86_64": {
-                signature: fs.readFileSync(`dist/${file}.sig`, "utf8"),
+                signature: fs.readFileSync(`release-out/${file}.sig`, "utf8"),
                 url: `https://github.com/${process.env.REPO}/releases/download/v${v}/${file}`,
               } },
             }, null, 2));
@@ -200,7 +201,7 @@ jobs:
 
       - name: SHA-256 sums
         shell: bash
-        working-directory: dist
+        working-directory: release-out
         run: sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
 
       # Attestations need a public repository (or GitHub Enterprise Cloud).
@@ -208,7 +209,7 @@ jobs:
         if: ${{ !github.event.repository.private }}
         uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
         with:
-          subject-path: dist/*.exe
+          subject-path: release-out/*.exe
 
       - name: Publish the release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
@@ -218,5 +219,5 @@ jobs:
           tag_name: v${{ env.VERSION }}
           target_commitish: ${{ github.sha }}
           body_path: notes/RELEASE_NOTES.md
-          files: dist/*
+          files: release-out/*
           fail_on_unmatched_files: true
