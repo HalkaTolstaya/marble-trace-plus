@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo } from 'react';
 import { observer } from 'mobx-react-lite';
+import { useAppSettingsStore } from '@entities/app-settings/app-settings-context';
 import { useTranslation } from 'react-i18next';
 import { usePreviewWorldFactory } from '@features/preview/preview-host-context';
 import { useUnitsStore } from '@entities/app-settings/units-context';
@@ -34,6 +35,8 @@ export const WidgetPreview = observer(
     live = false,
   }: WidgetPreviewProps) => {
     const editor = useWidgetEditor();
+    // The panels as the overlay draws them, with the app's transparency.
+    const { overlayTransparency } = useAppSettingsStore().appSettings;
     const units = useUnitsStore();
     const { t } = useTranslation('main-app');
 
@@ -131,6 +134,7 @@ export const WidgetPreview = observer(
       transparentContainer: widget.transparentContainer,
       autoHeight,
       contentSized,
+      overlayTransparency: overlayTransparency,
     });
 
     return (

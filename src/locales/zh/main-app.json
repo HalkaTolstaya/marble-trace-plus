@@ -645,6 +645,11 @@
       },
       "folderDesc": "把 Garage 61 导出的 CSV 放进这个文件夹（在 Garage 61 搜索中对某圈 Export → CSV）。几秒内即会导入，并在更快时用于匹配的赛道和车辆。",
       "openFolder": "打开文件夹"
+    },
+    "overlayTransparency": {
+      "title": "叠加层透明度",
+      "sliderTitle": "面板透明度：{{value}}%",
+      "desc": "让游戏透过每个小组件的背景显示。文字、线条和边框保持不变。"
     }
   },
   "bindings": {

@@ -5,6 +5,8 @@ import { useAppSettingsStore } from '@entities/app-settings/app-settings-context
 import { SettingsCard } from '@shared/ui/SettingsCard/SettingsCard';
 import styles from '../SettingsPage.module.scss';
 
+const TRANSPARENCY_SLIDER_WIDTH_PX = 180;
+
 const STEERING_LOCK_MIN_DEG = 180;
 const STEERING_LOCK_MAX_DEG = 1080;
 const STEERING_LOCK_STEP_DEG = 90;
@@ -53,6 +55,34 @@ export const OverlaySection = observer(() => {
             <Switch
               checked={appSettings.appSettings.hideWidgetsWhenGameClosed}
               onChange={(v) => appSettings.setHideWidgetsWhenGameClosed(v)}
+            />
+          </div>
+        </div>
+      </SettingsCard>
+
+      <SettingsCard title={t('settingsPage.overlayTransparency.title')}>
+        <div className={styles.fieldGroup}>
+          <div className={styles.fieldRow}>
+            <div className={styles.fieldTexts}>
+              <div className={styles.fieldTitle}>
+                {t('settingsPage.overlayTransparency.sliderTitle', {
+                  value: appSettings.appSettings.overlayTransparency,
+                })}
+              </div>
+
+              <div className={styles.fieldDesc}>
+                {t('settingsPage.overlayTransparency.desc')}
+              </div>
+            </div>
+
+            <Slider
+              style={{ width: TRANSPARENCY_SLIDER_WIDTH_PX }}
+              min={0}
+              max={100}
+              step={5}
+              value={appSettings.appSettings.overlayTransparency}
+              tooltip={{ formatter: (value) => `${value ?? 0}%` }}
+              onChange={(value) => appSettings.setOverlayTransparency(value)}
             />
           </div>
         </div>

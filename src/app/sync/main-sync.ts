@@ -45,6 +45,7 @@ const registerOverlayReadSaveReactions = (
     () => [
       root.appSettings.appSettings.hideAllWidgets,
       root.appSettings.appSettings.hideWidgetsWhenGameClosed,
+      root.appSettings.appSettings.overlayTransparency,
       root.appSettings.appSettings.autoSwitchLayouts,
       root.appSettings.appSettings.language,
       JSON.stringify(root.layouts.sessionLayouts),

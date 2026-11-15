@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react-lite';
+import { useAppSettingsStore } from '@entities/app-settings/app-settings-context';
 import type { ReactNode } from 'react';
 
 import { ErrorBoundary } from '@shared/ui/ErrorBoundary';
@@ -31,6 +32,8 @@ interface RemoteWidgetFrameProps {
  */
 export const RemoteWidgetFrame = observer(
   ({ widgetId, children }: RemoteWidgetFrameProps) => {
+    // The panels as the overlay draws them, with the app's transparency.
+    const { overlayTransparency } = useAppSettingsStore().appSettings;
     const liveWidgets = useLiveWidgetsStore();
     const widgetAutoHide = useWidgetAutoHideStore();
     const widget = liveWidgets.getWidget(widgetId);
@@ -61,6 +64,7 @@ export const RemoteWidgetFrame = observer(
       autoHeight,
       contentSized,
       hidden: isHidden,
+      overlayTransparency: overlayTransparency,
     });
 
     return (

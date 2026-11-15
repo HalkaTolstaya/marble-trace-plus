@@ -289,6 +289,7 @@ export const WidgetContainer = observer(
       autoHeight,
       contentSized,
       hidden: shouldHide,
+      overlayTransparency: appSettings.overlayTransparency,
     });
 
     const borderRadius = frameStyle.borderRadius;

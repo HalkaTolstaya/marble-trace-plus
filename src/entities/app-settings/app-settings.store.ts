@@ -72,6 +72,9 @@ const DEFAULT_APP_SETTINGS = {
   // half its 1% low; 30 gave most of it back (ADR-0009). The backend publishes
   // at this rate, so every widget moves on the same frames.
   overlayUpdateHz: DEFAULT_OVERLAY_UPDATE_HZ,
+  // Percent of every widget panel's background taken away, so the game shows
+  // through (0 = the panels as each widget sets them).
+  overlayTransparency: 0,
   // Pit stop strategy (`PitStrategy`). The car's, not a screen's — these used
   // to be widget settings, and the copy on a stream screen was silently ignored.
   pitAutoFuel: false,
@@ -455,6 +458,10 @@ export class AppSettingsStore {
   setCarLength(value: number) {
     this.appSettings.carLength = value;
     setCarLengthSilent(value);
+  }
+
+  setOverlayTransparency(value: number) {
+    this.appSettings.overlayTransparency = Math.min(100, Math.max(0, value));
   }
 
   setOverlayUpdateHz(value: number) {

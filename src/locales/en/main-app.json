@@ -647,6 +647,11 @@
       },
       "folderDesc": "Drop Garage 61 CSV exports into this folder (Export → CSV on a lap in the Garage 61 search). They are imported within seconds and used for the matching track and car whenever they are faster.",
       "openFolder": "Open folder"
+    },
+    "overlayTransparency": {
+      "title": "Overlay transparency",
+      "sliderTitle": "Panel transparency: {{value}}%",
+      "desc": "Lets the game show through every widget's background. Text, lines and edges stay as they are."
     }
   },
   "bindings": {

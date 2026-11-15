@@ -45,7 +45,19 @@ interface WidgetFrameStyleInput {
   contentSized?: boolean;
   /** A hidden widget keeps its frame but drops its body, so drop the plate too. */
   hidden?: boolean;
+  /**
+   * How much of every panel's background the user has taken away, 0–100
+   * (app setting `overlayTransparency`): the game shows through the plates
+   * while the text and the edges stay as they are.
+   */
+  overlayTransparency?: number;
 }
+
+/** The background with `transparency` percent of its strength taken away. */
+const fadeBackground = (color: string, transparency: number): string =>
+  transparency <= 0
+    ? color
+    : `color-mix(in srgb, ${color} ${Math.max(0, 100 - transparency)}%, transparent)`;
 
 /**
  * The CSS size of the box that hosts a widget, from its stored geometry: auto
@@ -81,15 +93,17 @@ export const widgetFrameStyle = ({
   autoHeight = false,
   contentSized = false,
   hidden = false,
+  overlayTransparency = 0,
 }: WidgetFrameStyleInput): CSSProperties => {
-  const backgroundColor =
+  const ownBackground =
     userSettings.backgroundColor ?? DEFAULT_WIDGET_BACKGROUND;
+  const backgroundColor = fadeBackground(ownBackground, overlayTransparency);
 
   const borderColor = userSettings.borderColor ?? DEFAULT_WIDGET_BORDER;
   const isPlateless = transparentContainer || hidden;
   const textColor = isPlateless
     ? '#ffffff'
-    : getContrastTextColor(backgroundColor);
+    : getContrastTextColor(ownBackground);
 
   return {
     ...(autoHeight || contentSized ? { height: 'auto' } : undefined),
