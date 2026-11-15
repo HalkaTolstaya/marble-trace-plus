@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useAppSettingsStore } from '@entities/app-settings/app-settings-context';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,9 @@ import { seedInputHistory } from '@features/preview/preview-animator';
 import { LiveRacePreview } from '@features/preview/live-race';
 import styles from './WidgetPreview.module.scss';
 
+/** The stage's padding each side, as in its stylesheet (`sp(xl)`). */
+const STAGE_PADDING_PX = 16;
+
 interface WidgetPreviewProps {
   widgetId: string;
   scenarioId?: string;
@@ -35,6 +38,8 @@ export const WidgetPreview = observer(
     live = false,
   }: WidgetPreviewProps) => {
     const editor = useWidgetEditor();
+    const [stage, setStage] = useState<HTMLDivElement | null>(null);
+    const [fitScale, setFitScale] = useState(1);
     // The panels as the overlay draws them, with the app's transparency.
     const { overlayTransparency } = useAppSettingsStore().appSettings;
     const units = useUnitsStore();
@@ -113,6 +118,38 @@ export const WidgetPreview = observer(
 
     const Widget = componentForWidget(previewId);
 
+    // A widget wider than the pane is shown whole, scaled down to fit; one
+    // that fits stays at its own size.
+    useLayoutEffect(() => {
+      if (!stage) {
+        return;
+      }
+
+      const measure = () => {
+        const frame = stage.firstElementChild;
+
+        if (!(frame instanceof HTMLElement) || frame.offsetWidth === 0) {
+          return;
+        }
+
+        const available = stage.clientWidth - STAGE_PADDING_PX * 2;
+
+        setFitScale(Math.min(1, available / frame.offsetWidth));
+      };
+
+      const observer = new ResizeObserver(measure);
+
+      observer.observe(stage);
+
+      if (stage.firstElementChild) {
+        observer.observe(stage.firstElementChild);
+      }
+
+      measure();
+
+      return () => observer.disconnect();
+    }, [stage, previewId]);
+
     if (!widget || !Widget) {
       return <div className={styles.empty}>{t('widgetPreview.noPreview')}</div>;
     }
@@ -139,7 +176,7 @@ export const WidgetPreview = observer(
 
     return (
       <PreviewProvide>
-        <div className={styles.stage}>
+        <div ref={setStage} className={styles.stage}>
           <div
             className={`${styles.widgetInner} ${
               overflowVisible ? styles.overflowVisible : ''
@@ -152,6 +189,7 @@ export const WidgetPreview = observer(
                 contentSized,
               }),
               ...frameStyle,
+              zoom: fitScale,
             }}
           >
             <ErrorBoundary>

@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Input Telemetry:** rev lights across the top (zone colours, LED glow, blue while the pit limiter is on), the comparison with the reference lap's throttle and brake chosen separately, and the lap distance over the graph.
 - **Pit and tow beside Standings:** to the right of the table, _PIT 5s_ while a car is on pit road or in its box, its last stop (_L28·7s_) for a minute after it rejoins, and a large yellow _TOW_ plate while a car is towed after a crash — your own with the time left from the sim, another car's timed from when it was picked up.
 - **Live preview:** the widget preview runs a race over a drawn track — cars lap, trade places and close laps, the pedals and wheel move — so every table shows its overtakes, intervals and lap times working.
+- **Widgets page like a control room:** every widget in one list, the open one showing its settings in place, and beside the list a live preview of it over a drawn track (scaled to fit) with the overlay transparency under it.
+- **Overlay transparency:** a slider (Settings → Overlay, and under the preview) takes 0–100 % of every widget panel's background away so the game shows through; text and edges stay as they are.
 - Compact settings blocks for these widgets: checkbox grids, − N + steppers and radio choices on one page.
 
 ### Changed
