@@ -47,7 +47,7 @@ const COLUMNS = {
   showCarNumber: bool(true),
   /** Driver's profile country flag, in its own column before the name. */
   showCountryFlag: bool(false),
-  showBrand: bool(true),
+  showBrand: bool(false),
   showTire: bool(true),
   showLicBadge: bool(true),
   /**

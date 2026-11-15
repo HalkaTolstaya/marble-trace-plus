@@ -6,7 +6,6 @@ import type {
 import type { DriverEntry } from '@shared/contracts/driver-entry';
 import type { CarIdentity } from '@shared/contracts/car-identity';
 import type { PaceCarPitPhase } from '@shared/contracts/generated/bindings';
-import { licColumnWidthPx } from '@shared/ui/RatingBadge/LicBadge.utils';
 import type { NameFormat } from '@shared/contracts/widget-choices';
 import type { RelativeWidgetSettings } from './settings-schema';
 
@@ -52,14 +51,20 @@ const colSpecs = (settings: RelativeWidgetSettings): ColSpec[] => [
   { px: 22, show: settings.showCountryFlag }, // country flag, right before the name
   { px: clampNameColumnWidth(settings.nameColumnWidth), show: true }, // name — fixed, user-sized
   { px: 36, show: settings.showLapNumber }, // lap "L29"
-  // Both widths follow the format the value is written in — see the same pair in
-  // Standings, which the two widgets keep aligned so their SR columns match.
+  // The ratings pill; with the licence off, iRating and its change stand alone.
   {
-    px: licColumnWidthPx(settings.licBadgeStyle, settings.showLicenseLetter),
+    px:
+      16 +
+      (settings.showLicenseLetter ? 14 : 0) +
+      (settings.showIRating ? (settings.abbreviateIRating ? 38 : 46) : 0) +
+      (settings.showIrChange ? 30 : 0),
     show: settings.showLicBadge,
   },
-  { px: settings.abbreviateIRating ? 36 : 48, show: settings.showIRating },
-  { px: 40, show: settings.showIrChange }, // ΔiR "+12"
+  {
+    px: settings.abbreviateIRating ? 36 : 48,
+    show: settings.showIRating && !settings.showLicBadge,
+  },
+  { px: 40, show: settings.showIrChange && !settings.showLicBadge }, // ΔiR "+12"
   {
     px: lapTimeColumnPx(decimalsOr(settings.lapTimeDecimals, 2)),
     show: settings.showBestLap,

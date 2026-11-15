@@ -5,4 +5,13 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  gap: sp(xs);
+}
+
+// The single-list views: one card holding the column titles and the rows.
+.singleList {
+  @include widget-card;
+
+  display: flex;
+  flex-direction: column;
 }

@@ -65,6 +65,15 @@ $widget-panel-bevel:
   inset 0 -1px 0 rgba(0, 0, 0, 0.4),
   inset 0 -10px 16px -12px rgba(0, 0, 0, 0.45);
 
+// A free-standing card of a widget made of several (Standings, Relative):
+// the panel colour, rounded, with the inset bevel and no outer shadow.
+@mixin widget-card {
+  background: var(--widget-bg);
+  border-radius: ws(8);
+  box-shadow: $widget-panel-bevel;
+  overflow: hidden;
+}
+
 // Surfaces
 $widget-surface-base: plate(rgba(0, 0, 0, 0.75));
 $widget-surface-overlay: plate(rgba(0, 0, 0, 0.8));

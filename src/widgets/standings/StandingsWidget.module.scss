@@ -1,12 +1,13 @@
 .standings {
   --widget-pad-x: sp(md);
 
-  font-family: $font-mono;
+  font-family: $font-table;
   font-variant-numeric: tabular-nums;
   color: $widget-text-primary;
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
+  gap: sp(xs);
   overflow: hidden;
 }

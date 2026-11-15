@@ -263,6 +263,8 @@ export const StandingsContent = observer(() => {
     <>
       <SessionHeader />
 
+      {hasData && <SessionFooter />}
+
       {!hasData ? (
         <NoDataPlaceholder />
       ) : (
@@ -276,8 +278,6 @@ export const StandingsContent = observer(() => {
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
           >
-            <StandingsHeader />
-
             {isGrouped ? (
               drawnClassGroups.map((group) => (
                 <ClassGroup
@@ -295,7 +295,10 @@ export const StandingsContent = observer(() => {
                 />
               ))
             ) : (
-              <ClassGroup group={displayGroup()} />
+              <div className={styles.singleList}>
+                <StandingsHeader />
+                <ClassGroup group={displayGroup()} />
+              </div>
             )}
 
             {/* Grouped view: the outer bar tracks the classes themselves, the
@@ -309,8 +312,6 @@ export const StandingsContent = observer(() => {
               visible={appSettings.interactMode || standingsWidget.isScrolled}
             />
           </div>
-
-          <SessionFooter />
         </>
       )}
     </>

@@ -100,6 +100,7 @@ export const playerRowStyle = (
 ): CSSProperties | undefined =>
   isPlayer
     ? {
-        background: `linear-gradient(to bottom, ${playerRowColor}, transparent 2px), linear-gradient(to top, ${playerRowColor}, transparent 2px), ${playerRowColor}`,
+        // Strong at the position, fading out across the row.
+        background: `linear-gradient(90deg, ${playerRowColor} 0%, color-mix(in srgb, ${playerRowColor} 45%, transparent) 55%, transparent 100%)`,
       }
     : undefined;

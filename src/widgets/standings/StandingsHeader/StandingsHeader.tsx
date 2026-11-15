@@ -36,14 +36,14 @@ export const StandingsHeader = observer(() => {
       <StandingsHeaderCell>Driver</StandingsHeaderCell>
 
       {settings.showLicBadge && (
-        <StandingsHeaderCell align="center">SR</StandingsHeaderCell>
+        <StandingsHeaderCell align="center">IR</StandingsHeaderCell>
       )}
 
-      {settings.showIRating && (
+      {settings.showIRating && !settings.showLicBadge && (
         <StandingsHeaderCell align="center">iR</StandingsHeaderCell>
       )}
 
-      {settings.showIrChange && (
+      {settings.showIrChange && !settings.showLicBadge && (
         <StandingsHeaderCell
           align="center"
           title="Projected iR change (Elo estimate, not real iRacing data)"

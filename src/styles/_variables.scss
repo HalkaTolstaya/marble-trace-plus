@@ -3,6 +3,8 @@
 // Typography
 $font-mono: 'Consolas', monospace;
 $font-widget: 'Rajdhani', sans-serif;
+// Timing tables (Standings, Relative): a grotesque with tabular figures.
+$font-table: 'Manrope', 'Segoe UI', sans-serif;
 // Main window UI chrome only (not widgets, which stay on $font-widget until localized)
 $font-app: 'Exo 2', 'Noto Sans SC', sans-serif;
 $font-size-widget: rem(13);

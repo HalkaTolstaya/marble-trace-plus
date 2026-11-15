@@ -1,6 +1,5 @@
 import type { CarIdentity } from '@shared/contracts/car-identity';
 import type { DriverEntry } from '@shared/contracts/driver-entry';
-import { licColumnWidthPx } from '@shared/ui/RatingBadge/LicBadge.utils';
 import type { StandingsWidgetSettings } from './settings-schema';
 
 export interface VisibleRows {
@@ -217,6 +216,18 @@ interface ColSpec {
   show: boolean;
 }
 
+/** The ratings pill's width: its letter, iRating and change, as shown. */
+export const ratingPillPx = (
+  settings: Pick<
+    StandingsWidgetSettings,
+    'showLicenseLetter' | 'showIRating' | 'showIrChange' | 'abbreviateIRating'
+  >
+): number =>
+  16 +
+  (settings.showLicenseLetter ? 14 : 0) +
+  (settings.showIRating ? (settings.abbreviateIRating ? 38 : 46) : 0) +
+  (settings.showIrChange ? 30 : 0);
+
 // Lap times widen by a digit per decimal; "1:46.000" at three.
 // A layout saved before the decimals existed reads them as missing.
 const decimalsOr = (decimals: number | undefined, fallback: number) =>
@@ -233,18 +244,18 @@ const colSpecs = (settings: StandingsWidgetSettings): ColSpec[] => [
   { px: 40, show: settings.showCarNumber }, // carNum   class-colored badge
   { px: 22, show: settings.showCountryFlag }, // country flag, right before the name
   { px: clampNameColumnWidth(settings.nameColumnWidth), show: true }, // name — fixed, user-sized
-  {
-    // "A 4.99" — matches Relative for an equal PIT↔SR gap; the width follows
-    // both the class letter and the style the value is drawn in.
-    px: licColumnWidthPx(settings.licBadgeStyle, settings.showLicenseLetter),
-    show: settings.showLicBadge,
-  },
+  // The ratings pill: licence letter, iRating and its change in one outline.
+  // With the licence off, the iRating and its change keep columns of their own.
+  { px: ratingPillPx(settings), show: settings.showLicBadge },
   {
     // "9.9k" abbreviated, "12345" spelled out — five mono digits need the room.
     px: settings.abbreviateIRating ? 42 : 52,
-    show: settings.showIRating,
+    show: settings.showIRating && !settings.showLicBadge,
   },
-  { px: 42, show: settings.showIrChange }, // ΔiR     "+123"
+  {
+    px: 42,
+    show: settings.showIrChange && !settings.showLicBadge,
+  }, // ΔiR     "+123"
   { px: 28, show: settings.showLapsCompleted }, // laps "00"
   {
     px: gapColumnPx(decimalsOr(settings.gapDecimals, 3)),

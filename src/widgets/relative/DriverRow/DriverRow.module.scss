@@ -17,15 +17,7 @@
   // Class marker, matching the one the standings rows and the class header
   // carry. A pseudo-element rather than a border so the grid columns keep
   // their measured width.
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--row-class-marker, transparent);
-  }
+  // The class colour lives in the position cell's fade (below).
 }
 
 .rowOdd {
@@ -136,7 +128,7 @@
   font-size: fs(md);
   font-weight: 700;
   line-height: 1;
-  font-family: $font-mono;
+  font-family: $font-table;
   padding: sp(xxxs) sp(xxs);
   border-radius: radius(md);
   white-space: nowrap;
@@ -196,7 +188,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  font-family: $font-mono;
+  font-family: $font-table;
   font-weight: 600;
   color: $widget-text-primary;
 }
@@ -210,7 +202,7 @@
 }
 
 .f2Time {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-weight: 900;
   font-size: fs(md);
   text-align: right;
@@ -243,7 +235,7 @@
 }
 
 .lapTime {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 900;
   color: $widget-text-primary;
@@ -256,7 +248,7 @@
 .lapChip {
   padding: 1px 5px;
   border-radius: 4px;
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(sm);
   font-weight: 700;
   color: $widget-text-secondary;
@@ -270,7 +262,7 @@
   display: inline-flex;
   align-items: center;
   gap: 1px;
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(sm);
   font-weight: 700;
 }
@@ -285,4 +277,39 @@
 
 .changeNeutral {
   color: $widget-text-muted;
+}
+
+// ── Table look (as in Standings) ───────────────────────────────────────────
+
+.driverRow {
+  font-family: $font-table;
+  font-weight: 800;
+  border-bottom: 0;
+}
+
+.posBlock {
+  justify-content: center;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--row-class-marker, transparent) 55%, transparent),
+    transparent
+  );
+}
+
+.driverPosition {
+  font-size: fs(lg);
+  font-weight: 800;
+}
+
+.driverCarNumber {
+  background: none !important;
+  color: $widget-text-secondary !important;
+  font-weight: 800;
+  padding: 0;
+}
+
+.driverName {
+  font-weight: 800;
+  text-overflow: clip;
+  mask-image: linear-gradient(90deg, #000 calc(100% - #{ws(14)}), transparent);
 }

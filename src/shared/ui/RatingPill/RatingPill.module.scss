@@ -1,0 +1,55 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: sp(xs);
+  padding: sp(xxxs) sp(xs);
+  border-radius: radius(sm);
+  border: 1px solid color-mix(in srgb, var(--lic-color) 70%, transparent);
+  background: color-mix(in srgb, var(--lic-color) 14%, rgba(0, 0, 0, 0.35));
+  font-family: $font-table;
+  font-size: fs(sm);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: $widget-text-primary;
+}
+
+.letter {
+  color: var(--lic-color);
+}
+
+.rating {
+  color: $widget-text-primary;
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  color: $widget-text-secondary;
+}
+
+.licP {
+  --lic-color: #{$race-purple};
+}
+
+.licA {
+  --lic-color: #{$rating-lic-a};
+}
+
+.licB {
+  --lic-color: #{$rating-lic-b};
+}
+
+.licC {
+  --lic-color: #{$race-yellow};
+}
+
+.licD {
+  --lic-color: #{$rating-lic-d};
+}
+
+.licR {
+  --lic-color: #{$rating-lic-r};
+}

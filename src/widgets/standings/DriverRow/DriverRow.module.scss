@@ -14,15 +14,7 @@
 
   // Class marker, matching the one the class header carries. A pseudo-element
   // rather than a border so the grid columns keep their measured width.
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--row-class-marker, transparent);
-  }
+  // The class colour lives in the position cell's fade (below).
 
   // The flash of a place won or lost (useRowMoveAnimation sets the
   // attribute). Opacity on a layer of its own: a one-shot composited fade,
@@ -198,7 +190,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 400;
 }
@@ -208,7 +200,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 400;
 }
@@ -222,7 +214,7 @@
 
 // Car number — the badge carries the class color
 .carNumber {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 700;
   line-height: 1;
@@ -268,7 +260,7 @@
 
 // Brand label
 .brandLabel {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(xs);
   color: $widget-text-secondary;
   text-transform: uppercase;
@@ -284,7 +276,7 @@
 }
 
 .irValue {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 600;
   color: $widget-text-primary;
@@ -296,7 +288,7 @@
   align-items: center;
   justify-content: center;
   font-size: fs(md);
-  font-family: $font-mono;
+  font-family: $font-table;
   font-weight: 400;
 }
 
@@ -310,7 +302,7 @@
 
 // Pit stops
 .pitStops {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(sm);
   color: $widget-text-muted;
 }
@@ -320,7 +312,7 @@
 }
 
 .lapsCompleted {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 400;
   color: $widget-text-primary;
@@ -328,14 +320,14 @@
 
 // Gap
 .gapLeader {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 400;
   color: $widget-text-primary;
 }
 
 .gapValue {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   // Read like the lap times beside it, not as a secondary number.
   font-weight: 900;
@@ -344,7 +336,7 @@
 
 // Lap time columns
 .interval {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 900;
   color: $widget-text-primary;
@@ -360,14 +352,14 @@
 }
 
 .lastLap {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 900;
   color: $widget-text-primary;
 }
 
 .bestLap {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 900;
   color: $widget-text-primary;
@@ -389,4 +381,63 @@
 .cellDimmed {
   color: $widget-text-secondary;
   font-weight: 400;
+}
+
+// ── Table look ─────────────────────────────────────────────────────────────
+// A grotesque with tabular figures, heavy for the names and times; the rows
+// sit on the card without lines between them, the position cell carries the
+// class colour as a fade, and the car number is a plain muted figure.
+
+.driverRow {
+  font-family: $font-table;
+  font-weight: 800;
+  border-bottom: 0;
+  min-height: ws(30);
+}
+
+.rowOdd {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.posCell {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--row-class-marker, transparent) 55%, transparent),
+    transparent
+  );
+}
+
+.posNumber {
+  font-family: $font-table;
+  font-size: fs(lg);
+  font-weight: 800;
+}
+
+.carNumber {
+  background: none !important;
+  color: $widget-text-secondary !important;
+  font-family: $font-table;
+  font-weight: 800;
+  padding: 0;
+}
+
+.driverName {
+  font-family: $font-table;
+  font-weight: 800;
+  // A long name fades out instead of ending in an ellipsis.
+  text-overflow: clip;
+  mask-image: linear-gradient(90deg, #000 calc(100% - #{ws(14)}), transparent);
+}
+
+.gapValue,
+.gapLeader,
+.interval,
+.lastLap,
+.bestLap {
+  font-family: $font-table;
+  font-weight: 800;
+}
+
+.bestLapFastest {
+  color: $widget-text-best-lap;
 }

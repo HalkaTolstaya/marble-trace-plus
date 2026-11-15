@@ -700,3 +700,9 @@ SOFTWARE.
 | [vite](https://www.npmjs.com/package/vite)                                                                                     | 8.3.4        | MIT               |
 | [vite-plugin-svgr](https://www.npmjs.com/package/vite-plugin-svgr)                                                             | 5.2.0        | MIT               |
 | [yallist](https://www.npmjs.com/package/yallist)                                                                               | 3.1.1        | ISC               |
+
+## Fonts
+
+- **Manrope** (`public/fonts/Manrope-Variable-*.woff2`) — Copyright 2019 The
+  Manrope Project Authors, SIL Open Font License 1.1
+  (`public/fonts/Manrope-OFL.txt`). Used by the Standings and Relative tables.

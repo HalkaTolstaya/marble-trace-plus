@@ -12,7 +12,7 @@ import { RadioMark } from '@entities/cars/RadioMark/RadioMark';
 import { getContrastTextColor, playerRowStyle } from '@shared/lib/colors';
 import { CountryFlag } from '@shared/ui/CountryFlag/CountryFlag';
 import { DriverFlagBadge } from '@shared/ui/DriverFlagBadge/DriverFlagBadge';
-import { LicBadge } from '@shared/ui/RatingBadge/LicBadge';
+import { RatingPill } from '@shared/ui/RatingPill/RatingPill';
 import { formatIr } from '@shared/ui/RatingBadge/LicBadge.utils';
 import {
   buildRelativeGridTemplate,
@@ -279,23 +279,27 @@ export const DriverRow = observer(({ carIdx, index }: DriverRowProps) => {
         </div>
       )}
 
-      {settings.showLicBadge ? (
-        <div className={styles.colLic}>
-          <LicBadge
+      {settings.showLicBadge && (
+        <div className={styles.cellCenter}>
+          <RatingPill
             licString={driver.licString}
+            iRating={driver.iRating}
+            irDelta={irDelta}
             showLetter={settings.showLicenseLetter}
-            badgeStyle={settings.licBadgeStyle}
+            showIRating={settings.showIRating}
+            showDelta={settings.showIrChange}
+            abbreviate={settings.abbreviateIRating}
           />
         </div>
-      ) : null}
+      )}
 
-      {settings.showIRating ? (
+      {settings.showIRating && !settings.showLicBadge && (
         <div className={styles.colIr}>
           <span>{formatIr(driver.iRating, settings.abbreviateIRating)}</span>
         </div>
-      ) : null}
+      )}
 
-      {settings.showIrChange && (
+      {settings.showIrChange && !settings.showLicBadge && (
         <div className={styles.cellCenter}>{irChangeMark}</div>
       )}
 

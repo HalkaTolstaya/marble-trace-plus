@@ -1,12 +1,9 @@
 .sessionHeader {
   // Lit from the top, so the bar reads as the widget's frame rather than as one
   // more row — the height it gains comes from the type, not from padding.
-  background: linear-gradient(
-    180deg,
-    rgba(30, 30, 35, $opacity-heavy) 0%,
-    rgba(19, 19, 22, $opacity-heavy) 100%
-  );
-  padding: sp(xxs) sp(md);
+  @include widget-card;
+
+  padding: sp(sm) sp(md);
   // Three tracks rather than two ends, and the title holds the elastic one: the
   // stats and the lap/clock readout are sized to their content and never give
   // way, so a bar too narrow for everything truncates the track name instead of
@@ -16,12 +13,11 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   column-gap: sp(sm);
-  border-bottom: 1px solid $widget-row-border;
-  font-family: $font-mono;
+  font-family: $font-table;
   text-transform: uppercase;
-  font-size: fs(xs);
-  font-weight: 400;
-  color: $widget-text-secondary;
+  font-size: fs(md);
+  font-weight: 800;
+  color: $widget-text-primary;
 }
 
 .sessionLeft {
@@ -168,4 +164,9 @@
   justify-self: end;
   flex-shrink: 0;
   white-space: nowrap;
+}
+
+// The shared pills inside take the table's grotesque, not their mono face.
+.sessionHeader * {
+  font-family: $font-table !important;
 }

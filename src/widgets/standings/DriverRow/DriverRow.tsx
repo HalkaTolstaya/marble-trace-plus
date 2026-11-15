@@ -17,7 +17,7 @@ import { RadioMark } from '@entities/cars/RadioMark/RadioMark';
 import { getContrastTextColor, playerRowStyle } from '@shared/lib/colors';
 import { CountryFlag } from '@shared/ui/CountryFlag/CountryFlag';
 import { DriverFlagBadge } from '@shared/ui/DriverFlagBadge/DriverFlagBadge';
-import { LicBadge } from '@shared/ui/RatingBadge/LicBadge';
+import { RatingPill } from '@shared/ui/RatingPill/RatingPill';
 import { formatIr } from '@shared/ui/RatingBadge/LicBadge.utils';
 import { TireBadge } from '@shared/ui/TireBadge/TireBadge';
 import {
@@ -291,16 +291,24 @@ export const DriverRow = observer(
         </div>
 
         {settings.showLicBadge && (
-          <div className={`${styles.cell} ${styles.cellRating}`}>
-            <LicBadge
+          <div className={`${styles.cell} ${styles.cellCenter}`}>
+            <RatingPill
               licString={driver.licString}
+              iRating={driver.iRating}
+              irDelta={
+                settings.useLivePositions
+                  ? driver.estimatedIrDeltaLive
+                  : driver.estimatedIrDeltaOfficial
+              }
               showLetter={settings.showLicenseLetter}
-              badgeStyle={settings.licBadgeStyle}
+              showIRating={settings.showIRating}
+              showDelta={settings.showIrChange}
+              abbreviate={settings.abbreviateIRating}
             />
           </div>
         )}
 
-        {settings.showIRating && (
+        {settings.showIRating && !settings.showLicBadge && (
           <div className={`${styles.cell} ${styles.cellRight}`}>
             <span className={`${styles.irValue} ${dimClass}`}>
               {formatIr(driver.iRating, settings.abbreviateIRating)}
@@ -308,7 +316,7 @@ export const DriverRow = observer(
           </div>
         )}
 
-        {settings.showIrChange && (
+        {settings.showIrChange && !settings.showLicBadge && (
           <div className={`${styles.cell} ${styles.cellCenter}`}>
             <IrChangeCell carIdx={carIdx} />
           </div>
