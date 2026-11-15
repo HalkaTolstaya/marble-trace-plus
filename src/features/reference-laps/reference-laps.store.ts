@@ -5,6 +5,7 @@ import {
   deleteLibraryLap,
   getReflapsOverview,
   importLapCsv,
+  openLapsFolder,
   listenReflapsStatus,
   refreshReference,
   setGarage61Token,
@@ -27,6 +28,7 @@ export class ReferenceLapsStore {
   policy: ReferencePolicy = { source: 'auto' };
   status: ReflapsStatus | null = null;
   laps: LibraryLap[] = [];
+  inboxFolder = '';
   busy = false;
   error: string | null = null;
 
@@ -63,6 +65,7 @@ export class ReferenceLapsStore {
     this.policy = overview.policy;
     this.status = overview.status ?? this.status;
     this.laps = overview.laps;
+    this.inboxFolder = overview.inboxFolder;
   }
 
   async load() {
@@ -113,6 +116,10 @@ export class ReferenceLapsStore {
 
   refresh() {
     return this.run(refreshReference);
+  }
+
+  openFolder() {
+    return this.run(openLapsFolder);
   }
 
   importCsv() {

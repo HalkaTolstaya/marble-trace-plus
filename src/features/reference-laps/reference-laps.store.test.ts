@@ -8,6 +8,7 @@ const service = vi.hoisted(() => ({
   refreshReference: vi.fn(),
   deleteLibraryLap: vi.fn(),
   importLapCsv: vi.fn(),
+  openLapsFolder: vi.fn(),
   listenReflapsStatus: vi.fn(),
 }));
 
@@ -20,6 +21,7 @@ const overview = (hasToken: boolean) => ({
   policy: { source: 'auto' as const },
   status: null,
   laps: [],
+  inboxFolder: 'C:\\Trailbrake\\laps',
 });
 
 describe('ReferenceLapsStore', () => {
@@ -51,6 +53,17 @@ describe('ReferenceLapsStore', () => {
 
     expect(store.error).toContain('malformed');
     expect(store.busy).toBe(false);
+  });
+
+  it('shows and opens the laps folder', async () => {
+    const store = new ReferenceLapsStore();
+
+    service.openLapsFolder.mockResolvedValue(undefined);
+    await store.load();
+    expect(store.inboxFolder).toContain('laps');
+
+    await store.openFolder();
+    expect(service.openLapsFolder).toHaveBeenCalledTimes(1);
   });
 
   it('pins a lap through the policy', async () => {

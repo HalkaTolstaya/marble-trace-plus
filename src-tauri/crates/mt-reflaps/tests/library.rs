@@ -141,3 +141,37 @@ async fn pinned_and_library_policies_use_the_library_only() {
     assert_eq!(auto.note, ResolveNote::NoToken);
     assert!(auto.reference.is_some());
 }
+
+#[tokio::test]
+async fn a_faster_imported_lap_beats_a_stale_cache_and_no_token() {
+    let dir = tempfile::tempdir().unwrap();
+    let transport = ReqwestTransport::new(Allowlist::for_tests("127.0.0.1")).unwrap();
+    let client = Garage61Client::new(transport, "http://127.0.0.1:9/api/v1");
+    let mut service = ReferenceLapService::new(dir.path(), client, MemoryTokenStore::default());
+    let lap = parse_garage61_csv(SAMPLE, NAME).unwrap();
+    let length = lap.track_length_est.unwrap();
+    let slower = mt_reflaps::lap::RefLap {
+        lap_time: lap.lap_time + 2.0,
+        meta: mt_reflaps::lap::LapMeta {
+            lap_time: Some(lap.lap_time + 2.0),
+            ..lap.meta.clone()
+        },
+        brake: lap.brake.iter().map(|value| value * 0.99).collect(),
+        ..lap.clone()
+    };
+
+    service
+        .library_mut()
+        .insert(&slower, NewEntry::default(), 1)
+        .unwrap();
+    service
+        .library_mut()
+        .insert(&lap, NewEntry::default(), 2)
+        .unwrap();
+
+    let auto = service
+        .resolve(&session(length), false, &ReferencePolicy::Auto, 3)
+        .await;
+
+    assert!((auto.reference.unwrap().lap.lap_time - lap.lap_time).abs() < 1e-6);
+}

@@ -11,6 +11,7 @@
 pub mod buckets;
 pub mod cue;
 pub mod garage61;
+pub mod inbox;
 pub mod lap;
 pub mod library;
 pub mod matching;

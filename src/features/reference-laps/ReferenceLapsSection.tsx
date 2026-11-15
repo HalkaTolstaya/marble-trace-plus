@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 import { Button, Empty, Flex, Input, Radio, Tag, Tooltip } from 'antd';
-import { FileUp, Pin, RefreshCw, Trash2 } from 'lucide-react';
+import { FileUp, FolderOpen, Pin, RefreshCw, Trash2 } from 'lucide-react';
 
 import { SettingsCard } from '@shared/ui/SettingsCard/SettingsCard';
 import type { ReferencePolicy } from '@shared/contracts/reflaps';
@@ -150,6 +150,22 @@ export const ReferenceLapsSection = observer(() => {
         <div className={styles.fieldDesc}>
           {t('settingsPage.referenceLaps.libraryDesc')}
         </div>
+
+        <div className={styles.fieldDesc}>
+          {t('settingsPage.referenceLaps.folderDesc')}
+        </div>
+
+        <Flex gap={8} align="center" style={{ marginBottom: 12 }}>
+          <code className={styles.folderPath}>{laps.inboxFolder}</code>
+          <Button
+            size="small"
+            icon={<FolderOpen size={ICON_SIZE} />}
+            disabled={laps.busy || !laps.inboxFolder}
+            onClick={() => void laps.openFolder()}
+          >
+            {t('settingsPage.referenceLaps.openFolder')}
+          </Button>
+        </Flex>
 
         {laps.laps.length === 0 ? (
           <Empty

@@ -219,11 +219,9 @@ impl<T: HttpTransport, S: TokenStore> ReferenceLapService<T, S> {
             session.car_id,
             if wet { "wet" } else { "dry" }
         );
-        let cached = self
-            .library
-            .best_garage61(session.track_id, session.car_id, wet)
-            .cloned()
-            .or_else(|| self.library.best_for(session, wet).cloned());
+        // Garage 61 downloads (matched by iRacing IDs) and CSVs from the laps
+        // folder (matched by car and lap length) compete on lap time.
+        let cached = self.library.best_for(session, wet).cloned();
         let fresh_enough = self
             .catalog
             .searched
@@ -248,9 +246,22 @@ impl<T: HttpTransport, S: TokenStore> ReferenceLapService<T, S> {
                 self.catalog.searched.insert(search_key, now);
                 self.save_catalog();
 
-                Resolution {
-                    reference: Some(resolved),
-                    note: ResolveNote::Fetched,
+                // A faster lap already in the library (a CSV the driver
+                // exported from the full Garage 61 search) still wins.
+                match self.library.best_for(session, wet).cloned() {
+                    Some(best)
+                        if best.id != resolved.entry.id
+                            && best.lap_time < resolved.entry.lap_time =>
+                    {
+                        Resolution {
+                            reference: self.resolved(&best).or(Some(resolved)),
+                            note: ResolveNote::Cached,
+                        }
+                    }
+                    _ => Resolution {
+                        reference: Some(resolved),
+                        note: ResolveNote::Fetched,
+                    },
                 }
             }
             Ok(None) => {

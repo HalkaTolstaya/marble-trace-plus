@@ -60,6 +60,9 @@ export const refreshReference = () => invoke<void>('reflaps_refresh');
 export const deleteLibraryLap = (id: string) =>
   invoke<void>('reflaps_delete', { id });
 
+/** Opens the laps folder in Explorer; the path is Rust's, not the webview's. */
+export const openLapsFolder = () => invoke<void>('reflaps_open_inbox');
+
 /** Opens a file dialog in Rust; resolves the new lap's id, or null if cancelled. */
 export const importLapCsv = () => invoke<string | null>('reflaps_import_csv');
 

@@ -130,6 +130,7 @@ fn setup(app: &mut App) -> Result<(), Box<dyn Error>> {
         Ok(state) => {
             app.manage(Arc::new(state));
             reflaps::spawn_watcher(app.handle());
+            reflaps::spawn_inbox_watcher(app.handle());
         }
         Err(error) => tracing::error!("reference laps unavailable: {error}"),
     }

@@ -637,7 +637,9 @@
         "differentCar": "Otro coche",
         "differentTrack": "Otro circuito",
         "unknown": "—"
-      }
+      },
+      "folderDesc": "Deja en esta carpeta los CSV exportados de Garage 61 (Export → CSV en una vuelta de la búsqueda). Se importan en segundos y se usan para el circuito y coche correspondientes cuando son más rápidos.",
+      "openFolder": "Abrir carpeta"
     }
   },
   "bindings": {

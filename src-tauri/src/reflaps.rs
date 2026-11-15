@@ -14,6 +14,9 @@ use mt_model::contract::events::EVENT_REFLAPS_STATUS;
 use mt_model::sim::session::SessionSnapshot;
 use mt_reflaps::buckets::to_reference_data;
 use mt_reflaps::garage61::{Garage61Client, PRODUCTION_BASE};
+use mt_reflaps::inbox::{InboxScanner, INBOX_DIR};
+use mt_reflaps::lap::parse_garage61_csv;
+use mt_reflaps::library::NewEntry;
 use mt_reflaps::matching::SessionKey;
 use mt_reflaps::net::{Allowlist, ReqwestTransport};
 use mt_reflaps::service::{ReferenceLapService, ReferencePolicy, ResolveNote};
@@ -38,6 +41,8 @@ pub type Service = ReferenceLapService<ReqwestTransport, KeyringTokenStore>;
 
 pub struct ReflapsState {
     policy_path: std::path::PathBuf,
+    /// `<install dir>\laps`: Garage 61 CSV exports dropped here are imported.
+    pub inbox: std::path::PathBuf,
     pub service: Mutex<Service>,
     pub policy: Mutex<ReferencePolicy>,
     /// Wakes the watcher to resolve again (token, policy or library changed).
@@ -100,8 +105,11 @@ impl ReflapsState {
             .and_then(|text| serde_json::from_str::<ReferencePolicy>(&text).ok())
             .unwrap_or_default();
 
+        let inbox = inbox_folder(&data_dir);
+
         Ok(Self {
             policy_path,
+            inbox,
             service: Mutex::new(ReferenceLapService::new(
                 &data_dir,
                 client,
@@ -129,6 +137,101 @@ impl ReflapsState {
 
         *self.policy.lock().await = policy;
     }
+}
+
+/// How often the laps folder is scanned.
+const INBOX_INTERVAL: Duration = Duration::from_secs(3);
+
+/// The folder next to the executable; the per-user NSIS install puts that
+/// under `%LOCALAPPDATA%`, so it is writable without elevation. Where it is
+/// not (a portable copy in a read-only place), the app data folder is used.
+fn inbox_folder(data_dir: &std::path::Path) -> std::path::PathBuf {
+    let beside_exe = std::env::current_exe()
+        .ok()
+        .and_then(|exe| exe.parent().map(|dir| dir.join(INBOX_DIR)));
+
+    if let Some(dir) = beside_exe {
+        if std::fs::create_dir_all(&dir).is_ok() {
+            return dir;
+        }
+    }
+
+    let fallback = data_dir
+        .join(mt_reflaps::library::LIBRARY_DIR)
+        .join(INBOX_DIR);
+    let _ = std::fs::create_dir_all(&fallback);
+
+    fallback
+}
+
+/// Imports every new or changed CSV in the laps folder into the library and
+/// asks for the session's reference to be resolved again.
+pub fn spawn_inbox_watcher(app: &AppHandle) {
+    let app = app.clone();
+
+    tauri::async_runtime::spawn(async move {
+        let mut scanner = InboxScanner::default();
+
+        loop {
+            tokio::time::sleep(INBOX_INTERVAL).await;
+
+            let Some(state) = app.try_state::<Arc<ReflapsState>>() else {
+                return;
+            };
+            let state = Arc::clone(&state);
+            let dir = state.inbox.clone();
+            let found =
+                tauri::async_runtime::spawn_blocking(move || scanner_scan(scanner, &dir)).await;
+            let Ok((returned, files)) = found else {
+                return;
+            };
+
+            scanner = returned;
+
+            if files.is_empty() {
+                continue;
+            }
+
+            let mut imported = 0;
+
+            for file in files {
+                match parse_garage61_csv(&file.text, &file.file_name) {
+                    Ok(lap) => {
+                        let added = state.service.lock().await.library_mut().insert(
+                            &lap,
+                            NewEntry::default(),
+                            now_unix(),
+                        );
+
+                        match added {
+                            Ok(entry) => {
+                                imported += 1;
+                                info!(lap_time = entry.lap_time, file = %file.file_name, "lap imported from the laps folder");
+                            }
+                            Err(error) => {
+                                error!(file = %file.file_name, "library refused the lap: {error}")
+                            }
+                        }
+                    }
+                    Err(error) => info!(file = %file.file_name, "not a usable lap CSV: {error}"),
+                }
+            }
+
+            if imported > 0 {
+                state.dirty.notify_one();
+            }
+        }
+    });
+}
+
+/// Moves the scanner through a blocking scan and back.
+fn scanner_scan(
+    mut scanner: InboxScanner,
+    dir: &std::path::Path,
+) -> (InboxScanner, Vec<mt_reflaps::inbox::InboxFile>) {
+    let files = scanner.scan(dir);
+
+    (scanner, files)
 }
 
 /// Starts the watcher: on every new track+car (and whenever woken) it
