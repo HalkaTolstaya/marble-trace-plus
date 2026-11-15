@@ -1,11 +1,13 @@
-// The bar fills in three steps into each reference brake point and turns solid
-// red on BRAKE; after the brake goes on it takes the grade's colour for a
-// moment (the flash), then the timing row keeps the verdict.
+// The bar is read out of the corner of the eye, so each step says itself three
+// ways at once: how far it has filled, what colour it is — yellow, amber,
+// orange, then solid red on BRAKE — and the figure on it. After the brake goes
+// on it takes the grade's colour and word for a moment (the flash), then the
+// timing row keeps the verdict.
 .root {
   width: 100%;
   height: 100%;
   font-family: $font-widget;
-  padding: sp(xs);
+  padding: sp(xs) sp(sm);
   gap: sp(xs);
   color: $widget-text-primary;
 }
@@ -15,9 +17,23 @@
   align-items: center;
   justify-content: space-between;
   gap: sp(sm);
-  font-size: fs(xs);
+  font-size: fs(xxs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: $widget-text-secondary;
   line-height: 1;
+}
+
+.zone {
+  white-space: nowrap;
+}
+
+.zoneValue {
+  color: $widget-text-primary;
+  font-size: fs(xs);
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
 .pips {
@@ -25,20 +41,22 @@
   gap: sp(xxs);
 }
 
+// A pip is a small well until its zone is graded; then it is lit in the
+// grade's colour.
 .pip {
-  width: ws(10);
-  height: ws(10);
+  width: ws(9);
+  height: ws(9);
   border-radius: 50%;
-  background: $widget-surface-cell;
-  border: 1px solid $widget-border-subtle;
+  background: $widget-surface-well;
+  box-shadow: inset 0 0 0 1px $widget-border-default;
 }
 
 .pipStale {
-  opacity: 0.45;
+  opacity: 0.4;
 }
 
 .pipCurrent {
-  border-color: $widget-text-primary;
+  box-shadow: inset 0 0 0 ws(2) $widget-text-primary;
 }
 
 .body {
@@ -50,18 +68,50 @@
 }
 
 .bar {
+  --cue-tone: #{$widget-text-muted};
+  --cue-cap: #{$widget-text-secondary};
+
   position: relative;
   flex: 1 1 auto;
   min-width: 0;
-  border-radius: radius(md);
-  background: $widget-surface-cell;
+  border-radius: radius(lg);
+  background: $widget-surface-well;
+  box-shadow: $widget-well-bevel;
   overflow: hidden;
 }
 
+.barCount3 {
+  --cue-tone: #{$race-yellow};
+  --cue-cap: #{$brake-cue-cap-early};
+}
+
+.barCount2 {
+  --cue-tone: #{$race-amber};
+  --cue-cap: #{$brake-cue-cap-mid};
+}
+
+.barCount1 {
+  --cue-tone: #{$race-orange};
+  --cue-cap: #{$brake-cue-cap-late};
+}
+
+.barBrake {
+  --cue-tone: #{$race-red};
+  --cue-cap: #{$widget-cap-danger};
+}
+
+// Thin behind, dense at its leading edge, with a lit cap on it: the eye lands
+// on where the count has got to. The width moves with the telemetry and is set
+// without a transition.
 .fill {
   position: absolute;
   inset: 0 auto 0 0;
-  background: rgba($race-red, 0.55);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--cue-tone) 30%, transparent),
+    color-mix(in srgb, var(--cue-tone) 78%, transparent)
+  );
+  box-shadow: inset ws(-3) 0 0 var(--cue-cap);
 }
 
 .join {
@@ -69,13 +119,42 @@
   inset: 0 auto 0 0;
   background: repeating-linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.08) 0 ws(4),
+    $widget-border-subtle 0 ws(4),
     transparent ws(4) ws(8)
   );
 }
 
+// The three counts, ruled on the bar.
+.thirds {
+  position: absolute;
+  inset: 22% 0;
+  background: linear-gradient(
+    to right,
+    transparent calc(100% / 3 - 0.5px),
+    $widget-border-default calc(100% / 3 - 0.5px) calc(100% / 3 + 0.5px),
+    transparent calc(100% / 3 + 0.5px) calc(200% / 3 - 0.5px),
+    $widget-border-default calc(200% / 3 - 0.5px) calc(200% / 3 + 0.5px),
+    transparent calc(200% / 3 + 0.5px)
+  );
+  pointer-events: none;
+}
+
+// BRAKE is the one solid thing the widget ever shows: the whole bar in red,
+// lit from the top like a plate, with nothing ruled on it.
 .barBrake .fill {
-  background: $race-red;
+  background: linear-gradient(
+    to bottom,
+    $widget-cap-danger,
+    $race-red 38%,
+    $brake-cue-floor
+  );
+  box-shadow:
+    inset 0 1px 0 $widget-led-sheen,
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.barBrake .thirds {
+  display: none;
 }
 
 .label {
@@ -84,30 +163,126 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: fs(xxl);
+  font-size: wfs(40);
   font-weight: 800;
-  font-style: italic;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.01em;
   line-height: 1;
+  // A dark edge under the figure, so it holds where the fill's cap passes
+  // behind it.
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+  animation: cueArrive 0.22s $ease-spring both;
+}
+
+.barIdle .label {
+  font-size: fs(xl);
+  color: $widget-text-secondary;
+  animation: none;
+}
+
+.barBrake .label {
+  font-size: wfs(34);
+  letter-spacing: 0.12em;
+  // The tracking adds its width after the last letter; this hands it back so
+  // the word sits on the bar's centre.
+  padding-left: 0.12em;
+  animation: cueStrike 0.28s $ease-spring both;
+}
+
+// A count arrives a little large and settles; BRAKE arrives larger.
+@keyframes cueArrive {
+  from {
+    opacity: 0.35;
+    transform: scale(1.45);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes cueStrike {
+  from {
+    opacity: 0.4;
+    transform: scale(1.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// The moment BRAKE comes up the bar is struck with light once, and it is gone
+// within a third of a second — one composited fade, not a blink.
+.strike {
+  position: absolute;
+  inset: 0;
+  background: $widget-text-primary;
+  opacity: 0;
+  pointer-events: none;
+  animation: cueFlare 0.32s ease-out both;
+}
+
+@keyframes cueFlare {
+  from {
+    opacity: 0.75;
+  }
+
+  to {
+    opacity: 0;
+  }
 }
 
 .flash {
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 1px 0 $widget-led-sheen,
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.flashLabel {
+  font-size: wfs(26);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: $widget-text-on-accent;
+  animation: cueArrive 0.22s $ease-spring both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .label,
+  .barBrake .label,
+  .flashLabel,
+  .strike {
+    animation: none;
+  }
 }
 
 .target {
-  flex: 0 0 ws(26);
+  flex: 0 0 ws(22);
   position: relative;
-  border-radius: radius(sm);
-  background: $widget-surface-cell;
+  border-radius: radius(md);
+  background: $widget-surface-well;
+  box-shadow: $widget-well-bevel;
   overflow: hidden;
 }
 
 .gauge {
   position: absolute;
   inset: auto 0 0 0;
-  background: $widget-brake;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, $widget-brake 55%, transparent),
+    $widget-brake 85%
+  );
+  box-shadow: inset 0 2px 0 $widget-cap-danger;
 }
 
 .targetLine {
@@ -115,12 +290,13 @@
   left: 0;
   right: 0;
   height: 2px;
+  margin-bottom: -1px;
   background: $race-gold;
 }
 
 .targetValue {
-  font-size: fs(xs);
   color: $race-gold;
+  white-space: nowrap;
 }
 
 .timing {
@@ -128,16 +304,21 @@
   align-items: baseline;
   gap: sp(sm);
   font-size: fs(sm);
+  font-weight: 700;
   line-height: 1;
   min-height: fs(sm);
+  white-space: nowrap;
 }
 
 .grade {
-  font-weight: 700;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .muted {
-  color: $widget-text-muted;
+  color: $widget-text-secondary;
+  font-weight: 600;
 }
 
 .tone-perfect {
@@ -173,7 +354,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $widget-text-muted;
+  color: $widget-text-secondary;
   font-size: fs(sm);
+  font-weight: 600;
   text-align: center;
 }

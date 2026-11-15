@@ -265,3 +265,10 @@ $status-chip-ground: rgba(9, 10, 13, 0.72);
 $status-chip-tint: 24%;
 $status-chip-outline: 75%;
 $status-chip-ink: 62%;
+
+// Brake point — the lit leading edge of the count as it warms from yellow to
+// orange, and the floor of the solid red BRAKE plate.
+$brake-cue-cap-early: color-mix(in srgb, $race-yellow 45%, #ffffff);
+$brake-cue-cap-mid: color-mix(in srgb, $race-amber 45%, #ffffff);
+$brake-cue-cap-late: color-mix(in srgb, $race-orange 45%, #ffffff);
+$brake-cue-floor: #c81e1e;

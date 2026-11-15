@@ -23,6 +23,33 @@ const toneClass = (tone: string): string => styles[`tone-${tone}`] ?? '';
 const ratio = (value: number): string =>
   `${Math.min(Math.max(value, 0), 1) * 100}%`;
 
+type BarStage = 'idle' | 'count3' | 'count2' | 'count1' | 'brake';
+
+/** What the bar is saying, as one name: each change of it is a change of state. */
+const barStageOf = (frame: BrakeCueFrame): BarStage => {
+  if (frame.mode === 'brake') {
+    return 'brake';
+  }
+
+  if (frame.mode !== 'countdown') {
+    return 'idle';
+  }
+
+  if (frame.beat >= 3) {
+    return 'count3';
+  }
+
+  return frame.beat === 2 ? 'count2' : 'count1';
+};
+
+const BAR_STAGE_CLASS: Record<BarStage, string> = {
+  idle: styles.barIdle,
+  count3: styles.barCount3,
+  count2: styles.barCount2,
+  count1: styles.barCount1,
+  brake: styles.barBrake,
+};
+
 const MESSAGE_KEYS: Partial<Record<BrakeCueFrame['mode'], string>> = {
   noReference: 'noReference',
   noZones: 'noZones',
@@ -54,13 +81,16 @@ export const BrakePointWidget = observer(() => {
   const verdict = frame.verdict;
   const target = frame.target ?? 0;
   const gaugeValue = frame.peak ?? frame.live;
+  const stage = barStageOf(frame);
 
   return (
     <WidgetPanel direction="column" className={styles.root}>
       <div className={styles.header}>
-        <span>
+        <span className={styles.zone}>
           {t('settingsPanels.brakePoint.zone')}{' '}
-          <FixedDigits text={`${frame.zoneNo}/${frame.zoneCount}`} />
+          <span className={styles.zoneValue}>
+            <FixedDigits text={`${frame.zoneNo}/${frame.zoneCount}`} />
+          </span>
         </span>
 
         {settings.showPips ? (
@@ -88,20 +118,35 @@ export const BrakePointWidget = observer(() => {
       </div>
 
       <div className={styles.body}>
-        <div
-          className={`${styles.bar} ${frame.mode === 'brake' ? styles.barBrake : ''}`}
-        >
+        <div className={`${styles.bar} ${BAR_STAGE_CLASS[stage]}`}>
           <div className={styles.join} style={{ width: ratio(frame.join) }} />
           <div className={styles.fill} style={{ width: ratio(frame.fill) }} />
+          <div className={styles.thirds} />
+
+          {/* Keyed by what it reads, so each count and BRAKE itself is a new
+              element: its arrival runs once, on that change of state, and the
+              bar under it moves without any motion of its own (ADR-0009). */}
+          <div key={stage} className={styles.label}>
+            <FixedDigits text={barLabel(frame)} />
+          </div>
+
+          {stage === 'brake' ? <div className={styles.strike} /> : null}
+
+          {/* The grade takes the whole bar for a moment, word and colour
+              together, and fades as one at the rate the backend sets. */}
           {frame.flash ? (
             <div
               className={`${styles.flash} ${toneClass(GRADE_TONE[frame.flash.grade])}`}
-              style={{ opacity: frame.flash.alpha * 0.85 }}
-            />
+              style={{ opacity: frame.flash.alpha }}
+            >
+              <span key={frame.flash.grade} className={styles.flashLabel}>
+                {GRADE_ARROWS[frame.flash.grade]}{' '}
+                {t(
+                  `settingsPanels.brakePoint.grades.${GRADE_KEY[frame.flash.grade]}`
+                )}
+              </span>
+            </div>
           ) : null}
-          <div className={styles.label}>
-            <FixedDigits text={barLabel(frame)} />
-          </div>
         </div>
 
         {settings.showTarget ? (
