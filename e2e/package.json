@@ -2,11 +2,11 @@
   "name": "marble-trace-plus-e2e",
   "private": true,
   "type": "module",
-  "description": "Smoke tests of the built Windows app through tauri-driver (WebDriver).",
+  "description": "Smoke tests of the built Windows app over the WebView2 DevTools protocol (Playwright connectOverCDP).",
   "scripts": {
     "test": "node --test --test-timeout=240000 smoke.e2e.mjs"
   },
   "devDependencies": {
-    "webdriverio": "9.20.0"
+    "playwright-core": "1.56.1"
   }
 }

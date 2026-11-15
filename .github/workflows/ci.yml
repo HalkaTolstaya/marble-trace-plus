@@ -293,7 +293,7 @@ jobs:
           if-no-files-found: error
 
   e2e:
-    name: E2E (Windows, tauri-driver)
+    name: E2E (Windows, WebView2 CDP)
     needs: build
     runs-on: windows-latest
     steps:
@@ -305,54 +305,12 @@ jobs:
         with:
           name: windows-app-exe
           path: e2e/bin
-      - uses: dtolnay/rust-toolchain@683b588c487a69d01f6c6ddf40f036ff682cc2c8 # master
-        with:
-          toolchain: stable
-      # Built from crates.io rather than a third-party prebuilt binary.
-      - name: Install tauri-driver
-        run: cargo install --locked tauri-driver@2.1.0
-      # msedgedriver must match the WebView2 Runtime the app runs on (not the
-      # Edge browser on the image), or WebView2 never opens its debug port.
-      - name: msedgedriver matching WebView2
-        shell: pwsh
-        run: |
-          $keys = @(
-            'HKLM:\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}',
-            'HKLM:\SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}'
-          )
-          $version = $keys | ForEach-Object { (Get-ItemProperty -Path $_ -ErrorAction SilentlyContinue).pv } | Where-Object { $_ } | Select-Object -First 1
-          if (-not $version) { throw 'WebView2 Runtime not found' }
-          Write-Output "WebView2 Runtime $version"
-          $dir = Join-Path $env:RUNNER_TEMP 'msedgedriver'
-          New-Item -ItemType Directory -Force -Path $dir | Out-Null
-          $zip = Join-Path $dir 'driver.zip'
-          Invoke-WebRequest -Uri "https://msedgedriver.microsoft.com/$version/edgedriver_win64.zip" -OutFile $zip
-          Expand-Archive -Path $zip -DestinationPath $dir -Force
-          "EDGEWEBDRIVER=$dir" >> $env:GITHUB_ENV
-      - name: Diagnostics - start the exe without a driver
-        shell: pwsh
-        run: |
-          $exe = Get-ChildItem e2e/bin -Filter *.exe | Select-Object -First 1
-          Write-Output "Starting $($exe.FullName)"
-          $proc = Start-Process -FilePath $exe.FullName -PassThru
-          Start-Sleep -Seconds 20
-          $proc.Refresh()
-          Write-Output "Exited: $($proc.HasExited)  ExitCode: $(if ($proc.HasExited) { $proc.ExitCode } else { '-' })"
-          Get-Process | Where-Object { $_.ProcessName -match 'trailbrake|marble|msedgewebview2' } | Format-Table ProcessName, Id, MainWindowTitle -AutoSize | Out-String | Write-Output
-          if (-not $proc.HasExited) { Stop-Process -Id $proc.Id -Force }
-          Get-Process msedgewebview2 -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-          foreach ($root in @($env:APPDATA, $env:LOCALAPPDATA)) {
-            $dir = Join-Path $root 'io.github.halkatolstaya.trailbrake'
-            if (Test-Path $dir) {
-              Write-Output "== $dir"
-              Get-ChildItem $dir -Recurse -Depth 2 | Select-Object -First 40 | ForEach-Object { $_.FullName } | Write-Output
-              Get-ChildItem $dir -Recurse -Filter *.log | ForEach-Object { Write-Output "--- $($_.FullName)"; Get-Content $_.FullName -Tail 60 }
-            }
-          }
       - name: Install the e2e runner
         working-directory: e2e
-        run: npm ci
-      - name: Run WebdriverIO against the release exe (no iRacing)
+        run: npm ci --ignore-scripts
+      # The exe is driven over the WebView2 DevTools protocol (Playwright
+      # connectOverCDP); no iRacing, no Garage 61 token.
+      - name: Smoke test the release exe
         working-directory: e2e
         shell: bash
         run: |
@@ -367,12 +325,3 @@ jobs:
             Get-ChildItem (Join-Path $root 'io.github.halkatolstaya.trailbrake') -Recurse -Filter *.log -ErrorAction SilentlyContinue |
               ForEach-Object { Write-Output "--- $($_.FullName)"; Get-Content $_.FullName -Tail 80 }
           }
-      - name: Upload app logs
-        if: failure()
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
-        with:
-          name: e2e-app-logs
-          path: |
-            ~/AppData/Roaming/io.github.halkatolstaya.trailbrake/logs
-            ~/AppData/Local/io.github.halkatolstaya.trailbrake/logs
-          if-no-files-found: ignore
