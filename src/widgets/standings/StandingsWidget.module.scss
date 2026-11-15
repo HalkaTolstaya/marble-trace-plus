@@ -9,5 +9,8 @@
   display: flex;
   flex-direction: column;
   gap: sp(xs);
-  overflow: hidden;
+  // Cut at the bottom as before; open on the right for the pit pills. The
+  // shared panel clips by default, so this has to win over it.
+  overflow: visible !important;
+  clip-path: inset(0 -240px 0 0);
 }

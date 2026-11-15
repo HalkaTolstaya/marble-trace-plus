@@ -28,6 +28,7 @@ import {
 } from '@widgets/standings/standings-utils';
 import { PosChange } from './PosChange';
 import { PositionCell } from './PositionCell';
+import { PitPill } from './PitPill';
 import { IrChangeCell } from './IrChangeCell';
 
 import styles from './DriverRow.module.scss';
@@ -168,7 +169,6 @@ export const DriverRow = observer(
 
     // The tow truck has the car: it left the world without going through the pit
     // lane, which OUT alone would not tell apart from a garage exit.
-    const isTowed = driver.isTowed && !isFinished;
 
     const isOffTrack = driver.trackSurface === TRACK_SURFACE_OFF_TRACK;
 
@@ -280,13 +280,14 @@ export const DriverRow = observer(
 
           <DriverStatusBadges
             flagType={flagType}
-            isTowed={isTowed}
             isOut={isOut}
             isOffTrack={isOffTrack}
             isPit={isPit}
             pitState={pitState}
             isFinished={isFinished}
-            showPit={settings.showPitIndicator}
+            // Pit road and tows go in the pill beside the row instead.
+            showPit={false}
+            isTowed={false}
           />
         </div>
 
@@ -400,6 +401,7 @@ export const DriverRow = observer(
             <TireBadge tire={driver.tireCompound} />
           </div>
         )}
+        {settings.showPitIndicator && <PitPill carIdx={carIdx} />}
       </div>
     );
   }

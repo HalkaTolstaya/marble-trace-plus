@@ -1,4 +1,5 @@
 .sessionFooter {
+  flex-shrink: 0;
   @include widget-card;
 
   // A peer of the rows above it, not a second header — but the text still needs

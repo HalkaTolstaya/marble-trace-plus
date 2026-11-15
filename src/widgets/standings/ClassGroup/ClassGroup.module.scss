@@ -13,4 +13,15 @@
 
   display: flex;
   flex-direction: column;
+  // The pit pills sit outside it; the rounded corners are kept by the rows.
+  overflow: visible;
+
+  > :last-child {
+    border-bottom-left-radius: ws(8);
+    border-bottom-right-radius: ws(8);
+  }
+
+  > :last-child [class*='posCell'] {
+    border-bottom-left-radius: ws(8);
+  }
 }

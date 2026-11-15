@@ -23,7 +23,9 @@ import type { BackendComputedStore } from '@entities/cars/computed.store';
 import type { LiveWidgetsView } from '@entities/layout/live-widgets.store';
 import type { SessionStore } from '@entities/session/session.store';
 import type { PlayerPositionStore } from '@entities/player/player-position.store';
+import type { PlayerStore } from '@entities/player/player.store';
 import { LapPaceTracker } from '@entities/cars/lap-pace';
+import { PitTracker } from '@entities/cars/pit-tracker';
 import type { StandingsWidgetSettings } from './settings-schema';
 
 interface StandingsDeps {
@@ -31,6 +33,7 @@ interface StandingsDeps {
   liveWidgets: LiveWidgetsView;
   session: SessionStore;
   playerPosition: PlayerPositionStore;
+  player: PlayerStore;
 }
 
 export type PositionChangeDirection = 'up' | 'down';
@@ -48,6 +51,9 @@ const ARROW_LINGER_MS = 400;
 const ORDER_SETTLE_MS = 900;
 
 const MS_PER_SECOND = 1000;
+
+/** The pit pills count whole seconds. */
+const CLOCK_STEP_MS = 1000;
 
 // Scroll key for the view modes that draw a single list. Real class ids are
 // positive, so it can never collide with one.
@@ -149,6 +155,14 @@ export class StandingsWidgetStore implements StandingsHotkeyTarget {
   /** Each car's laps as the overlay saw them: the average and stint columns. */
   readonly lapPace = new LapPaceTracker();
 
+  /** Time on pit road and under tow: the pills beside the rows. */
+  readonly pits = new PitTracker();
+
+  /** The wall clock the pit pills count against, a step a second. */
+  clockMs = Date.now();
+
+  private clockTimer: ReturnType<typeof setInterval> | null = null;
+
   constructor({ core, instanceId }: WidgetInstanceContext<StandingsDeps>) {
     this.root = core;
     this.instanceId = instanceId;
@@ -161,11 +175,14 @@ export class StandingsWidgetStore implements StandingsHotkeyTarget {
       | 'changeTimers'
       | 'disposers'
       | 'scrollResetTimer'
+      | 'clockTimer'
     >(
       this,
       {
         root: false,
         lapPace: false,
+        pits: false,
+        clockTimer: false,
         previousPositions: false,
         pendingPositions: false,
         changeTimers: false,
@@ -185,6 +202,7 @@ export class StandingsWidgetStore implements StandingsHotkeyTarget {
           this.settleOrder(entries);
           this.trackPositionChanges(entries);
           this.lapPace.record(entries, this.lapPaceSessionKey);
+          this.pits.record(entries, Date.now());
         }
       )
     );
@@ -222,6 +240,17 @@ export class StandingsWidgetStore implements StandingsHotkeyTarget {
         { equals: compareStructural }
       )
     );
+
+    // A step a second, the pit pills' seconds. Only the pills read it, so
+    // a row with none does not wake.
+    this.clockTimer = setInterval(() => this.tickClock(), CLOCK_STEP_MS);
+
+    // Cars already on pit road or under tow when the table opens.
+    this.pits.record(this.root.backendComputed.driverIdentities, Date.now());
+  }
+
+  private tickClock() {
+    this.clockMs = Date.now();
   }
 
   /**
@@ -255,6 +284,11 @@ export class StandingsWidgetStore implements StandingsHotkeyTarget {
   dispose() {
     for (const disposer of this.disposers) {
       disposer();
+    }
+
+    if (this.clockTimer !== null) {
+      clearInterval(this.clockTimer);
+      this.clockTimer = null;
     }
 
     this.disposers.length = 0;
@@ -476,6 +510,16 @@ export class StandingsWidgetStore implements StandingsHotkeyTarget {
         });
       }, delayMs)
     );
+  }
+
+  /**
+   * The player's own tow, straight from the sim (`PlayerCarTowTime`): the
+   * seconds left until the car is in its box, or null when not being towed.
+   */
+  get playerTowSecondsLeft(): number | null {
+    const left = this.root.player.pitService?.towTimeS ?? 0;
+
+    return left > 0 ? Math.ceil(left) : null;
   }
 
   /** A new session (or a subsession) starts every car's lap history over. */

@@ -1,4 +1,5 @@
 .sessionHeader {
+  flex-shrink: 0;
   // Lit from the top, so the bar reads as the widget's frame rather than as one
   // more row — the height it gains comes from the type, not from padding.
   @include widget-card;
