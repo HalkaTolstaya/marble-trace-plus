@@ -405,7 +405,9 @@
       "showPitLimiterLights": "Pit limiter lights",
       "compareThrottle": "Throttle",
       "compareBrake": "Brake",
-      "showDistance": "Show distance"
+      "showDistance": "Distance axis",
+      "distanceWindow": "Distance window",
+      "distanceWindowDesc": "Metres of track the graph covers once it is plotted against distance — behind the car and ahead of it together."
     },
     "linearMap": {
       "moduleLayout": "Module Layout",

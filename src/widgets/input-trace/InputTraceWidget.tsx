@@ -8,7 +8,6 @@ import { CornerSpeeds } from './SpeedBlock/CornerSpeeds';
 import { SpeedGear } from './SpeedBlock/SpeedGear';
 import { SteeringWheel } from './SteeringWheel/SteeringWheel';
 import { RevStrip } from './RevStrip/RevStrip';
-import { DistanceTag } from './CanvasTrace/DistanceTag';
 
 import styles from './InputTraceWidget.module.scss';
 import type { InputTraceSettings } from './settings-schema';
@@ -57,7 +56,6 @@ export const InputTraceWidget = observer(() => {
       {showTrace && (
         <div className={styles.chartArea}>
           <CanvasTrace />
-          {settings.showDistance && <DistanceTag />}
         </div>
       )}
 

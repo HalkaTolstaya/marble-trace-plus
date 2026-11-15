@@ -241,3 +241,16 @@ $map-track-surface: #1c1e24;
 $map-dot-surface: #101216;
 $map-dot-casing: rgba(6, 7, 9, 0.85);
 $map-player-halo: rgba(46, 230, 128, 0.75);
+
+// A well: a surface sunk into its panel (a plot, a bar's track). Darker than
+// the plate, shaded under its top lip and lit along its bottom edge — the
+// panel bevel turned inside out.
+$widget-surface-well: plate(rgba(0, 0, 0, 0.42));
+$widget-well-bevel:
+  inset 0 1px 0 rgba(0, 0, 0, 0.55),
+  inset 0 6px 10px -8px rgba(0, 0, 0, 0.6),
+  inset 0 -1px 0 rgba(255, 255, 255, 0.07);
+
+// A rev light that is off, and the lit edge of one that is on.
+$widget-led-off: rgba(255, 255, 255, 0.08);
+$widget-led-sheen: rgba(255, 255, 255, 0.5);

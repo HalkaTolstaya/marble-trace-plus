@@ -405,7 +405,9 @@
       "showPitLimiterLights": "限速灯",
       "compareThrottle": "油门",
       "compareBrake": "刹车",
-      "showDistance": "显示距离"
+      "showDistance": "距离轴",
+      "distanceWindow": "距离窗口",
+      "distanceWindowDesc": "图表按距离绘制时覆盖的赛道长度（米），包含车后与车前两段。"
     },
     "linearMap": {
       "moduleLayout": "模块布局",

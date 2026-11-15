@@ -405,7 +405,9 @@
       "showPitLimiterLights": "Огни пит-лимитера",
       "compareThrottle": "Газ",
       "compareBrake": "Тормоз",
-      "showDistance": "Дистанция"
+      "showDistance": "Ось дистанции",
+      "distanceWindow": "Окно дистанции",
+      "distanceWindowDesc": "Сколько метров трассы помещается на графике, когда он строится по дистанции, — позади машины и впереди неё вместе."
     },
     "linearMap": {
       "moduleLayout": "Расположение модуля",

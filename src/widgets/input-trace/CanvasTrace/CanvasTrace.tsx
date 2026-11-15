@@ -14,6 +14,7 @@ import {
   ensureTraceBuffers,
   pushTraceSample,
   type TraceBufferState,
+  type TraceScene,
 } from './canvas-trace-render';
 import type { InputTraceSettings } from '../settings-schema';
 
@@ -34,16 +35,34 @@ export const CanvasTrace = observer(() => {
   bufferStateRef.current ??= createTraceBufferState();
 
   const draw = useCallback(
-    (settings: InputTraceSettings, steeringLockDeg: number) => {
+    (
+      settings: InputTraceSettings,
+      steeringLockDeg: number,
+      scene: TraceScene
+    ) => {
       const canvas = canvasRef.current;
       const state = bufferStateRef.current;
 
       if (!canvas || !state) return;
 
-      drawInputTrace(canvas, state, settings, steeringLockDeg);
+      drawInputTrace(canvas, state, settings, steeringLockDeg, scene);
     },
     []
   );
+
+  // What the frame is painted from besides the buffers. Read inside the
+  // autorun, so a reference loaded or a session joined repaints the plot.
+  const sceneOf = useCallback((): TraceScene => {
+    const { lapPct, trackLengthM, referenceSamples } = inputTrace;
+
+    return {
+      referenceLoaded: referenceSamples !== null,
+      distance:
+        lapPct !== null && trackLengthM !== null
+          ? { nowPct: lapPct, trackLengthM, referenceSamples }
+          : null,
+    };
+  }, [inputTrace]);
 
   useReactiveCanvasLoop(
     (scheduleDraw) => {
@@ -70,6 +89,12 @@ export const CanvasTrace = observer(() => {
         showSlide: _showSlide,
         slideColor: _slideColor,
         steeringZoom: _steeringZoom,
+        showReference: _showReference,
+        compareThrottle: _compareThrottle,
+        compareBrake: _compareBrake,
+        referenceOpacity: _referenceOpacity,
+        showDistance: _showDistance,
+        distanceWindow: _distanceWindow,
       } = settings;
 
       // Read inside the autorun for the same reason: the lock lives in app
@@ -94,17 +119,19 @@ export const CanvasTrace = observer(() => {
         }
       }
 
-      scheduleDraw(() => draw(settings, steeringLockDeg));
+      const scene = sceneOf();
+
+      scheduleDraw(() => draw(settings, steeringLockDeg, scene));
     },
-    [liveWidgets, inputTrace, appSettings, draw]
+    [liveWidgets, inputTrace, appSettings, draw, sceneOf]
   );
 
   const redrawOnResize = useCallback(() => {
     const currentSettings =
       liveWidgets.getSettings<InputTraceSettings>(instanceId);
 
-    draw(currentSettings, appSettings.appSettings.steeringLock);
-  }, [liveWidgets, instanceId, appSettings, draw]);
+    draw(currentSettings, appSettings.appSettings.steeringLock, sceneOf());
+  }, [liveWidgets, instanceId, appSettings, draw, sceneOf]);
 
   useCanvasAutoResize(canvasRef, redrawOnResize);
 

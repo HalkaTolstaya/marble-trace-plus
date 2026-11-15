@@ -215,6 +215,7 @@ export const InputTraceSettingsPanel = observer(() => {
 
         <Row setting="speedBlockSide" dependsOn={hasSpeedBlockSide} />
         <Row setting="referenceOpacity" dependsOn="showReference" />
+        <Row setting="distanceWindow" dependsOn="showDistance" />
       </Card>
 
       <Card title={t('settingsPanels.inputTrace.graphSettings')}>
