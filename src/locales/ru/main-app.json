@@ -48,11 +48,6 @@
     "resetOk": "Сбросить и перезапустить",
     "resetCancel": "Отмена"
   },
-  "installMismatch": {
-    "title": "Запущена вторая, устаревшая копия Trailbrake",
-    "description": "Это окно — v{{runningVersion}} из {{runningDir}}, а установленная версия — {{registeredVersion}} в {{registeredDir}}. Обновления приходят в установленную копию, поэтому эта остаётся старой. Удалите копию из {{runningDir}} и запускайте Trailbrake из установленной.",
-    "unknownVersion": "неизвестно"
-  },
   "updateBanner": {
     "downloading": "Загрузка обновления...",
     "ready": "Обновление загружено. Перезапуск...",
