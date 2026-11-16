@@ -210,7 +210,8 @@
       "lapTimeDecimalsShort": "Decimales de vuelta",
       "layoutTitle": "Diseño",
       "layout_realTimeClock": "Reloj",
-      "layout_carBrand": "Marca"
+      "layout_carBrand": "Marca",
+      "smoothMotion": "Animación suave"
     },
     "delta": {
       "deltaReference": "Referencia del delta",

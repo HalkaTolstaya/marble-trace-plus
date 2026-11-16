@@ -1,13 +1,13 @@
 import { useWidgetInstanceId } from '@entities/layout/useWidgetSettings';
 import { useLiveWidgetsStore } from '@entities/layout/live-widgets-context';
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import type { NearbyCar } from '@shared/contracts/generated/bindings';
 import type { BaseUserSettings } from '@shared/contracts/widget-settings';
 import type { UnitSystem } from '@shared/contracts/domain';
 import { formatDistance } from '@shared/lib/telemetry-format';
-import { useReactiveCanvasLoop } from '@shared/hooks/useReactiveCanvasLoop';
+import { useSmoothCanvasLoop } from '@shared/hooks/useSmoothCanvasLoop';
 import { useAppSettingsStore } from '@entities/app-settings/app-settings-context';
 import { useBackendComputedStore } from '@entities/cars/computed-context';
 import { useRadarWidgetStore } from '@entities/radar/radar-context';
@@ -64,6 +64,7 @@ export const RadarScope = observer(() => {
   // Bumped by the observer below: a new size is the one reason to repaint that
   // no observable carries.
   const [sizeVersion, setSizeVersion] = useState(0);
+  const previousCarsRef = useRef<ReadonlyMap<number, NearbyCar>>(new Map());
 
   useLayoutEffect(() => {
     if (!canvas) {
@@ -83,10 +84,20 @@ export const RadarScope = observer(() => {
   // clock, a setting, the roster, the units — or the size does, which rebuilds
   // the loop. It used to repaint on every animation frame, which kept the
   // overlay redrawing at the monitor's rate while the scope was up (ADR-0009).
-  useReactiveCanvasLoop(
-    (scheduleDraw) => {
+  const smoothMotion =
+    liveWidgets.getSettings<ProximityRadarSettings>(instanceId).smoothMotion;
+
+  useSmoothCanvasLoop(
+    (scheduleFrame) => {
       // oxlint-disable-next-line no-restricted-properties
-      const allCars = computed.proximity?.nearbyCars ?? [];
+      const targetCars = computed.proximity?.nearbyCars ?? [];
+      // Where each car was drawn last tick: the frames in between glide from
+      // there to the new place.
+      const fromCars = previousCarsRef.current;
+
+      previousCarsRef.current = new Map(
+        targetCars.map((car) => [car.carIdx, car])
+      );
       // oxlint-disable-next-line no-restricted-properties
       const formation = computed.proximity?.formation ?? false;
       // Read here, not in the render, so the autorun tracks every one of them.
@@ -101,7 +112,8 @@ export const RadarScope = observer(() => {
         return;
       }
 
-      scheduleDraw(() => {
+      scheduleFrame((progress) => {
+        const allCars = carsAt(targetCars, fromCars, progress);
         const ctx = canvas.getContext('2d');
 
         if (!ctx) {
@@ -191,7 +203,8 @@ export const RadarScope = observer(() => {
       units,
       session,
       sizeVersion,
-    ]
+    ],
+    smoothMotion
   );
 
   if (!visible || !computed.hasProximity) {
@@ -206,6 +219,34 @@ export const RadarScope = observer(() => {
     />
   );
 });
+
+/**
+ * The cars `progress` of the way from where the last tick put them to where
+ * this one does. A car new to the scope, or one that changed lanes, is drawn
+ * where it is now: it has no path to glide along.
+ */
+const carsAt = (
+  targetCars: readonly NearbyCar[],
+  fromCars: ReadonlyMap<number, NearbyCar>,
+  progress: number
+): NearbyCar[] =>
+  targetCars.map((car) => {
+    const from = fromCars.get(car.carIdx);
+
+    if (!from || progress >= 1 || from.lateralSide !== car.lateralSide) {
+      return car;
+    }
+
+    const between = (start: number, end: number) =>
+      start + (end - start) * progress;
+
+    return {
+      ...car,
+      longitudinalDist: between(from.longitudinalDist, car.longitudinalDist),
+      clearance: between(from.clearance, car.clearance),
+      bumperDist: between(from.bumperDist, car.bumperDist),
+    };
+  });
 
 interface LaneContext {
   radiusPx: number;

@@ -210,7 +210,8 @@
       "lapTimeDecimalsShort": "Знаки времени круга",
       "layoutTitle": "Макет",
       "layout_realTimeClock": "Часы",
-      "layout_carBrand": "Марка машины"
+      "layout_carBrand": "Марка машины",
+      "smoothMotion": "Плавная анимация"
     },
     "delta": {
       "deltaReference": "Эталон дельты",

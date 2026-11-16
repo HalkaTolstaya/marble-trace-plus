@@ -22,6 +22,7 @@ line; it is never edited into agreeing with the new one.
 | [0014](0014-one-input-trace-and-the-brake-point-widget.md) | One Input Trace with a reference overlay; the brake-point countdown is its own widget                   | accepted, 2026-11-14      |
 | [0015](0015-threat-model-and-hardening.md)                 | Threat model and the hardening it requires                                                              | accepted, 2026-11-14      |
 | [0016](0016-no-usage-analytics.md)                         | No usage analytics                                                                                      | accepted, 2026-11-14      |
+| [0017](0017-smooth-motion-on-primary-telemetry.md)         | Smooth motion on the driver's primary telemetry (amends 0009)                                           | accepted, 2026-11-16      |
 
 When a decision is resolved, see [`docs/agents/domain.md`](../agents/domain.md)
 for how the record is written.

@@ -210,7 +210,8 @@
       "lapTimeDecimalsShort": "圈速小数位",
       "layoutTitle": "布局",
       "layout_realTimeClock": "实时时钟",
-      "layout_carBrand": "车辆品牌"
+      "layout_carBrand": "车辆品牌",
+      "smoothMotion": "平滑动画"
     },
     "delta": {
       "deltaReference": "差值参考",

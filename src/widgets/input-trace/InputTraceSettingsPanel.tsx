@@ -85,6 +85,11 @@ export const InputTraceSettingsPanel = observer(() => {
 
   const layoutItems: CheckItem[] = [
     {
+      key: 'smoothMotion',
+      label: t('settingsPanels.common.smoothMotion'),
+      checked: settings.smoothMotion,
+    },
+    {
       key: 'showTrace',
       label: label('showTrace'),
       checked: settings.showTrace,

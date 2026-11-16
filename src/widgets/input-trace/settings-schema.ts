@@ -99,6 +99,12 @@ export const INPUT_TRACE_SETTINGS = defineSettings('inputTrace', {
   distanceWindow: num(800, { min: 200, max: 3000, step: 100 }),
   /** The revs as a strip of lights across the top. */
   showRevLights: bool(true),
+  /**
+   * The plot glides between telemetry ticks instead of stepping (ADR-0017):
+   * the driver's primary trace, kept fluid at the user's choice. Off returns
+   * to one change per tick.
+   */
+  smoothMotion: bool(true),
   /** Lit rev lights bloom. */
   revLightsGlow: bool(true),
   /** The rev strip turns blue while the pit limiter is on. */

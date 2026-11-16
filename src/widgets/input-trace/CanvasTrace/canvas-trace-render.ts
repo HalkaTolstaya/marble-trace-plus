@@ -49,6 +49,12 @@ export interface DistanceFrame {
 
 /** What a frame is painted from, besides the buffers and the settings. */
 export interface TraceScene {
+  /**
+   * Smooth motion (ADR-0017): how many sample columns the time plot still has
+   * to travel to its newest position. Drawn shifted right by this much, it
+   * glides left between ticks instead of jumping a tick's worth at once.
+   */
+  timeLagSamples?: number;
   /** A reference lap is loaded: the buffers carry its pedals. */
   referenceLoaded: boolean;
   /** The car's place on a lap of known length; null off track or without one. */
@@ -190,6 +196,8 @@ interface PlotArea {
 }
 
 interface ChannelPassContext {
+  /** See `TraceScene.timeLagSamples`. */
+  timeLagSamples: number;
   ctx: CanvasRenderingContext2D;
   state: TraceBufferState;
   settings: InputTraceSettings;
@@ -240,9 +248,11 @@ const placeSamples = (
   const xs = state.xScratch;
 
   if (!distance) {
+    const lag = pass.timeLagSamples;
+
     for (let sampleIndex = 0; sampleIndex < state.count; sampleIndex++) {
       xs[sampleIndex] =
-        plot.left + (sampleIndex / (bufferSize - 1)) * plot.width;
+        plot.left + ((sampleIndex + lag) / (bufferSize - 1)) * plot.width;
     }
 
     return;
@@ -769,6 +779,7 @@ export const drawInputTrace = (
     bufferSize: bufferSizeFor(settings),
     scaleTop: plot.top + verticalInset,
     scaleHeight: plot.height - verticalInset * 2,
+    timeLagSamples: scene.timeLagSamples ?? 0,
   };
 
   placeSamples(pass, distance);
