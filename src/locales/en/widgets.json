@@ -1032,6 +1032,11 @@
       "hideDriverLinesDesc": "Show only the engineer. What you said, and the ✓ or ✗ of a command, are left out."
     },
     "brakePoint": {
+      "layoutBlock": "Layout",
+      "layout": "Reading",
+      "layoutDesc": "What the plate reads on the way in: the count 3-2-1, or the metres left to the brake point.",
+      "layout_countdown": "Countdown",
+      "layout_meters": "Metres",
       "countdown": "Countdown",
       "grading": "Grading",
       "display": "Display",

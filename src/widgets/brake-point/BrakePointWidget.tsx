@@ -11,43 +11,27 @@ import {
   GRADE_ARROWS,
   GRADE_KEY,
   GRADE_TONE,
-  barLabel,
   formatMetres,
   formatSeconds,
   percent,
+  plateLabel,
+  plateStageOf,
+  type PlateStage,
 } from './brake-point-format';
 import type { BrakePointSettings } from './settings-schema';
 
 const toneClass = (tone: string): string => styles[`tone-${tone}`] ?? '';
 
-const ratio = (value: number): string =>
-  `${Math.min(Math.max(value, 0), 1) * 100}%`;
+const unit = (value: number): number => Math.min(Math.max(value, 0), 1);
 
-type BarStage = 'idle' | 'count3' | 'count2' | 'count1' | 'brake';
+const ratio = (value: number): string => `${unit(value) * 100}%`;
 
-/** What the bar is saying, as one name: each change of it is a change of state. */
-const barStageOf = (frame: BrakeCueFrame): BarStage => {
-  if (frame.mode === 'brake') {
-    return 'brake';
-  }
-
-  if (frame.mode !== 'countdown') {
-    return 'idle';
-  }
-
-  if (frame.beat >= 3) {
-    return 'count3';
-  }
-
-  return frame.beat === 2 ? 'count2' : 'count1';
-};
-
-const BAR_STAGE_CLASS: Record<BarStage, string> = {
-  idle: styles.barIdle,
-  count3: styles.barCount3,
-  count2: styles.barCount2,
-  count1: styles.barCount1,
-  brake: styles.barBrake,
+const PLATE_STAGE_CLASS: Record<PlateStage, string> = {
+  idle: styles.plateIdle,
+  count3: styles.plateCount,
+  count2: styles.plateCount,
+  count1: styles.plateCount,
+  brake: styles.plateBrake,
 };
 
 const MESSAGE_KEYS: Partial<Record<BrakeCueFrame['mode'], string>> = {
@@ -59,6 +43,10 @@ const MESSAGE_KEYS: Partial<Record<BrakeCueFrame['mode'], string>> = {
 /**
  * The brake-point countdown (ADR-0014). The state machine runs on the
  * telemetry thread; this only draws the frame it last sent.
+ *
+ * One plate, read out of the corner of the eye: a figure in the middle, a red
+ * line running round its edge as the brake point comes up, and the whole
+ * plate red on BRAKE. Everything else is an optional row above or below it.
  */
 export const BrakePointWidget = observer(() => {
   const { t } = useTranslation('widgets');
@@ -81,60 +69,80 @@ export const BrakePointWidget = observer(() => {
   const verdict = frame.verdict;
   const target = frame.target ?? 0;
   const gaugeValue = frame.peak ?? frame.live;
-  const stage = barStageOf(frame);
+  const stage = plateStageOf(frame);
+  const showHeader = settings.showPips || settings.showTarget;
+  // By metres the figure changes with every reading, so only the step into the
+  // count and into BRAKE is an arrival; by counts each count is one.
+  const arrivalKey =
+    settings.layout === 'meters' && stage !== 'brake' && stage !== 'idle'
+      ? 'count'
+      : stage;
 
   return (
     <WidgetPanel direction="column" className={styles.root}>
-      <div className={styles.header}>
-        <span className={styles.zone}>
-          {t('settingsPanels.brakePoint.zone')}{' '}
-          <span className={styles.zoneValue}>
-            <FixedDigits text={`${frame.zoneNo}/${frame.zoneCount}`} />
+      {showHeader ? (
+        <div className={styles.header}>
+          <span className={styles.zone}>
+            {t('settingsPanels.brakePoint.zone')}{' '}
+            <span className={styles.zoneValue}>
+              <FixedDigits text={`${frame.zoneNo}/${frame.zoneCount}`} />
+            </span>
           </span>
-        </span>
 
-        {settings.showPips ? (
-          <div className={styles.pips}>
-            {frame.pips.map((pip, index) => (
-              <span
-                key={index}
-                className={[
-                  styles.pip,
-                  pip.grade ? toneClass(GRADE_TONE[pip.grade]) : '',
-                  pip.stale ? styles.pipStale : '',
-                  pip.current ? styles.pipCurrent : '',
-                ].join(' ')}
-              />
-            ))}
-          </div>
-        ) : null}
+          {settings.showPips ? (
+            <div className={styles.pips}>
+              {frame.pips.map((pip, index) => (
+                <span
+                  key={index}
+                  className={[
+                    styles.pip,
+                    pip.grade ? toneClass(GRADE_TONE[pip.grade]) : '',
+                    pip.stale ? styles.pipStale : '',
+                    pip.current ? styles.pipCurrent : '',
+                  ].join(' ')}
+                />
+              ))}
+            </div>
+          ) : null}
 
-        {settings.showTarget ? (
-          <span className={styles.targetValue}>
-            {t('settingsPanels.brakePoint.target')}{' '}
-            <FixedDigits text={percent(frame.target)} />%
-          </span>
-        ) : null}
-      </div>
+          {settings.showTarget ? (
+            <span className={styles.targetValue}>
+              {t('settingsPanels.brakePoint.target')}{' '}
+              <FixedDigits text={percent(frame.target)} />%
+            </span>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className={styles.body}>
         <div
-          className={`${styles.bar} ${BAR_STAGE_CLASS[stage]} ${settings.smoothMotion ? styles.barSmooth : ''}`}
+          className={`${styles.plate} ${PLATE_STAGE_CLASS[stage]} ${settings.smoothMotion ? styles.plateSmooth : ''}`}
         >
-          <div className={styles.join} style={{ width: ratio(frame.join) }} />
-          <div className={styles.fill} style={{ width: ratio(frame.fill) }} />
-          <div className={styles.thirds} />
+          {/* The count's progress, drawn round the plate's own edge: the line
+              starts at the top left corner and has gone all the way round by
+              the brake point. Its length moves with the telemetry. */}
+          <svg className={styles.contour} aria-hidden="true">
+            <rect
+              className={styles.contourJoin}
+              pathLength={1}
+              style={{ strokeDasharray: `${unit(frame.join)} 1` }}
+            />
+            <rect
+              className={styles.contourLine}
+              pathLength={1}
+              style={{ strokeDasharray: `${unit(frame.fill)} 1` }}
+            />
+          </svg>
 
           {/* Keyed by what it reads, so each count and BRAKE itself is a new
-              element: its arrival runs once, on that change of state, and the
-              bar under it moves without any motion of its own (ADR-0009). */}
-          <div key={stage} className={styles.label}>
-            <FixedDigits text={barLabel(frame)} />
+              element: its arrival runs once, on that change of state. */}
+          <div key={arrivalKey} className={styles.label}>
+            <FixedDigits text={plateLabel(frame, settings.layout)} />
           </div>
 
           {stage === 'brake' ? <div className={styles.strike} /> : null}
 
-          {/* The grade takes the whole bar for a moment, word and colour
+          {/* The grade takes the whole plate for a moment, word and colour
               together, and fades as one at the rate the backend sets. */}
           {frame.flash ? (
             <div

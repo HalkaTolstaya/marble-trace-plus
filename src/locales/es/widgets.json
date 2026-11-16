@@ -1032,6 +1032,11 @@
       "hideDriverLinesDesc": "Muestra solo al ingeniero. Lo que dijiste y el ✓ o ✗ de un comando no aparecen."
     },
     "brakePoint": {
+      "layoutBlock": "Diseño",
+      "layout": "Lectura",
+      "layoutDesc": "Lo que muestra la placa al acercarse: la cuenta 3-2-1 o los metros que faltan hasta el punto de frenada.",
+      "layout_countdown": "Cuenta atrás",
+      "layout_meters": "Metros",
       "countdown": "Cuenta atrás",
       "grading": "Calificación",
       "display": "Visualización",

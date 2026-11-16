@@ -15,6 +15,11 @@ export const BrakePointSettingsPanel = observer(() => {
 
   return (
     <>
+      <Card title={t('settingsPanels.brakePoint.layoutBlock')} defaultOpen>
+        <Row setting="layout" />
+        <Row setting="smoothMotion" />
+      </Card>
+
       <Card title={t('settingsPanels.brakePoint.countdown')}>
         <Row setting="countdownSeconds" />
         <Row setting="reactionSeconds" />
@@ -37,10 +42,6 @@ export const BrakePointSettingsPanel = observer(() => {
 
         <div className={styles.fieldGroup}>
           <Row setting="showPips" />
-        </div>
-
-        <div className={styles.fieldGroup}>
-          <Row setting="smoothMotion" />
         </div>
       </Card>
     </>

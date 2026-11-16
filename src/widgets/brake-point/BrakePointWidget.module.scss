@@ -1,14 +1,17 @@
-// The bar is read out of the corner of the eye, so each step says itself three
-// ways at once: how far it has filled, what colour it is — yellow, amber,
-// orange, then solid red on BRAKE — and the figure on it. After the brake goes
-// on it takes the grade's colour and word for a moment (the flash), then the
-// timing row keeps the verdict.
+// One plate, read out of the corner of the eye. While the brake point comes
+// up it is dark glass with a figure on it and a red line running round its
+// edge; on BRAKE the whole plate is red; after the brake goes on it takes the
+// grade's colour and word for a moment. The rows above and below are optional
+// and off by default.
+$plate-corner: 8;
+$contour-width: 3px;
+
 .root {
   width: 100%;
   height: 100%;
   font-family: $font-widget;
-  padding: sp(xs) sp(sm);
-  gap: sp(xs);
+  padding: sp(xxs);
+  gap: sp(xxs);
   color: $widget-text-primary;
 }
 
@@ -17,6 +20,7 @@
   align-items: center;
   justify-content: space-between;
   gap: sp(sm);
+  padding: sp(xxxs) sp(xs) 0;
   font-size: fs(xxs);
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -63,115 +67,58 @@
   flex: 1 1 auto;
   min-height: 0;
   display: flex;
-  gap: sp(sm);
+  gap: sp(xs);
   align-items: stretch;
 }
 
-.bar {
-  --cue-tone: #{$widget-text-muted};
-  --cue-cap: #{$widget-text-secondary};
-
+.plate {
   position: relative;
   flex: 1 1 auto;
   min-width: 0;
-  border-radius: radius(lg);
+  border-radius: ws($plate-corner);
   background: $widget-surface-well;
-  box-shadow: $widget-well-bevel;
   overflow: hidden;
 }
 
-.barCount3 {
-  --cue-tone: #{$race-yellow};
-  --cue-cap: #{$brake-cue-cap-early};
-}
-
-.barCount2 {
-  --cue-tone: #{$race-amber};
-  --cue-cap: #{$brake-cue-cap-mid};
-}
-
-.barCount1 {
-  --cue-tone: #{$race-orange};
-  --cue-cap: #{$brake-cue-cap-late};
-}
-
-.barBrake {
-  --cue-tone: #{$race-red};
-  --cue-cap: #{$widget-cap-danger};
-}
-
-// Thin behind, dense at its leading edge, with a lit cap on it: the eye lands
-// on where the count has got to. The width moves with the telemetry and is set
-// without a transition.
-.fill {
+// The contour is an svg the size of the plate; its two rectangles take their
+// geometry from here, so the corners stay round at any size of the widget.
+.contour {
   position: absolute;
-  inset: 0 auto 0 0;
-  background: linear-gradient(
-    to right,
-    color-mix(in srgb, var(--cue-tone) 30%, transparent),
-    color-mix(in srgb, var(--cue-tone) 78%, transparent)
-  );
-  box-shadow: inset ws(-3) 0 0 var(--cue-cap);
-}
-
-.join {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background: repeating-linear-gradient(
-    135deg,
-    $widget-border-subtle 0 ws(4),
-    transparent ws(4) ws(8)
-  );
-}
-
-// Smooth motion (the user's setting, ADR-0017): the fill flows to each new
-// value instead of stepping to it. Linear, and about as long as the gap
-// between two frames of the cue, so it neither lags the count nor eases into
-// every one of them. Back onto the idle bar it does not flow: an emptying bar
-// would read as a count running backwards.
-.barSmooth:not(.barIdle) .fill,
-.barSmooth:not(.barIdle) .join {
-  transition: width $smooth-motion-step linear;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .barSmooth:not(.barIdle) .fill,
-  .barSmooth:not(.barIdle) .join {
-    transition: none;
-  }
-}
-
-// The three counts, ruled on the bar.
-.thirds {
-  position: absolute;
-  inset: 22% 0;
-  background: linear-gradient(
-    to right,
-    transparent calc(100% / 3 - 0.5px),
-    $widget-border-default calc(100% / 3 - 0.5px) calc(100% / 3 + 0.5px),
-    transparent calc(100% / 3 + 0.5px) calc(200% / 3 - 0.5px),
-    $widget-border-default calc(200% / 3 - 0.5px) calc(200% / 3 + 0.5px),
-    transparent calc(200% / 3 + 0.5px)
-  );
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 
-// BRAKE is the one solid thing the widget ever shows: the whole bar in red,
-// lit from the top like a plate, with nothing ruled on it.
-.barBrake .fill {
-  background: linear-gradient(
-    to bottom,
-    $widget-cap-danger,
-    $race-red 38%,
-    $brake-cue-floor
-  );
-  box-shadow:
-    inset 0 1px 0 $widget-led-sheen,
-    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+.contourJoin,
+.contourLine {
+  x: calc(#{$contour-width} / 2);
+  y: calc(#{$contour-width} / 2);
+  width: calc(100% - #{$contour-width});
+  height: calc(100% - #{$contour-width});
+  rx: calc(#{ws($plate-corner)} - #{$contour-width} / 2);
+  fill: none;
+  stroke-width: $contour-width;
+  stroke-linecap: butt;
 }
 
-.barBrake .thirds {
-  display: none;
+// How far the zones behind this one reach, under the count's own line.
+.contourJoin {
+  stroke: $widget-border-default;
+}
+
+.contourLine {
+  stroke: $race-red;
+}
+
+// Smooth motion (the user's setting, ADR-0017): the line runs on to each new
+// value instead of stepping to it. Linear, and about as long as the gap
+// between two frames of the cue, so it neither lags the count nor eases into
+// every one of them. Back onto the idle plate it does not run: a line
+// shortening would read as a count going backwards.
+.plateSmooth:not(.plateIdle) .contourLine,
+.plateSmooth:not(.plateIdle) .contourJoin {
+  transition: stroke-dasharray $smooth-motion-step linear;
 }
 
 .label {
@@ -180,28 +127,49 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: wfs(40);
+  font-size: wfs(44);
   font-weight: 800;
-  letter-spacing: 0.01em;
   line-height: 1;
-  // A dark edge under the figure, so it holds where the fill's cap passes
-  // behind it.
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
   animation: cueArrive 0.22s $ease-spring both;
 }
 
-.barIdle .label {
+// Between zones the plate only says how far the next one is.
+.plateIdle .label {
   font-size: fs(xl);
   color: $widget-text-secondary;
   animation: none;
 }
 
-.barBrake .label {
+.plateIdle .contourLine,
+.plateIdle .contourJoin {
+  stroke: transparent;
+}
+
+// BRAKE is the one solid thing the widget ever shows: the whole plate in red,
+// lit from the top, with nothing else on it.
+.plateBrake {
+  background: linear-gradient(
+    to bottom,
+    $brake-cue-crest,
+    $race-red 42%,
+    $brake-cue-floor
+  );
+  box-shadow:
+    inset 0 1px 0 $widget-led-sheen,
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.plateBrake .contour {
+  display: none;
+}
+
+.plateBrake .label {
   font-size: wfs(34);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.16em;
   // The tracking adds its width after the last letter; this hands it back so
-  // the word sits on the bar's centre.
-  padding-left: 0.12em;
+  // the word sits on the plate's centre.
+  padding-left: 0.16em;
   animation: cueStrike 0.28s $ease-spring both;
 }
 
@@ -230,8 +198,8 @@
   }
 }
 
-// The moment BRAKE comes up the bar is struck with light once, and it is gone
-// within a third of a second — one composited fade, not a blink.
+// The moment BRAKE comes up the plate is struck with light once, and it is
+// gone within a third of a second — one composited fade, not a blink.
 .strike {
   position: absolute;
   inset: 0;
@@ -263,7 +231,7 @@
 }
 
 .flashLabel {
-  font-size: wfs(26);
+  font-size: wfs(28);
   font-weight: 800;
   letter-spacing: 0.08em;
   line-height: 1;
@@ -275,15 +243,20 @@
 
 @media (prefers-reduced-motion: reduce) {
   .label,
-  .barBrake .label,
+  .plateBrake .label,
   .flashLabel,
   .strike {
     animation: none;
   }
+
+  .plateSmooth:not(.plateIdle) .contourLine,
+  .plateSmooth:not(.plateIdle) .contourJoin {
+    transition: none;
+  }
 }
 
 .target {
-  flex: 0 0 ws(22);
+  flex: 0 0 ws(20);
   position: relative;
   border-radius: radius(md);
   background: $widget-surface-well;
@@ -320,10 +293,11 @@
   display: flex;
   align-items: baseline;
   gap: sp(sm);
-  font-size: fs(sm);
+  padding: 0 sp(xs) sp(xxxs);
+  font-size: fs(xs);
   font-weight: 700;
   line-height: 1;
-  min-height: fs(sm);
+  min-height: fs(xs);
   white-space: nowrap;
 }
 

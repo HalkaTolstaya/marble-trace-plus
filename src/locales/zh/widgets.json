@@ -1032,6 +1032,11 @@
       "hideDriverLinesDesc": "只显示工程师。你说的话和指令的 ✓ / ✗ 不再显示。"
     },
     "brakePoint": {
+      "layoutBlock": "布局",
+      "layout": "读数",
+      "layoutDesc": "接近时面板显示的内容：3-2-1 倒计时，或距刹车点的米数。",
+      "layout_countdown": "倒计时",
+      "layout_meters": "米",
       "countdown": "倒数",
       "grading": "评分",
       "display": "显示",

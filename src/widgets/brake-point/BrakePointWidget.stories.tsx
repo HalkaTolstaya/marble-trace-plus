@@ -14,6 +14,7 @@ interface StoryArgs {
   showTiming?: boolean;
   showTarget?: boolean;
   showPips?: boolean;
+  layout?: 'countdown' | 'meters';
 }
 
 const PIPS: BrakeCueFrame['pips'] = [
@@ -92,7 +93,7 @@ const meta: Meta<StoryArgs> = {
   title: 'Widgets/BrakePointWidget',
   ...defineWidgetStories<StoryArgs>({
     widget: BrakePointWidget,
-    size: { width: 340, height: 120 },
+    size: { width: 340, height: 84 },
     seed: (store, args) => {
       store.widgetInstances.seed<BrakePointWidgetStore>(
         'brake-point',
@@ -137,5 +138,20 @@ export const GradedPerfect: Story = {
 };
 
 export const GradedLate: Story = { args: { scene: 'graded', grade: 'late' } };
+
+/** By metres: the plate counts the distance down instead of 3-2-1. */
+export const Meters: Story = { args: { layout: 'meters' } };
+
+/** Every optional row on: zone pips, the target pressure, the timing row. */
+export const WithDetails: Story = {
+  args: {
+    scene: 'graded',
+    grade: 'late',
+    showPips: true,
+    showTarget: true,
+    showTiming: true,
+  },
+  parameters: { widgetFrame: { height: 130 } },
+};
 
 export const NoReference: Story = { args: { scene: 'noReference' } };
