@@ -17,6 +17,8 @@ import type { WeatherWidgetSettings } from '../settings-schema';
 const VIEWBOX_RADIUS = 94;
 const VIEWBOX_SIZE = VIEWBOX_RADIUS * 2;
 const ARROW_SCALE = 0.88;
+/** The ring's own radius in RingGeometry: the ground fills the dial to it. */
+const DIAL_RADIUS = 82;
 
 // The dial is drawn smaller in the horizontal layout, where it shares the row
 // with the conditions, so its cardinal letters are set in larger user units to
@@ -30,7 +32,7 @@ interface WindCompassProps {
 
 export const WindCompass = observer(
   ({ horizontal = false }: WindCompassProps) => {
-    const { showCompass, showCompassRing } =
+    const { showCompass, showCompassRing, smoothMotion } =
       useWidgetSettings<WeatherWidgetSettings>('weather');
 
     if (!showCompass) {
@@ -46,9 +48,16 @@ export const WindCompass = observer(
             viewBox={`${-VIEWBOX_RADIUS} ${-VIEWBOX_RADIUS} ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`}
             className={styles.compassSvg}
           >
+            {/* The dial's ground: a disc sunk into the panel. It is round, so
+                it stands still while the ring over it turns. */}
             {showCompassRing && (
-              <RotatingRing>
+              <circle r={DIAL_RADIUS} className={styles.dialGround} />
+            )}
+
+            {showCompassRing && (
+              <RotatingRing smooth={smoothMotion}>
                 <RingGeometry
+                  smooth={smoothMotion}
                   cardinalUnits={
                     horizontal ? CARDINAL_UNITS_HORIZONTAL : CARDINAL_UNITS_TALL
                   }
@@ -57,7 +66,7 @@ export const WindCompass = observer(
             )}
 
             <g transform={`scale(${ARROW_SCALE})`}>
-              <WindArrow />
+              <WindArrow smooth={smoothMotion} />
             </g>
 
             <g pointerEvents="none">
@@ -66,7 +75,7 @@ export const WindCompass = observer(
                 y="-40"
                 width="80"
                 height="80"
-                style={{ color: 'rgba(255,255,255,0.88)' }}
+                className={styles.car}
               />
             </g>
           </svg>

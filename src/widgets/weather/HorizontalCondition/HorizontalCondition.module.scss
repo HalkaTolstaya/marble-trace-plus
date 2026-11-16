@@ -26,7 +26,7 @@
 .skiesText {
   font-family: $font-widget;
   font-size: fs(xl);
-  font-weight: 600;
+  font-weight: 800;
   line-height: 1;
   color: $widget-text-primary;
   white-space: nowrap;
@@ -39,7 +39,7 @@
   // Off the type scale on purpose: the mockup sets the reading at 8.3% of the
   // widget's width, which lands between the xxxl step and the next one.
   font-size: wfs(40);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
   color: $widget-text-primary;
   white-space: nowrap;
@@ -47,7 +47,7 @@
 
 .airTempUnit {
   font-size: fs(xl);
-  font-weight: 600;
+  font-weight: 700;
   margin-left: 1px;
-  color: $widget-text-muted;
+  color: $widget-text-secondary;
 }

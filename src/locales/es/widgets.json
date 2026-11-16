@@ -102,6 +102,8 @@
   },
   "settingsPanels": {
     "common": {
+      "smoothMotion": "Animación suave",
+      "smoothMotionDesc": "Las partes móviles se desplazan con suavidad entre las actualizaciones de telemetría en lugar de saltar. Se desactiva si Windows pide reducir el movimiento.",
       "lapCounter": "Contador de Vueltas",
       "lapCounterDesc": "Sesión cuenta la vuelta de la carrera, la del líder. Propia cuenta la vuelta en la que estás, que es menor si te han doblado.",
       "lapCounter_session": "Sesión",

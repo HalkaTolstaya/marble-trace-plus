@@ -15,6 +15,7 @@ export const WeatherSettingsPanel = observer(() => {
   return (
     <Card title={t('settingsPanels.weather.moduleParameters')}>
       <Row setting="horizontal" />
+      <Row setting="smoothMotion" />
       <Row setting="showCompass" />
       <Row setting="showCompassRing" dependsOn="showCompass" />
       <Row setting="showAirTemp" />

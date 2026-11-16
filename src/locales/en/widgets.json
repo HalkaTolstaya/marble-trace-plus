@@ -102,6 +102,8 @@
   },
   "settingsPanels": {
     "common": {
+      "smoothMotion": "Smooth animation",
+      "smoothMotionDesc": "Eases the moving parts between telemetry updates instead of stepping them. Off when Windows asks for reduced motion.",
       "lapCounter": "Lap Counter",
       "lapCounterDesc": "Session counts the race's own lap, the leader's. Own counts the lap you are on, which reads lower once you are lapped.",
       "lapCounter_session": "Session",

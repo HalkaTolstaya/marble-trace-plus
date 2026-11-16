@@ -16,6 +16,12 @@ export const WEATHER_SETTINGS = defineSettings('weather', {
   showWindBearing: bool(true),
   /** Wide layout: compass and conditions on one row, stats and forecast below. */
   horizontal: bool(false),
+  /**
+   * Eases the moving parts between telemetry ticks instead of stepping them —
+   * the user's own exception to the one-clock rule (ADR-0017). Off under
+   * reduced motion whatever this says.
+   */
+  smoothMotion: bool(true, { label: 'common.smoothMotion' }),
 });
 
 export type WeatherWidgetSettings = SettingsOf<typeof WEATHER_SETTINGS.shape>;

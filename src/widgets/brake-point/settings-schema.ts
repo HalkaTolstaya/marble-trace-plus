@@ -22,6 +22,12 @@ export const BRAKE_POINT_SETTINGS = defineSettings('brakePoint', {
   showTarget: bool(true),
   /** One pip per counted zone, this lap's grade. */
   showPips: bool(true),
+  /**
+   * Eases the moving parts between telemetry ticks instead of stepping them —
+   * the user's own exception to the one-clock rule (ADR-0017). Off under
+   * reduced motion whatever this says.
+   */
+  smoothMotion: bool(true, { label: 'common.smoothMotion' }),
 });
 
 export type BrakePointSettings = SettingsOf<typeof BRAKE_POINT_SETTINGS.shape>;

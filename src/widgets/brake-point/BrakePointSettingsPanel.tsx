@@ -38,6 +38,10 @@ export const BrakePointSettingsPanel = observer(() => {
         <div className={styles.fieldGroup}>
           <Row setting="showPips" />
         </div>
+
+        <div className={styles.fieldGroup}>
+          <Row setting="smoothMotion" />
+        </div>
       </Card>
     </>
   );

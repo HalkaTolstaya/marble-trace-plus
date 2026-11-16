@@ -124,6 +124,23 @@
   );
 }
 
+// Smooth motion (the user's setting, ADR-0017): the fill flows to each new
+// value instead of stepping to it. Linear, and about as long as the gap
+// between two frames of the cue, so it neither lags the count nor eases into
+// every one of them. Back onto the idle bar it does not flow: an emptying bar
+// would read as a count running backwards.
+.barSmooth:not(.barIdle) .fill,
+.barSmooth:not(.barIdle) .join {
+  transition: width $smooth-motion-step linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barSmooth:not(.barIdle) .fill,
+  .barSmooth:not(.barIdle) .join {
+    transition: none;
+  }
+}
+
 // The three counts, ruled on the bar.
 .thirds {
   position: absolute;

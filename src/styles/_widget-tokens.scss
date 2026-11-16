@@ -272,3 +272,13 @@ $brake-cue-cap-early: color-mix(in srgb, $race-yellow 45%, #ffffff);
 $brake-cue-cap-mid: color-mix(in srgb, $race-amber 45%, #ffffff);
 $brake-cue-cap-late: color-mix(in srgb, $race-orange 45%, #ffffff);
 $brake-cue-floor: #c81e1e;
+
+// The cell that is "now" in a row of wells (the forecast's current hour): the
+// info colour let into the ground and drawn round it, as a status chip is.
+$widget-tint-info: rgba($race-blue, 0.16);
+$widget-outline-info: rgba($race-blue, 0.7);
+
+// Smooth motion (ADR-0017): how long a value on the driver's primary telemetry
+// takes to reach its next reading — a little over one overlay tick at 30 Hz,
+// so consecutive readings join into one movement without trailing behind.
+$smooth-motion-step: 0.1s;

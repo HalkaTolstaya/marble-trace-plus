@@ -118,7 +118,9 @@ export const BrakePointWidget = observer(() => {
       </div>
 
       <div className={styles.body}>
-        <div className={`${styles.bar} ${BAR_STAGE_CLASS[stage]}`}>
+        <div
+          className={`${styles.bar} ${BAR_STAGE_CLASS[stage]} ${settings.smoothMotion ? styles.barSmooth : ''}`}
+        >
           <div className={styles.join} style={{ width: ratio(frame.join) }} />
           <div className={styles.fill} style={{ width: ratio(frame.fill) }} />
           <div className={styles.thirds} />
