@@ -169,8 +169,10 @@ $speed-limit-seam: $pit-readout-seam;
 .unit {
   margin: auto 0 0;
   text-align: center;
-  font-size: fs(xxs);
-  letter-spacing: 0.08em;
+  // "KM/H" across a narrow column, the speed bar's width.
+  font-size: wfs(8);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
   color: $widget-label;
   font-weight: 600;
   opacity: 0.85;

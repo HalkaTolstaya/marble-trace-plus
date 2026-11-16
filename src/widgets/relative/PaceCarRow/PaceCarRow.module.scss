@@ -82,7 +82,7 @@
 
 .carNumber {
   font-size: fs(xs);
-  font-family: $font-mono;
+  font-family: $font-table;
   color: $widget-text-primary;
 }
 
@@ -121,7 +121,7 @@
 }
 
 .gap {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-weight: 900;
   font-size: fs(md);
   text-align: right;

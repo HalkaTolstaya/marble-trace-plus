@@ -8,6 +8,7 @@ import {
   rangeRingRadii,
 } from '@entities/radar/radar-scope-utils';
 import { scopeRangeMeters } from '@entities/radar/radar-constants';
+import { CheckBox } from '@features/widget-settings/blocks/SettingsBlocks';
 import { distanceUnit, formatDistance } from '@shared/lib/telemetry-format';
 import { useUnitsStore } from '@entities/app-settings/units-context';
 import styles from '@features/widget-settings/WidgetSettings.module.scss';
@@ -107,6 +108,14 @@ const ScopeCard = observer(() => {
             <ScopeReadout settings={settings} />
           </Col>
         </GridRow>
+
+        <div className={styles.fieldGroup}>
+          <CheckBox
+            label={t('settingsPanels.common.smoothMotion')}
+            checked={settings.smoothMotion}
+            onChange={(checked) => update({ smoothMotion: checked })}
+          />
+        </div>
 
         <div className={styles.fieldGroup}>
           <Row setting="showAxes" />

@@ -2,9 +2,9 @@
 import type { CSSProperties } from 'react';
 import { observer } from 'mobx-react-lite';
 import { formatLapTime } from '@shared/lib/telemetry-format';
+import { formatAverageLap } from '@entities/cars/lap-pace';
 import {
   abbreviateName,
-  formatBrand,
   formatCarNumber,
   TRACK_SURFACE_IN_PIT_STALL,
   TRACK_SURFACE_OFF_TRACK,
@@ -16,7 +16,8 @@ import { RadioMark } from '@entities/cars/RadioMark/RadioMark';
 import { getContrastTextColor, playerRowStyle } from '@shared/lib/colors';
 import { CountryFlag } from '@shared/ui/CountryFlag/CountryFlag';
 import { DriverFlagBadge } from '@shared/ui/DriverFlagBadge/DriverFlagBadge';
-import { LicBadge } from '@shared/ui/RatingBadge/LicBadge';
+import { RatingPill } from '@shared/ui/RatingPill/RatingPill';
+import { BrandMark } from '@shared/ui/BrandMark/BrandMark';
 import { formatIr } from '@shared/ui/RatingBadge/LicBadge.utils';
 import { TireBadge } from '@shared/ui/TireBadge/TireBadge';
 import {
@@ -27,6 +28,7 @@ import {
 } from '@widgets/standings/standings-utils';
 import { PosChange } from './PosChange';
 import { PositionCell } from './PositionCell';
+import { PitPill } from './PitPill';
 import { IrChangeCell } from './IrChangeCell';
 
 import styles from './DriverRow.module.scss';
@@ -87,7 +89,8 @@ export const DriverRow = observer(
           liveLeader,
           isRaceSession,
           leads,
-          calculateLapsBehind(liveLeader, liveDriver)
+          calculateLapsBehind(liveLeader, liveDriver),
+          { decimals: settings.gapDecimals, signed: true }
         );
 
         scheduleWrite(() => {
@@ -96,6 +99,42 @@ export const DriverRow = observer(
           element.classList.toggle(styles.gapLeader, isMuted);
           element.classList.toggle(styles.gapValue, !isMuted);
           element.textContent = gapInfo.value;
+        });
+      },
+      [computed, standingsWidget, session, settings, carIdx]
+    );
+
+    // Interval: the same measure as the gap, against the car ahead in the
+    // class instead of its leader. A class leader has nothing ahead.
+    const intervalRef = useReactiveDomWrite<HTMLSpanElement>(
+      (element, scheduleWrite) => {
+        const liveDriver = computed.driverEntryOf(carIdx);
+        const aheadIdx = standingsWidget.carAheadInClass.get(carIdx);
+        const liveAhead =
+          aheadIdx === undefined ? null : computed.driverEntryOf(aheadIdx);
+
+        if (!liveDriver) {
+          return;
+        }
+
+        const sessions = session.sessionInfo?.sessions;
+        const isRaceSession =
+          sessions?.[session.sessionInfo?.currentSessionNum ?? 0]
+            ?.sessionType === 'Race';
+
+        const intervalInfo = liveAhead
+          ? getStandingsGap(
+              liveDriver,
+              liveAhead,
+              isRaceSession,
+              false,
+              calculateLapsBehind(liveAhead, liveDriver),
+              { decimals: settings.gapDecimals, signed: true }
+            )
+          : null;
+
+        scheduleWrite(() => {
+          element.textContent = intervalInfo?.value ?? '';
         });
       },
       [computed, standingsWidget, session, settings, carIdx]
@@ -130,7 +169,6 @@ export const DriverRow = observer(
 
     // The tow truck has the car: it left the world without going through the pit
     // lane, which OUT alone would not tell apart from a garage exit.
-    const isTowed = driver.isTowed && !isFinished;
 
     const isOffTrack = driver.trackSurface === TRACK_SURFACE_OFF_TRACK;
 
@@ -171,6 +209,16 @@ export const DriverRow = observer(
 
     const bestLap = resolveBestLapDisplay(driver);
 
+    // Within the player's class: a car ahead reads its interval in red, one
+    // behind in green; every other car keeps the plain colour.
+    const playerSide = standingsWidget.sideOfPlayer.get(carIdx);
+    const intervalSideClass =
+      playerSide === 'ahead'
+        ? styles.intervalAhead
+        : playerSide === 'behind'
+          ? styles.intervalBehind
+          : '';
+
     // One switch mutes every informational column at once, so the row's accent
     // is left to the position, the name and the best lap.
     const dimClass = settings.dimSecondaryColumns ? styles.cellDimmed : '';
@@ -184,27 +232,35 @@ export const DriverRow = observer(
       >
         <PositionCell carIdx={carIdx} />
 
-        <div className={`${styles.cell} ${styles.carNumberCell}`}>
-          <span
-            className={styles.carNumber}
-            style={{
-              backgroundColor: driver.carClassColor,
-              color: getContrastTextColor(driver.carClassColor),
-            }}
-          >
-            {formattedCarNumber}
-          </span>
-        </div>
-
         {settings.showPosChange && (
           <div className={`${styles.cell} ${styles.cellCenter}`}>
             <PosChange carIdx={carIdx} />
           </div>
         )}
 
+        {settings.showCarNumber && (
+          <div className={`${styles.cell} ${styles.carNumberCell}`}>
+            <span
+              className={styles.carNumber}
+              style={{
+                backgroundColor: driver.carClassColor,
+                color: getContrastTextColor(driver.carClassColor),
+              }}
+            >
+              {formattedCarNumber}
+            </span>
+          </div>
+        )}
+
         {settings.showCountryFlag && (
           <div className={`${styles.cell} ${styles.cellCenter}`}>
             <CountryFlag flairId={driver.flairId} isAi={driver.isAi} />
+          </div>
+        )}
+
+        {settings.showBrand && (
+          <div className={`${styles.cell} ${styles.cellCenter}`}>
+            <BrandMark carScreenName={driver.carScreenName} />
           </div>
         )}
 
@@ -230,27 +286,36 @@ export const DriverRow = observer(
 
           <DriverStatusBadges
             flagType={flagType}
-            isTowed={isTowed}
             isOut={isOut}
             isOffTrack={isOffTrack}
             isPit={isPit}
             pitState={pitState}
             isFinished={isFinished}
-            showPit={settings.showPitIndicator}
+            // Pit road and tows go in the pill beside the row instead.
+            showPit={false}
+            isTowed={false}
           />
         </div>
 
         {settings.showLicBadge && (
-          <div className={`${styles.cell} ${styles.cellRating}`}>
-            <LicBadge
+          <div className={`${styles.cell} ${styles.cellCenter}`}>
+            <RatingPill
               licString={driver.licString}
+              iRating={driver.iRating}
+              irDelta={
+                settings.useLivePositions
+                  ? driver.estimatedIrDeltaLive
+                  : driver.estimatedIrDeltaOfficial
+              }
               showLetter={settings.showLicenseLetter}
-              badgeStyle={settings.licBadgeStyle}
+              showIRating={settings.showIRating}
+              showDelta={settings.showIrChange}
+              abbreviate={settings.abbreviateIRating}
             />
           </div>
         )}
 
-        {settings.showIRating && (
+        {settings.showIRating && !settings.showLicBadge && (
           <div className={`${styles.cell} ${styles.cellRight}`}>
             <span className={`${styles.irValue} ${dimClass}`}>
               {formatIr(driver.iRating, settings.abbreviateIRating)}
@@ -258,7 +323,7 @@ export const DriverRow = observer(
           </div>
         )}
 
-        {settings.showIrChange && (
+        {settings.showIrChange && !settings.showLicBadge && (
           <div className={`${styles.cell} ${styles.cellCenter}`}>
             <IrChangeCell carIdx={carIdx} />
           </div>
@@ -278,11 +343,12 @@ export const DriverRow = observer(
           </div>
         )}
 
-        {settings.showLastLap && (
+        {settings.showInterval && (
           <div className={`${styles.cell} ${styles.cellRight}`}>
-            <span className={`${styles.lastLap} ${dimClass}`}>
-              {isPit ? '-' : formatLapTime(driver.lastLapTime)}
-            </span>
+            <span
+              ref={intervalRef}
+              className={`${styles.interval} ${intervalSideClass}`}
+            />
           </div>
         )}
 
@@ -291,18 +357,36 @@ export const DriverRow = observer(
             <span
               className={`${styles.bestLap} ${isClassBestLap ? styles.bestLapFastest : ''} ${bestLap.isQualifying ? styles.bestLapQualifying : ''}`}
             >
-              {formatLapTime(bestLap.time)}
+              {formatLapTime(bestLap.time, settings.lapTimeDecimals)}
             </span>
           </div>
         )}
 
-        {settings.showBrand && (
+        {settings.showLastLap && (
+          <div className={`${styles.cell} ${styles.cellRight}`}>
+            <span className={`${styles.lastLap} ${dimClass}`}>
+              {isPit
+                ? '-'
+                : formatLapTime(driver.lastLapTime, settings.lapTimeDecimals)}
+            </span>
+          </div>
+        )}
+
+        {settings.showAvgLap && (
+          <div className={`${styles.cell} ${styles.cellRight}`}>
+            <span className={`${styles.lastLap} ${dimClass}`}>
+              {formatAverageLap(
+                standingsWidget.lapPace.averageLap(carIdx, settings.avgLapMode),
+                settings.lapTimeDecimals
+              )}
+            </span>
+          </div>
+        )}
+
+        {settings.showStintLaps && (
           <div className={`${styles.cell} ${styles.cellCenter}`}>
-            <span
-              className={`${styles.brandLabel} ${dimClass}`}
-              title={driver.carScreenName}
-            >
-              {formatBrand(driver.carScreenName)}
+            <span className={`${styles.lapsCompleted} ${dimClass}`}>
+              {standingsWidget.lapPace.stintLaps(carIdx, driver.lap)}
             </span>
           </div>
         )}
@@ -312,6 +396,7 @@ export const DriverRow = observer(
             <TireBadge tire={driver.tireCompound} />
           </div>
         )}
+        {settings.showPitIndicator && <PitPill carIdx={carIdx} />}
       </div>
     );
   }

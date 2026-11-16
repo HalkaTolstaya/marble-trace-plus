@@ -37,6 +37,7 @@ export const applyClientSnapshot = (
     Object.assign(core.appSettings.appSettings, {
       hideAllWidgets: snapshot.hideAllWidgets,
       hideWidgetsWhenGameClosed: snapshot.hideWidgetsWhenGameClosed,
+      overlayTransparency: snapshot.overlayTransparency,
       steeringLock: snapshot.steeringLock,
       carLength: snapshot.carLength,
       interactHotkeyMode: snapshot.interactHotkeyMode,

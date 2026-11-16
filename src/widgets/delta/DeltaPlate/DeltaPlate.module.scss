@@ -7,6 +7,8 @@
 // otherwise is) — a reading always occupies the same DELTA_SLOTS monospace
 // slots, so that measure is both constant and exact.
 .plate {
+  position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
   width: max-content;
@@ -15,6 +17,7 @@
   background: var(--widget-bg);
   border: 1px solid var(--widget-border);
   border-radius: 999px;
+  box-shadow: $widget-panel-bevel;
   // The side padding belongs to the plate, not to the numbers: the reset makes
   // every box border-box, so padding on a slot-sized number would eat into the
   // slots its own text reserved.
@@ -22,4 +25,33 @@
   // Callers shift the plate by its margin while its width animates; the two
   // have to move on the same clock or the number drifts mid-transition.
   transition: margin-right 140ms ease-out;
+}
+
+// The state reads before the digits do: its colour comes in from the left
+// edge and is gone by the time it reaches the number, the way a class colour
+// opens a row in Standings.
+.plate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(
+    to right,
+    var(--delta-wash, transparent),
+    transparent $widget-wash-reach
+  );
+  pointer-events: none;
+}
+
+.ahead {
+  --delta-wash: #{$widget-wash-positive};
+}
+
+.behind {
+  --delta-wash: #{$widget-wash-danger};
+}
+
+.neutral {
+  --delta-wash: transparent;
 }

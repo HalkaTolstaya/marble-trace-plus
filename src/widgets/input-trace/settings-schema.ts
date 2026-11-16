@@ -85,9 +85,33 @@ export const INPUT_TRACE_SETTINGS = defineSettings('inputTrace', {
    * live lines, at the lap distance the car was at (ADR-0014).
    */
   showReference: bool(true),
+  /** In the comparison: the reference lap's throttle trace. */
+  compareThrottle: bool(true),
+  /** In the comparison: the reference lap's brake trace. */
+  compareBrake: bool(true),
+  /**
+   * Plots the graph against lap distance instead of time: metres along the
+   * bottom, "now" standing short of the right edge, and the reference lap
+   * drawn on past it, over the stretch of track still ahead.
+   */
+  showDistance: bool(false),
+  /** Metres of track the distance axis covers, behind and ahead together. */
+  distanceWindow: num(800, { min: 200, max: 3000, step: 100 }),
+  /** The revs as a strip of lights across the top. */
+  showRevLights: bool(true),
+  /**
+   * The plot glides between telemetry ticks instead of stepping (ADR-0017):
+   * the driver's primary trace, kept fluid at the user's choice. Off returns
+   * to one change per tick.
+   */
+  smoothMotion: bool(true),
+  /** Lit rev lights bloom. */
+  revLightsGlow: bool(true),
+  /** The rev strip turns blue while the pit limiter is on. */
+  showPitLimiterLights: bool(true),
   referenceOpacity: num(0.3, { min: 0.05, max: 0.8, step: 0.05 }),
   historySeconds: num(5, { min: 1, max: 60, step: 1 }),
-  lineWidth: num(3.5, { min: 1, max: 10, step: 0.5 }),
+  lineWidth: num(2.5, { min: 1, max: 10, step: 0.5 }),
   smoothing: num(0, { min: 0, max: 20, step: 1 }),
   // The physical lock-to-lock range is app-wide (appSettings.steeringLock) —
   // it describes the wheel on the desk, not this widget. Only the display

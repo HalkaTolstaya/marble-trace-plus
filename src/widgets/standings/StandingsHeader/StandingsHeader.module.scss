@@ -2,10 +2,10 @@
   display: grid;
   align-items: center;
   column-gap: sp(xxxs);
-  padding: sp(xs) sp(md);
-  background: rgb(24, 24, 27);
-  border-bottom: 1px solid rgba(39, 39, 42, 0.5);
-  position: sticky;
-  top: 0;
-  z-index: 2;
+  padding: sp(xs) sp(md) sp(xxs);
+  font-family: $font-table;
+  font-size: fs(xxs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: $widget-text-muted;
 }

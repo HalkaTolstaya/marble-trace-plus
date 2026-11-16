@@ -17,19 +17,11 @@
   // Class marker, matching the one the standings rows and the class header
   // carry. A pseudo-element rather than a border so the grid columns keep
   // their measured width.
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--row-class-marker, transparent);
-  }
+  // The class colour lives in the position cell's fade (below).
 }
 
 .rowOdd {
-  background-color: rgba(255, 255, 255, 0.035);
+  background-color: rgba(255, 255, 255, 0.02);
 }
 
 .driverRowPlayer {
@@ -136,7 +128,7 @@
   font-size: fs(md);
   font-weight: 700;
   line-height: 1;
-  font-family: $font-mono;
+  font-family: $font-table;
   padding: sp(xxxs) sp(xxs);
   border-radius: radius(md);
   white-space: nowrap;
@@ -196,7 +188,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  font-family: $font-mono;
+  font-family: $font-table;
   font-weight: 600;
   color: $widget-text-primary;
 }
@@ -210,20 +202,137 @@
 }
 
 .f2Time {
-  font-family: $font-mono;
-  font-weight: 900;
-  font-size: fs(md);
+  font-family: $font-table;
+  font-weight: 800;
+  // The one number the table is for, a step over everything beside it.
+  font-size: fs(lg);
   text-align: right;
 }
 
 .f2Positive {
-  color: $widget-status-danger;
+  // A car behind the player: green, as the interval in Standings.
+  color: $widget-status-positive;
 }
 
 .f2Negative {
-  color: $widget-status-info;
+  // A car ahead of the player: red, the one to chase.
+  color: $widget-status-danger;
 }
 
 .f2Player {
   color: $widget-status-caution;
+}
+
+.cellCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cellRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.lapTime {
+  font-family: $font-table;
+  font-size: fs(md);
+  font-weight: 900;
+  color: $widget-text-primary;
+}
+
+.lapTimeBest {
+  color: $widget-text-best-lap;
+}
+
+.lapChip {
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: $font-table;
+  font-size: fs(sm);
+  font-weight: 700;
+  color: $widget-text-secondary;
+  background: $widget-surface-raised;
+  box-shadow: inset 0 0 0 1px $widget-border-subtle;
+}
+
+.changeUp,
+.changeDown,
+.changeNeutral {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  font-family: $font-table;
+  font-size: fs(sm);
+  font-weight: 700;
+}
+
+.changeUp {
+  color: $widget-status-positive;
+}
+
+.changeDown {
+  color: $widget-status-danger;
+}
+
+.changeNeutral {
+  color: $widget-text-muted;
+}
+
+// ── Table look (as in Standings) ───────────────────────────────────────────
+
+.driverRow {
+  font-family: $font-table;
+  font-weight: 800;
+  border-bottom: 0;
+  min-height: ws(30);
+}
+
+.posBlock {
+  justify-content: center;
+}
+
+$class-fade-reach: 92;
+
+// The class colour opens the row: densest on the card's edge, through the
+// position and gone before the driver's name. It belongs to the row, not to
+// the position cell, so its reach does not depend on that column's width.
+.driverRow {
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: -1;
+    width: ws($class-fade-reach);
+    border-bottom-left-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--row-class-marker, transparent) 70%, transparent),
+      color-mix(in srgb, var(--row-class-marker, transparent) 26%, transparent)
+        48%,
+      transparent
+    );
+    pointer-events: none;
+  }
+}
+
+.driverPosition {
+  font-size: fs(lg);
+  font-weight: 800;
+}
+
+.driverCarNumber {
+  background: none !important;
+  color: $widget-text-secondary !important;
+  font-weight: 800;
+  padding: 0;
+}
+
+.driverName {
+  font-weight: 800;
+  text-overflow: clip;
+  mask-image: linear-gradient(90deg, #000 calc(100% - #{ws(14)}), transparent);
 }

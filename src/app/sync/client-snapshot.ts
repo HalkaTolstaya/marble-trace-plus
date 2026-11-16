@@ -28,6 +28,7 @@ export const clientSnapshotFor = (
     widgets: widgetsOnMonitor(layout.widgets, monitor.name),
     hideAllWidgets: settings.hideAllWidgets,
     hideWidgetsWhenGameClosed: settings.hideWidgetsWhenGameClosed,
+    overlayTransparency: settings.overlayTransparency,
     hidesOffTrack:
       settings.autoSwitchLayouts && !root.layouts.sessionLayouts.Garage,
     units: root.units.unitSystem,
@@ -75,6 +76,7 @@ export const snapshotAppInputs = (root: MainRoot): unknown[] => {
     root.layouts.liveLayoutId,
     settings.hideAllWidgets,
     settings.hideWidgetsWhenGameClosed,
+    settings.overlayTransparency,
     settings.autoSwitchLayouts,
     root.layouts.sessionLayouts.Garage,
     root.units.unitSystem,

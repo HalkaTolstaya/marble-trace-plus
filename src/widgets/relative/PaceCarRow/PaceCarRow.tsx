@@ -84,6 +84,8 @@ export const PaceCarRow = observer(({ carIdx, index }: PaceCarRowProps) => {
         style={{ borderLeft: `3px solid ${driver.carClassColor}` }}
       />
 
+      {settings.showPosChange && <div />}
+
       {settings.showCarNumber && (
         <div className={styles.carNumberCell}>
           <span className={styles.carNumber}>#{formattedCarNumber}</span>
@@ -91,6 +93,8 @@ export const PaceCarRow = observer(({ carIdx, index }: PaceCarRowProps) => {
       )}
 
       {settings.showCountryFlag && <div className={styles.flagCell} />}
+
+      {settings.showBrand && <div />}
 
       <span
         className={[
@@ -103,7 +107,8 @@ export const PaceCarRow = observer(({ carIdx, index }: PaceCarRowProps) => {
         {driver.userName}
       </span>
 
-      <div className={styles.gapBlock}>
+      {/* The gap stays in the last column whatever lies between. */}
+      <div className={styles.gapBlock} style={{ gridColumn: '-2 / -1' }}>
         <span ref={gapRef} className={styles.gap} />
       </div>
     </div>

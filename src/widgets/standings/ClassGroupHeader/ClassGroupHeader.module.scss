@@ -1,9 +1,10 @@
 .header {
+  @include widget-card;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: sp(xs) sp(md);
-  border-bottom: 1px solid $widget-row-border;
+  padding: sp(sm) sp(md);
   flex-shrink: 0;
 }
 
@@ -22,7 +23,7 @@
 }
 
 .pagination {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(xs);
   font-weight: 700;
   color: $widget-text-primary;
@@ -36,11 +37,16 @@
 }
 
 .className {
-  font-family: $font-widget;
+  font-family: $font-table;
   font-weight: 800;
-  font-size: fs(sm);
+  font-size: fs(lg);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
+  // Lit in its own colour, with a dark under-shadow to stay legible on a
+  // bright track.
+  text-shadow:
+    0 0 ws(10) color-mix(in srgb, currentColor 70%, transparent),
+    0 1px ws(2) rgba(0, 0, 0, 0.7);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -52,4 +58,9 @@
   align-items: center;
   gap: sp(xs);
   flex-shrink: 0;
+}
+
+// The shared pills inside take the table's grotesque, not their mono face.
+.header * {
+  font-family: $font-table !important;
 }

@@ -21,7 +21,8 @@ export const COMMON_WIDGET_DEFAULTS = {
 // Dark glass with a faint green edge (Trailbrake's look).
 export const PANEL_APPEARANCE_DEFAULTS = {
   backgroundColor: 'rgba(10, 12, 15, 0.82)',
-  borderColor: 'rgba(46, 230, 128, 0.22)',
+  // A hairline, as the table cards have: the bevel does the rest.
+  borderColor: 'rgba(255, 255, 255, 0.07)',
 };
 
 export const TRANSPARENT_APPEARANCE_DEFAULTS = {
@@ -30,11 +31,12 @@ export const TRANSPARENT_APPEARANCE_DEFAULTS = {
 };
 
 // Default highlight color for the player's own row in the standings/relative
-// tables (#f5c518 yellow). Stored as a setting so users can recolor it.
-export const DEFAULT_PLAYER_ROW_COLOR = 'rgba(245, 197, 24, 0.32)';
+// tables: the brand green, fading out to the right. Stored as a setting so
+// users can recolor it.
+export const DEFAULT_PLAYER_ROW_COLOR = 'rgba(46, 230, 128, 0.42)';
 
-// Default color of the player's position/car number (solid gold #f5c518).
-export const DEFAULT_PLAYER_ACCENT_COLOR = '#f5c518';
+// Default color of the player's position number (the brand green).
+export const DEFAULT_PLAYER_ACCENT_COLOR = '#2ee680';
 
 // Widgets with toggleable columns/sections have a natural width that changes as
 // elements are shown/hidden. This builds a resolveLayoutChange that, when any of

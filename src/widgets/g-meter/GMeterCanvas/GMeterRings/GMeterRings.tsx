@@ -1,3 +1,4 @@
+import { WIDGET_CANVAS_FONT_FAMILY } from '@shared/lib/canvas';
 import { useWidgetSettings } from '@entities/layout/useWidgetSettings';
 import { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react-lite';
@@ -61,7 +62,7 @@ export const GMeterRings = observer(({ width, height }: GMeterRingsProps) => {
       LABEL_BASE_SIZE_PX * (width / LABEL_BASE_WIDTH_PX) * fontScale
     );
 
-    ctx.font = `600 ${labelSize}px 'Rajdhani', sans-serif`;
+    ctx.font = `600 ${labelSize}px ${WIDGET_CANVAS_FONT_FAMILY}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.lineWidth = GRID_LINE_WIDTH_PX;

@@ -937,7 +937,6 @@ window.
 | `companions.service.ts`                       | detect, launch and close companion apps                                                                                                 |
 | `diagnostics-hud.service.ts`                  | open and close the HUD window, emit its state                                                                                           |
 | `perf.service.ts`                             | `getPerfRun`, `submitOverlayPerf` (the perf harness)                                                                                    |
-| `install.service.ts`                          | `checkInstallIntegrity`                                                                                                                 |
 | `window-visibility.service.ts`                | `watchMinimized`                                                                                                                        |
 | `file-export.service.ts`                      | `saveTextFileAndReveal`                                                                                                                 |
 | `opener.service.ts` · `external-link.ts`      | `openExternalUrl`, `openExternalLink`                                                                                                   |
@@ -1590,7 +1589,6 @@ store calls `invoke` directly.
 |                         | `getRemoteServerInfo`, `getRemoteDevices`, `remoteScreenUrl`                                                    | `get_remote_server_info`, `get_remote_devices`, `remote_screen_url`                                                       | what the settings section shows                             |
 |                         | `publishRemoteSnapshot` / `publishRemoteControl`                                                                | `publish_remote_snapshot` / `publish_remote_control`                                                                      | main's snapshots and signals, to the hub                    |
 | `companions.service.ts` | `detectCompanionApps`, `companionAppStatuses`, `launchCompanionApp`, `closeCompanionApp(s)`, `companionAppIcon` | `detect_companion_apps`, `companion_app_statuses`, `launch_companion_app`, `close_companion_app(s)`, `companion_app_icon` | companion apps                                              |
-| `install.service.ts`    | `checkInstallIntegrity`                                                                                         | `check_install_integrity`                                                                                                 | the install-mismatch banner (temporary until 0.29.0)        |
 | `perf.service.ts`       | `getPerfRun` / `submitOverlayPerf`                                                                              | `get_perf_run` / `submit_overlay_perf`                                                                                    | the perf harness (dev builds)                               |
 
 The `*Silent` naming marks a setter that pushes a value into the backend without

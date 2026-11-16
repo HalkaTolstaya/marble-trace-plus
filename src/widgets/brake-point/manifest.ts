@@ -6,7 +6,8 @@ import {
 import { BRAKE_POINT_SETTINGS } from './settings-schema';
 
 const DESIGN_WIDTH = 340;
-const DESIGN_HEIGHT = 120;
+// One plate; the optional rows above and below it share this height.
+const DESIGN_HEIGHT = 84;
 
 export const BRAKE_POINT_MANIFEST: WidgetManifest = {
   id: 'brake-point',

@@ -134,9 +134,11 @@ $go-steps: 14;
   align-self: center;
   margin: 0 0 auto;
   font-family: $font-mono;
-  font-size: fs(xl);
-  font-weight: 700;
+  font-size: fs(lg);
+  font-weight: 800;
   line-height: 1;
+  // A narrow column: the figures close up rather than spill out of it.
+  letter-spacing: -0.04em;
   // White whatever the urgency is: the colour of the lane is the bar's to say,
   // and a number that changed hue with it only made the metres harder to read
   // at the moment they matter most.
@@ -150,9 +152,10 @@ $go-steps: 14;
   flex: none;
   align-self: center;
   margin: auto 0 0;
-  font-size: fs(xxs);
+  // As wide as the column allows: "KM/H" in the speed column's width.
+  font-size: wfs(8);
   opacity: 0.85;
-  letter-spacing: 0.08em;
+  letter-spacing: -0.02em;
   color: $widget-label;
   font-weight: 600;
   white-space: nowrap;

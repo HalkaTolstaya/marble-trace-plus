@@ -17,7 +17,7 @@ const CARDINAL_ANGLES = [
 
 const MINOR_TICK_ANGLES = [45, 135, 225, 315];
 
-const RING_COLOR = 'rgba(255,255,255,0.22)';
+const NORTH_ANGLE = 0;
 
 const DEGREES_TO_RADIANS = Math.PI / 180;
 
@@ -30,65 +30,67 @@ const DEGREES_TO_RADIANS = Math.PI / 180;
 interface RingGeometryProps {
   /** Cardinal letter size, in the svg's own user units. */
   cardinalUnits: number;
+  /** The letters ease upright with the ring, when it eases. */
+  smooth: boolean;
 }
 
-export const RingGeometry = observer(({ cardinalUnits }: RingGeometryProps) => {
-  return (
-    <>
-      <circle r={RING_RADIUS} fill="none" stroke={RING_COLOR} strokeWidth="2" />
+export const RingGeometry = observer(
+  ({ cardinalUnits, smooth }: RingGeometryProps) => {
+    return (
+      <>
+        <circle r={RING_RADIUS} className={styles.ring} strokeWidth="1.5" />
 
-      {CARDINAL_ANGLES.map(({ angle }) => {
-        const angleRad = angle * DEGREES_TO_RADIANS;
+        {CARDINAL_ANGLES.map(({ angle }) => {
+          const angleRad = angle * DEGREES_TO_RADIANS;
 
-        return (
-          <line
-            key={angle}
-            x1={Math.sin(angleRad) * TICK_OUTER}
-            y1={-Math.cos(angleRad) * TICK_OUTER}
-            x2={Math.sin(angleRad) * TICK_INNER_MAJOR}
-            y2={-Math.cos(angleRad) * TICK_INNER_MAJOR}
-            stroke={RING_COLOR}
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        );
-      })}
+          return (
+            <line
+              key={angle}
+              x1={Math.sin(angleRad) * TICK_OUTER}
+              y1={-Math.cos(angleRad) * TICK_OUTER}
+              x2={Math.sin(angleRad) * TICK_INNER_MAJOR}
+              y2={-Math.cos(angleRad) * TICK_INNER_MAJOR}
+              className={`${styles.tick} ${angle === NORTH_ANGLE ? styles.tickNorth : ''}`}
+              strokeWidth="2"
+            />
+          );
+        })}
 
-      {MINOR_TICK_ANGLES.map((angle) => {
-        const angleRad = angle * DEGREES_TO_RADIANS;
+        {MINOR_TICK_ANGLES.map((angle) => {
+          const angleRad = angle * DEGREES_TO_RADIANS;
 
-        return (
-          <line
-            key={angle}
-            x1={Math.sin(angleRad) * TICK_OUTER}
-            y1={-Math.cos(angleRad) * TICK_OUTER}
-            x2={Math.sin(angleRad) * TICK_INNER_MINOR}
-            y2={-Math.cos(angleRad) * TICK_INNER_MINOR}
-            stroke={RING_COLOR}
-            strokeWidth="1"
-            strokeLinecap="round"
-          />
-        );
-      })}
+          return (
+            <line
+              key={angle}
+              x1={Math.sin(angleRad) * TICK_OUTER}
+              y1={-Math.cos(angleRad) * TICK_OUTER}
+              x2={Math.sin(angleRad) * TICK_INNER_MINOR}
+              y2={-Math.cos(angleRad) * TICK_INNER_MINOR}
+              className={styles.tick}
+              strokeWidth="1"
+            />
+          );
+        })}
 
-      {CARDINAL_ANGLES.map(({ label, angle }) => {
-        const angleRad = angle * DEGREES_TO_RADIANS;
-        const labelX = Math.sin(angleRad) * LABEL_RADIUS;
-        const labelY = -Math.cos(angleRad) * LABEL_RADIUS;
+        {CARDINAL_ANGLES.map(({ label, angle }) => {
+          const angleRad = angle * DEGREES_TO_RADIANS;
+          const labelX = Math.sin(angleRad) * LABEL_RADIUS;
+          const labelY = -Math.cos(angleRad) * LABEL_RADIUS;
 
-        return (
-          <g key={label} transform={`translate(${labelX}, ${labelY})`}>
-            <text
-              style={{ fontSize: cardinalUnits }}
-              textAnchor="middle"
-              dominantBaseline="central"
-              className={styles.cardinalLabel}
-            >
-              {label}
-            </text>
-          </g>
-        );
-      })}
-    </>
-  );
-});
+          return (
+            <g key={label} transform={`translate(${labelX}, ${labelY})`}>
+              <text
+                style={{ fontSize: cardinalUnits }}
+                textAnchor="middle"
+                dominantBaseline="central"
+                className={`${styles.cardinalLabel} ${angle === NORTH_ANGLE ? styles.cardinalNorth : ''} ${smooth ? styles.cardinalSmooth : ''}`}
+              >
+                {label}
+              </text>
+            </g>
+          );
+        })}
+      </>
+    );
+  }
+);

@@ -11,6 +11,12 @@ import {
   usePanelWidgetId,
 } from '@features/widget-settings/setting-rows';
 import { schemaRows } from '@features/widget-settings/schema-rows';
+import {
+  BlockHint,
+  CheckGrid,
+  SettingsBlock,
+  type CheckItem,
+} from '@features/widget-settings/blocks/SettingsBlocks';
 import { useAppSettingsStore } from '@entities/app-settings/app-settings-context';
 import {
   INPUT_TRACE_SETTINGS,
@@ -75,28 +81,146 @@ export const InputTraceSettingsPanel = observer(() => {
     });
   };
 
+  const label = (key: string) => t(`settingsPanels.inputTrace.${key}`);
+
+  const layoutItems: CheckItem[] = [
+    {
+      key: 'smoothMotion',
+      label: t('settingsPanels.common.smoothMotion'),
+      checked: settings.smoothMotion,
+    },
+    {
+      key: 'showTrace',
+      label: label('showTrace'),
+      checked: settings.showTrace,
+    },
+    {
+      key: 'showSteering',
+      label: label('showSteering'),
+      checked: settings.showSteering,
+    },
+    {
+      key: 'showSpeedGear',
+      label: label('showSpeedGear'),
+      checked: settings.showSpeedGear,
+    },
+    { key: 'showBars', label: label('showBars'), checked: settings.showBars },
+    {
+      key: 'showThrottle',
+      label: label('showThrottle'),
+      checked: settings.showThrottle,
+    },
+    {
+      key: 'showBrake',
+      label: label('showBrake'),
+      checked: settings.showBrake,
+    },
+    {
+      key: 'showClutch',
+      label: label('showClutch'),
+      checked: settings.showClutch,
+    },
+    {
+      key: 'showInputValues',
+      label: label('showInputValues'),
+      checked: settings.showInputValues,
+      disabled: !settings.showBars,
+    },
+    {
+      key: 'logo',
+      label: label('steeringCenterDisplay_logo'),
+      checked: settings.steeringCenterDisplay === 'logo',
+      disabled: !settings.showSteering,
+    },
+  ];
+
+  const revItems: CheckItem[] = [
+    {
+      key: 'showRevLights',
+      label: label('showRevLights'),
+      checked: settings.showRevLights,
+    },
+    {
+      key: 'revLightsGlow',
+      label: label('revLightsGlow'),
+      checked: settings.revLightsGlow,
+      disabled: !settings.showRevLights,
+    },
+    {
+      key: 'showPitLimiterLights',
+      label: label('showPitLimiterLights'),
+      checked: settings.showPitLimiterLights,
+      disabled: !settings.showRevLights,
+    },
+  ];
+
+  const comparisonItems: CheckItem[] = [
+    {
+      key: 'showReference',
+      label: label('showReference'),
+      checked: settings.showReference,
+    },
+    {
+      key: 'compareThrottle',
+      label: label('compareThrottle'),
+      checked: settings.compareThrottle,
+      disabled: !settings.showReference,
+    },
+    {
+      key: 'compareBrake',
+      label: label('compareBrake'),
+      checked: settings.compareBrake,
+      disabled: !settings.showReference,
+    },
+    {
+      key: 'showDistance',
+      label: label('showDistance'),
+      checked: settings.showDistance,
+      disabled: !settings.showTrace,
+    },
+  ];
+
   return (
     <>
-      <Card title={t('settingsPanels.inputTrace.layout')}>
-        <div className={styles.fieldGroup}>
-          <Row setting="showTrace" />
-        </div>
+      <Card title={t('settingsPanels.inputTrace.layout')} defaultOpen>
+        <SettingsBlock title={t('settingsPanels.inputTrace.layout')}>
+          <CheckGrid
+            items={layoutItems}
+            onToggle={(key, checked) =>
+              key === 'logo'
+                ? update({
+                    steeringCenterDisplay: checked ? 'logo' : 'none',
+                  })
+                : update({ [key]: checked } as Partial<InputTraceSettings>)
+            }
+          />
+        </SettingsBlock>
+
+        <SettingsBlock title={t('settingsPanels.inputTrace.revLights')}>
+          <CheckGrid
+            columns={2}
+            items={revItems}
+            onToggle={(key, checked) =>
+              update({ [key]: checked } as Partial<InputTraceSettings>)
+            }
+          />
+          <BlockHint>{t('settingsPanels.inputTrace.revLightsHint')}</BlockHint>
+        </SettingsBlock>
+
+        <SettingsBlock title={t('settingsPanels.inputTrace.comparison')}>
+          <CheckGrid
+            columns={2}
+            items={comparisonItems}
+            onToggle={(key, checked) =>
+              update({ [key]: checked } as Partial<InputTraceSettings>)
+            }
+          />
+          <BlockHint>{t('settingsPanels.inputTrace.comparisonHint')}</BlockHint>
+        </SettingsBlock>
 
         <Row setting="speedBlockSide" dependsOn={hasSpeedBlockSide} />
-
-        <div className={styles.fieldGroup}>
-          <Row setting="showBars" />
-        </div>
-
-        <Row setting="showInputValues" dependsOn="showBars" />
-      </Card>
-
-      <Card title={t('settingsPanels.inputTrace.reference')}>
-        <div className={styles.fieldGroup}>
-          <Row setting="showReference" />
-        </div>
-
         <Row setting="referenceOpacity" dependsOn="showReference" />
+        <Row setting="distanceWindow" dependsOn="showDistance" />
       </Card>
 
       <Card title={t('settingsPanels.inputTrace.graphSettings')}>

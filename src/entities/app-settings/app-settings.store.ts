@@ -2,7 +2,6 @@ import { makeAutoObservable, runInAction } from 'mobx';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { getVersion } from '@tauri-apps/api/app';
-import { checkInstallIntegrity } from '@shared/api/install.service';
 import {
   requestDragMode,
   requestInteractMode,
@@ -20,7 +19,6 @@ import i18n from '@/i18n';
 import type { AppLanguage, UnitSystem } from '@shared/contracts/domain';
 import type {
   CompanionApp,
-  InstallMismatch,
   InteractHotkeyMode,
   OverlayModes,
   VoiceCrewSettings,
@@ -72,6 +70,9 @@ const DEFAULT_APP_SETTINGS = {
   // half its 1% low; 30 gave most of it back (ADR-0009). The backend publishes
   // at this rate, so every widget moves on the same frames.
   overlayUpdateHz: DEFAULT_OVERLAY_UPDATE_HZ,
+  // Percent of every widget panel's background taken away, so the game shows
+  // through (0 = the panels as each widget sets them).
+  overlayTransparency: 0,
   // Pit stop strategy (`PitStrategy`). The car's, not a screen's — these used
   // to be widget settings, and the copy on a stream screen was silently ignored.
   pitAutoFuel: false,
@@ -194,15 +195,6 @@ export class AppSettingsStore {
   settingsLockReason: SettingsLockReason | null = null;
 
   /**
-   * Set when this executable is not the one Windows has on record as installed.
-   * Read once at startup — an installation does not change under a running app.
-   *
-   * Temporary: part of the `.msi` migration, deleted with the rest of it (see
-   * the module doc of `src-tauri/src/commands/install.rs`).
-   */
-  installMismatch: InstallMismatch | null = null;
-
-  /**
    * The overlay's mouse modes. Owned by the hotkey dispatcher in the backend —
    * their keys fire there — and mirrored here from `app://overlay-modes`
    * (`applyOverlayModes`). A setter asks the dispatcher; it never writes these.
@@ -242,12 +234,6 @@ export class AppSettingsStore {
 
     runInAction(() => {
       this.currentVersion = version;
-    });
-
-    const mismatch = await checkInstallIntegrity();
-
-    runInAction(() => {
-      this.installMismatch = mismatch;
     });
 
     if (this.ownsUpdates && this.appSettings.autoUpdate) {
@@ -455,6 +441,10 @@ export class AppSettingsStore {
   setCarLength(value: number) {
     this.appSettings.carLength = value;
     setCarLengthSilent(value);
+  }
+
+  setOverlayTransparency(value: number) {
+    this.appSettings.overlayTransparency = Math.min(100, Math.max(0, value));
   }
 
   setOverlayUpdateHz(value: number) {

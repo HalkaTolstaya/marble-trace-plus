@@ -8,7 +8,7 @@ import { PROXIMITY_RADAR_SETTINGS } from '@entities/radar/radar.settings-schema'
  * than transparent: an instrument reads as an instrument only once it has a
  * rim, and a user who wants the old bare-icons look sets both to transparent.
  */
-const SCOPE_APPEARANCE_DEFAULTS = {
+export const SCOPE_APPEARANCE_DEFAULTS = {
   backgroundColor: 'rgba(12, 14, 18, 0.55)',
   borderColor: 'rgba(255, 255, 255, 0.18)',
 };

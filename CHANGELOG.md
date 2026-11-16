@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.0] — 2026-11-15
+
+### Added
+
+- **Standings, multiclass:** in the By Class view (now the default) your class shows its leaders and the cars around you — 10 rows: the top 3, then 3 ahead, you and 3 behind — and every other class its top 3. _Visible Rows - Your Class_, _Leader Rows_, _Visible Rows - Other Classes_ and _Show other classes_ set it.
+- **Standings:** interval column (red to the cars ahead of you in your class, green to those behind), average lap (_Recent pace_: last five clean laps, or _Session average_), laps in stint, and gap / lap-time decimals.
+- **Relative:** position change, lap number, iRating change, best / last / average lap, tyre and stint columns; a header with temperatures, SoF, incidents and the clock; column titles; a footer with your laps and the timer; _Ahead_ / _Behind_ counts; driver name format (J. Smith / Smith / John Smith); text size; density.
+- **Input Telemetry:** rev lights across the top (zone colours, LED glow, blue while the pit limiter is on), the comparison with the reference lap's throttle and brake chosen separately, and the lap distance over the graph.
+- **Car logos in the tables:** the maker's logo in its colour (Porsche, BMW, Ferrari, AMG, Audi, Lamborghini, McLaren, Aston Martin, Chevrolet, Toyota, Mazda and more) before each driver in Standings and Relative, so the cars in a pack are told apart at a glance. A maker without a logo gets a short name on its colours.
+- **Pit and tow beside Standings:** to the right of the table, _PIT 5s_ while a car is on pit road or in its box, its last stop (_L28·7s_) for a minute after it rejoins, and a large yellow _TOW_ plate while a car is towed after a crash — your own with the time left from the sim, another car's timed from when it was picked up.
+- **Live preview:** the widget preview runs a race over a drawn track — cars lap, trade places and close laps, the pedals and wheel move — so every table shows its overtakes, intervals and lap times working.
+- **Widgets page like a control room:** every widget in one list, the open one showing its settings in place, and beside the list a live preview of it over a drawn track (scaled to fit) with the overlay transparency under it.
+- **Overlay transparency:** a slider (Settings → Overlay, and under the preview) takes 0–100 % of every widget panel's background away so the game shows through; text and edges stay as they are.
+- Compact settings blocks for these widgets: checkbox grids, − N + steppers and radio choices on one page.
+- **Input Telemetry, distance axis:** with _Distance axis_ on, the graph is plotted against lap distance — metres along the bottom, a "now" line, the reference lap as soft hills over the whole window, the stretch still ahead of the car included, and your pedals as lines up to "now". _Distance window_ sets how much track it covers.
+- **Delta Sectors (new widget):** the lap sector by sector against the reference lap — the same one the brake points use. Each banked sector shows its time and what it gained or lost, on a plate that is purple when quicker than the reference and red when slower; the sector you are in fills with a bar as you drive it, with the live difference beside it. Under the sectors: best, last and the reference lap. _Sector rows_ sets how many are on screen.
+- **Brake Point:** _Reading_ — the count 3-2-1 or the metres left to the brake point.
+- **Smooth animation** (Weather, Brake Point, Delta Sectors; on by default, off when Windows asks for reduced motion): the wind arrow and compass turn, and the count and sector bars run, between telemetry updates instead of stepping.
+
+### Changed
+
+- **Standings and Relative look:** separate cards over the game (session bar, weather, each class's header and table), no row dividers, the position cell fading from the class colour, your row in a fading green, licence + iRating + change in one outlined pill in the licence colour, heavy white times with the class best in purple. The tables use Manrope (SIL OFL), bundled.
+- The gap reads like the lap times; the relative's gaps are red ahead and green behind.
+- **One look for every widget:** all of them use the same typeface with tabular figures (Manrope) and the same glass panel — a hairline edge, the inset bevel, rounded corners. Relative is built from the same cards as Standings. Narrow readouts (pit line, tyre wear, car-number dots) were tightened to fit.
+- **Delta:** the number sits on a glass pill with a wash of its state colour; the bar is a ruled track with a lit leading edge, a zero mark and the active range written at both ends.
+- **Radar:** cars are drawn as bodies with a nose, our own with cabin glass; a beam gathers into a band of light at the rim; the distance is written on a dark chip outlined in the beam's colour.
+- **Track map:** the circuit is a dark ribbon with lit edges that holds on any background; dots have a dark casing, your own is drawn on top with a halo and a pointer; start/finish is a line across the track with a checkered tile.
+- **Input Telemetry:** the plot and pedal tracks are sunk wells, pedal fills carry a lit cap, lines get a soft fall of colour and a marker on the newest sample, and the rev lights glow as a ring rather than a blur. The reference is no longer stepped.
+- **Standings and Relative:** the class colour runs from the card's edge through the position, PIT / PIT IN / PIT OUT / TOW are glass chips in the status colour, the pit tile beside a row arrives with a slight spring, and the relative gap is a size larger.
+
+- **Brake Point:** one plate read out of the corner of the eye — a large figure on dark glass, a red line running round the plate's edge as the brake point comes up, the whole plate red with BRAKE on it, then the grade's colour and word. Zone pips, target pressure and the timing row are still there, off by default.
+- **Weather:** one glass panel ruled by hairlines instead of dark bands; forecast hours are sunk cells, the current one outlined; on the compass north is the lit letter and the wind arrow crosses north the short way round.
+
 ## [0.28.4] — 2026-11-15
 
 ### Changed

@@ -23,25 +23,29 @@ export const StandingsHeader = observer(() => {
     >
       <StandingsHeaderCell>Pos</StandingsHeaderCell>
 
-      <StandingsHeaderCell align="right">#</StandingsHeaderCell>
-
       {settings.showPosChange && (
         <StandingsHeaderCell align="center">±</StandingsHeaderCell>
       )}
 
+      {settings.showCarNumber && (
+        <StandingsHeaderCell align="center">#</StandingsHeaderCell>
+      )}
+
       {settings.showCountryFlag && <StandingsHeaderCell> </StandingsHeaderCell>}
+
+      {settings.showBrand && <StandingsHeaderCell> </StandingsHeaderCell>}
 
       <StandingsHeaderCell>Driver</StandingsHeaderCell>
 
       {settings.showLicBadge && (
-        <StandingsHeaderCell align="center">SR</StandingsHeaderCell>
+        <StandingsHeaderCell align="center">IR</StandingsHeaderCell>
       )}
 
-      {settings.showIRating && (
+      {settings.showIRating && !settings.showLicBadge && (
         <StandingsHeaderCell align="center">iR</StandingsHeaderCell>
       )}
 
-      {settings.showIrChange && (
+      {settings.showIrChange && !settings.showLicBadge && (
         <StandingsHeaderCell
           align="center"
           title="Projected iR change (Elo estimate, not real iRacing data)"
@@ -55,19 +59,27 @@ export const StandingsHeader = observer(() => {
       )}
 
       {settings.showGap && (
-        <StandingsHeaderCell align="center">Gap</StandingsHeaderCell>
+        <StandingsHeaderCell align="right">Gap</StandingsHeaderCell>
       )}
 
-      {settings.showLastLap && (
-        <StandingsHeaderCell align="center">Last</StandingsHeaderCell>
+      {settings.showInterval && (
+        <StandingsHeaderCell align="right">Int</StandingsHeaderCell>
       )}
 
       {settings.showBestLap && (
-        <StandingsHeaderCell align="center">Best</StandingsHeaderCell>
+        <StandingsHeaderCell align="right">Best</StandingsHeaderCell>
       )}
 
-      {settings.showBrand && (
-        <StandingsHeaderCell align="center">Brand</StandingsHeaderCell>
+      {settings.showLastLap && (
+        <StandingsHeaderCell align="right">Last</StandingsHeaderCell>
+      )}
+
+      {settings.showAvgLap && (
+        <StandingsHeaderCell align="right">Avg</StandingsHeaderCell>
+      )}
+
+      {settings.showStintLaps && (
+        <StandingsHeaderCell align="center">Stint</StandingsHeaderCell>
       )}
 
       {settings.showTire && (

@@ -263,3 +263,6 @@ export const scrollThumbFor = (
     topPercent: (100 - heightPercent) * travelled,
   };
 };
+
+/** The widgets' typeface, for text drawn on a canvas. */
+export const WIDGET_CANVAS_FONT_FAMILY = "Manrope, 'Segoe UI', sans-serif";

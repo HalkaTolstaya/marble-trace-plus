@@ -13,9 +13,13 @@ import { describe, expect, it } from 'vitest';
 // What remains is a transition on a change of state — a light switching on, a
 // panel opening — which runs once and stops. Each is listed here with why it
 // does not follow the telemetry; a new one is a decision, not a default.
+const SMOOTH_MOTION =
+  "smooth motion on the driver's primary telemetry, user's decision, off with smoothMotion (ADR-0017)";
+
 const STATE_CHANGE_TRANSITIONS: Record<string, string> = {
   'close-battle/BattleAxis.module.scss':
     'the axis rescales when the battle range changes, not every frame',
+  'delta-sectors/DeltaSectorsWidget.module.scss': SMOOTH_MOTION,
   'delta/DeltaLive/DeltaLive.module.scss':
     'the plate resizes when the number gains or loses a digit',
   'delta/DeltaPlate/DeltaPlate.module.scss':
@@ -30,6 +34,9 @@ const STATE_CHANGE_TRANSITIONS: Record<string, string> = {
   'standings/ClassSwitcher/ClassSwitcher.module.scss': 'pointer hover',
   'track-map/TrackMapView/RotationControls/RotationControls.module.scss':
     'pointer hover on the rotation controls',
+  'weather/WindCompass/RingGeometry/RingGeometry.module.scss': SMOOTH_MOTION,
+  'weather/WindCompass/RotatingRing/RotatingRing.module.scss': SMOOTH_MOTION,
+  'weather/WindCompass/WindArrow/WindArrow.module.scss': SMOOTH_MOTION,
 };
 
 const WIDGETS_DIR = dirname(fileURLToPath(import.meta.url));

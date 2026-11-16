@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import WindArrowIcon from '@assets/wind-arrow.svg?react';
@@ -11,6 +12,7 @@ import { useEnvironmentStore } from '@entities/environment/environment-context';
 import { usePlayerStore } from '@entities/player/player-context';
 import { useSessionStore } from '@entities/session/session-context';
 
+import { unwrapAngle } from '../unwrap-angle';
 import styles from './WindArrow.module.scss';
 
 const RADIANS_TO_DEGREES = 180 / Math.PI;
@@ -45,7 +47,14 @@ const ARROW_FLIP = `rotate(180 0 ${-ARROW_BASE_RADIUS + ARROW_HEIGHT / 2})`;
  * the reactive-DOM primitive and wakes React not at all; only the wind's own
  * speed, which arrives once a second, re-renders the arrow — for its colour.
  */
-export const WindArrow = observer(() => {
+interface WindArrowProps {
+  /** Ease to each bearing instead of stepping to it. */
+  smooth: boolean;
+}
+
+export const WindArrow = observer(({ smooth }: WindArrowProps) => {
+  // The last bearing written, unwrapped — see `unwrapAngle`.
+  const writtenBearingRef = useRef<number | null>(null);
   const sessionStore = useSessionStore();
   const environmentStore = useEnvironmentStore();
   const player = usePlayerStore();
@@ -68,17 +77,21 @@ export const WindArrow = observer(() => {
         FULL_TURN_DEGREES;
 
       scheduleWrite(() => {
-        element.style.setProperty(
-          WIND_BEARING_PROPERTY,
-          `${relativeBearing}deg`
-        );
+        const bearing = unwrapAngle(writtenBearingRef.current, relativeBearing);
+
+        writtenBearingRef.current = bearing;
+        element.style.setProperty(WIND_BEARING_PROPERTY, `${bearing}deg`);
       });
     },
     [player, environmentStore, sessionStore]
   );
 
   return (
-    <g ref={groupRef} className={styles.windArrowGroup} pointerEvents="none">
+    <g
+      ref={groupRef}
+      className={`${styles.windArrowGroup} ${smooth ? styles.smooth : ''}`}
+      pointerEvents="none"
+    >
       <g transform={ARROW_FLIP}>
         <WindArrowIcon
           x="-14"

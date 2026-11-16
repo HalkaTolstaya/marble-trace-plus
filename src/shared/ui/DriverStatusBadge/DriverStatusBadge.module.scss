@@ -1,45 +1,53 @@
 .badge {
+  --chip-tone: #{$race-neutral};
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.2em 0.35em;
-  border-radius: 0.25em;
-  font-size: 0.7em;
-  font-weight: 100;
+  padding: 0.24em 0.42em;
+  border-radius: 0.3em;
+  font-size: 0.66em;
+  font-weight: 800;
+  letter-spacing: 0.05em;
   flex-shrink: 0;
   line-height: 1;
-  color: #fff;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--chip-tone) $status-chip-ink, #ffffff);
+  background: color-mix(
+    in srgb,
+    var(--chip-tone) $status-chip-tint,
+    $status-chip-ground
+  );
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--chip-tone) $status-chip-outline, transparent);
 }
 
 .pit {
-  background: $race-red;
+  --chip-tone: #{$race-red};
 }
 
 .pitIn {
-  background: $race-blue;
+  --chip-tone: #{$race-blue};
 }
 
 .pitExit {
-  background: $race-amber;
-  color: rgba(0, 0, 0, 0.85);
+  --chip-tone: #{$race-amber};
 }
 
 .tow {
-  background: $race-orange;
-  color: rgba(0, 0, 0, 0.85);
+  --chip-tone: #{$race-orange};
 }
 
-.out {
-  background: rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.45);
-}
-
+// Not racing any more: the chip recedes with the row it sits in.
+.out,
 .offTrack {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.35);
+  color: $widget-text-secondary;
+  background: $status-chip-ground;
+  box-shadow: inset 0 0 0 1px $widget-border-default;
 }
 
 .dnf {
-  background: #111;
-  color: $race-red;
+  --chip-tone: #{$race-red};
+
+  background: $status-chip-ground;
 }

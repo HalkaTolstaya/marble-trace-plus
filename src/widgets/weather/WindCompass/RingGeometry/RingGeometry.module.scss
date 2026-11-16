@@ -2,8 +2,8 @@
   font-family: $font-widget;
   // Size comes from the `cardinalUnits` prop: the letters live in the svg's
   // user units, so they must be stated there rather than in scaled CSS px.
-  font-weight: 400;
-  fill: rgba(255, 255, 255, 0.22);
+  font-weight: 800;
+  fill: $widget-text-muted;
   paint-order: stroke;
   stroke-width: 3px;
   stroke-linecap: round;
@@ -16,4 +16,33 @@
   // writes at up to 60 Hz, so a transition here would just retarget itself
   // every frame for no visible gain.
   transform: rotate(calc(-1 * var(--compass-yaw, 0deg)));
+}
+
+// North is the one letter the dial is read by.
+.cardinalNorth {
+  fill: $widget-text-primary;
+}
+
+.ring,
+.tick {
+  fill: none;
+  stroke: $widget-border-default;
+  stroke-linecap: round;
+}
+
+.tickNorth {
+  stroke: $widget-text-primary;
+}
+
+// With smooth motion the ring eases to its heading, so the letters ease back
+// by the same amount on the same clock — or they would lean for the length of
+// every step.
+.cardinalSmooth {
+  transition: transform $smooth-motion-step linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cardinalSmooth {
+    transition: none;
+  }
 }

@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Layout, ConfigProvider, theme, App as AntdApp } from 'antd';
 import { observer } from 'mobx-react-lite';
-import { useTranslation } from 'react-i18next';
 import { initMainSync } from '@app/sync/main-sync';
-import { WidgetList } from '@pages/widgets/WidgetList/WidgetList';
 import { WidgetWorkbench } from '@pages/widgets/WidgetWorkbench/WidgetWorkbench';
 import { LayoutEditor } from '@pages/layouts/LayoutEditor';
 import { SettingsPage } from '@pages/settings/SettingsPage';
@@ -13,7 +11,6 @@ import { useVoiceCrewStore } from '@features/voice-crew/voice-crew-context';
 import { AppHeader, type AppSection } from './AppHeader/AppHeader';
 import { AppFooter } from './AppFooter/AppFooter';
 import { UpdateBanner } from './UpdateBanner/UpdateBanner';
-import { InstallMismatchBanner } from './InstallMismatchBanner/InstallMismatchBanner';
 import { SettingsLockBanner } from './SettingsLockBanner/SettingsLockBanner';
 import styles from './MainWindow.module.scss';
 import { useSimStore } from '@entities/sim/sim-context';
@@ -25,7 +22,6 @@ export const MainWindow = observer(() => {
   const simStore = useSimStore();
   const root = useMainRoot();
   const crew = useVoiceCrewStore();
-  const { t } = useTranslation('main-app');
 
   const [activeSection, setActiveSection] = useState<AppSection>('layouts');
   const [selectedWidgetId, setSelectedWidgetId] = useState<string | null>(null);
@@ -151,8 +147,6 @@ export const MainWindow = observer(() => {
             }}
           />
 
-          <InstallMismatchBanner />
-
           <SettingsLockBanner />
 
           <UpdateBanner />
@@ -195,18 +189,11 @@ export const MainWindow = observer(() => {
                 key="widgets"
               >
                 <div className={styles.widgetsSection}>
-                  <div className={styles.widgetCatalog}>
-                    <div className={styles.catalogTitle}>
-                      {t('mainWindow.widgetModules')}
-                    </div>
-                    <WidgetList
-                      selectedId={activeWidgetId}
+                  <div className={styles.widgetWorkbench}>
+                    <WidgetWorkbench
+                      widgetId={activeWidgetId}
                       onSelect={setSelectedWidgetId}
                     />
-                  </div>
-
-                  <div className={styles.widgetWorkbench}>
-                    <WidgetWorkbench widgetId={activeWidgetId} />
                   </div>
                 </div>
               </div>

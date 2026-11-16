@@ -1,17 +1,131 @@
 .root {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(rem(420), 1fr) minmax(rem(360), 1fr);
   width: 100%;
   height: 100%;
   min-height: 0;
   gap: sp(lg);
 }
 
+// The widgets, one row each; the open one carries its settings.
+.listColumn {
+  display: flex;
+  flex-direction: column;
+  gap: sp(xs);
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: sp(xs);
+}
+
+.widgetRow {
+  border-radius: radius(lg);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid transparent;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.widgetRowOpen {
+  border-color: $brand-accent;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.widgetRowUnavailable {
+  opacity: 0.45;
+}
+
+.widgetRowHeader {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: sp(md);
+  width: 100%;
+  padding: sp(md) sp(lg);
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.widgetRowTitle {
+  font-weight: 700;
+  font-size: rem(14);
+  color: #fff;
+  white-space: nowrap;
+}
+
+.widgetRowTag {
+  justify-self: end;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: rem(12);
+  color: #8b8e98;
+}
+
+.widgetRowToggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: rem(26);
+  height: rem(26);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.widgetRowOpen .widgetRowToggle {
+  background: $brand-accent;
+  color: #06140c;
+}
+
+.widgetRowBody {
+  padding: 0 sp(lg) sp(lg);
+}
+
+// The preview stays in view while the list scrolls past it.
 .previewColumn {
   display: flex;
-  flex: 1 1 0;
   min-width: 0;
+  min-height: 0;
   flex-direction: column;
   gap: sp(sm);
+}
+
+.transparencyBar {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: sp(md);
+  padding: sp(sm) sp(md);
+  border-radius: radius(lg);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.transparencyTitle {
+  font-weight: 700;
+  color: #fff;
+}
+
+.transparencyValue {
+  min-width: 4ch;
+  padding: 1px sp(xs);
+  border-radius: radius(md);
+  background: rgba(255, 255, 255, 0.08);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.transparencySlider {
+  width: 100%;
+  margin: 0;
 }
 
 .scenarioBar {
@@ -42,13 +156,6 @@
   border: 1px solid #2a2c32;
 }
 
-.settingsPane {
-  flex: 0 0 360px;
-  min-width: 0;
-  overflow-y: auto;
-  padding-right: sp(xs);
-}
-
 .empty {
   display: flex;
   align-items: center;
@@ -57,4 +164,32 @@
   height: 100%;
   color: #8b8e98;
   font-family: $font-widget;
+}
+
+.liveToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: sp(xs);
+  margin-left: auto;
+  cursor: pointer;
+}
+
+// A track drawn in CSS behind the preview, kept quiet so the widget is what
+// the eye lands on: an overcast sky, a tree line, a verge with a kerb, and
+// the asphalt running to the bottom edge.
+.scene {
+  position: relative;
+  background:
+    repeating-linear-gradient(90deg, #b8322e 0 28px, #e6e6e6 28px 56px) 0 61% /
+      100% 5px no-repeat,
+    linear-gradient(
+      180deg,
+      #a9b0b5 0%,
+      #c7cbce 28%,
+      #7d877c 42%,
+      #2e4029 49%,
+      #3a5634 56%,
+      #2b2e32 61%,
+      #1b1d20 100%
+    );
 }

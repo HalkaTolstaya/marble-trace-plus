@@ -3,34 +3,16 @@ import { observer } from 'mobx-react-lite';
 import styles from './FixedDigits.module.scss';
 
 interface FixedDigitsProps {
-  /** Any text; only its digits are laid out on the fixed grid. */
+  /** Any text; its digits keep one width whatever they are. */
   text: string;
   className?: string;
 }
 
-const DIGIT_PATTERN = /\d/;
-
 /**
- * Renders text with every digit in a cell of the same width, so a clock or a
- * lap count does not shuffle sideways as its digits change. `tabular-nums`
- * cannot do this here — Rajdhani ships no tabular figures, so the browser has
- * nothing to switch to and the widget's own font falls back to proportional
- * ones.
+ * Text whose digits all take the same width, so a clock or a lap count does
+ * not shuffle sideways as its digits change. The widgets' typeface (Manrope)
+ * carries tabular figures, so the font does it; spaces are kept as written.
  */
-export const FixedDigits = observer(({ text, className }: FixedDigitsProps) => {
-  return (
-    <span className={`${styles.root} ${className ?? ''}`}>
-      {Array.from(text, (char, index) =>
-        DIGIT_PATTERN.test(char) ? (
-          <span className={styles.digit} key={index}>
-            {char}
-          </span>
-        ) : (
-          <span className={styles.separator} key={index}>
-            {char}
-          </span>
-        )
-      )}
-    </span>
-  );
-});
+export const FixedDigits = observer(({ text, className }: FixedDigitsProps) => (
+  <span className={`${styles.root} ${className ?? ''}`}>{text}</span>
+));

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
-import { Select } from 'antd';
+import { Select, Slider, Switch } from 'antd';
+import { Minus, Plus } from 'lucide-react';
 import { WidgetPreview } from '../WidgetPreview/WidgetPreview';
 import { WidgetSettings } from '@features/widget-settings/WidgetSettings';
 import { DefaultsEditorProvider } from '@features/widget-settings/WidgetEditorContext';
@@ -10,6 +11,12 @@ import {
   DEFAULT_PREVIEW_SCENARIO_ID,
 } from '@features/preview/scenarios';
 import { WIDGET_BY_ID } from '@entities/widget/widget-catalog';
+import { useAppSettingsStore } from '@entities/app-settings/app-settings-context';
+import { useWidgetDefaultsStore } from '@entities/widget/widget-defaults-context';
+import {
+  getWidgetDescription,
+  getWidgetLabel,
+} from '@entities/widget/widget-i18n';
 import styles from './WidgetWorkbench.module.scss';
 
 const scenarioOption = (scenarioId: string) => {
@@ -62,68 +69,160 @@ const openingScenarioFor = (widgetId: string): string =>
   WIDGET_BY_ID.get(widgetId)?.previewScenarios?.[0] ??
   DEFAULT_PREVIEW_SCENARIO_ID;
 
-// Two-pane widget catalog workspace: live preview column on the left, widget
-// settings panel on the right. The parent owns which widget is active,
-// including the default-to-first fallback.
+const TRANSPARENCY_SLIDER_STEP = 5;
+
+interface WidgetWorkbenchProps {
+  widgetId: string | null;
+  onSelect: (widgetId: string) => void;
+}
+
+/**
+ * The widgets page: every widget in one list, the open one showing its
+ * settings in place, and beside the list a live preview of it over a drawn
+ * track with the overlay transparency under it. Opening a row is picking the
+ * widget the preview shows.
+ */
 export const WidgetWorkbench = observer(
-  ({ widgetId }: { widgetId: string | null }) => {
+  ({ widgetId, onSelect }: WidgetWorkbenchProps) => {
     const { t } = useTranslation('main-app');
-    // Pinned to the widget it was picked on: a pick says "show me this state of
-    // this widget", and carrying it to the next widget shows another domain's
-    // state or, on a widget that cannot draw it, nothing at all.
-    const [picked, setPicked] = useState<{
-      widgetId: string;
-      scenarioId: string;
-    } | null>(null);
-
-    if (!widgetId) {
-      return (
-        <div className={styles.empty}>{t('widgetWorkbench.noWidgets')}</div>
-      );
-    }
-
-    const scenarioOptions = scenarioOptionsFor(widgetId);
-    const isPickedHere =
-      picked?.widgetId === widgetId &&
-      scenarioOptions.some((option) => option.value === picked.scenarioId);
-    const activeScenarioId = isPickedHere
-      ? picked.scenarioId
-      : openingScenarioFor(widgetId);
+    const widgetDefaults = useWidgetDefaultsStore();
 
     return (
       <DefaultsEditorProvider>
         <div className={styles.root}>
-          <div className={styles.previewColumn}>
-            {scenarioOptions.length > 0 && (
-              <div className={styles.scenarioBar}>
-                <span className={styles.scenarioLabel}>
-                  {t('widgetWorkbench.scenario')}
-                </span>
-                <Select
-                  size="small"
-                  value={activeScenarioId}
-                  onChange={(scenarioId) => setPicked({ widgetId, scenarioId })}
-                  options={scenarioOptions}
-                  style={{ minWidth: 160 }}
-                  popupMatchSelectWidth={false}
-                />
-              </div>
-            )}
+          <div className={styles.listColumn}>
+            {widgetDefaults.catalogWidgets.map((widget) => {
+              const isOpen = widget.id === widgetId;
+              const isAvailable = widgetDefaults.availableWidgetIds.includes(
+                widget.id
+              );
 
-            <div className={styles.previewPane}>
-              <WidgetPreview
-                key={widgetId}
-                widgetId={widgetId}
-                scenarioId={activeScenarioId}
-              />
-            </div>
+              return (
+                <section
+                  key={widget.id}
+                  className={`${styles.widgetRow} ${isOpen ? styles.widgetRowOpen : ''} ${isAvailable ? '' : styles.widgetRowUnavailable}`}
+                >
+                  <button
+                    type="button"
+                    className={styles.widgetRowHeader}
+                    disabled={!isAvailable}
+                    aria-expanded={isOpen}
+                    onClick={() => onSelect(widget.id)}
+                  >
+                    <span className={styles.widgetRowTitle}>
+                      {getWidgetLabel(t, widget)}
+                    </span>
+                    <span className={styles.widgetRowTag}>
+                      {isAvailable
+                        ? getWidgetDescription(t, widget) ||
+                          t('widgetList.defaultDescription')
+                        : t('widgetList.unavailable')}
+                    </span>
+                    <span className={styles.widgetRowToggle} aria-hidden>
+                      {isOpen ? <Minus size={14} /> : <Plus size={14} />}
+                    </span>
+                  </button>
+
+                  {isOpen && (
+                    <div className={styles.widgetRowBody}>
+                      <WidgetSettings widgetId={widget.id} hideHeader />
+                    </div>
+                  )}
+                </section>
+              );
+            })}
           </div>
 
-          <div className={styles.settingsPane}>
-            <WidgetSettings widgetId={widgetId} />
+          <div className={styles.previewColumn}>
+            {widgetId ? (
+              <WidgetPreviewPane widgetId={widgetId} />
+            ) : (
+              <div className={styles.empty}>
+                {t('widgetWorkbench.noWidgets')}
+              </div>
+            )}
           </div>
         </div>
       </DefaultsEditorProvider>
     );
   }
 );
+
+/** The preview of one widget: scenario, live race, the scene, transparency. */
+const WidgetPreviewPane = observer(({ widgetId }: { widgetId: string }) => {
+  const { t } = useTranslation('main-app');
+  const appSettings = useAppSettingsStore();
+  // Pinned to the widget it was picked on: a pick says "show me this state of
+  // this widget", and carrying it to the next widget shows another domain's
+  // state or, on a widget that cannot draw it, nothing at all.
+  const [picked, setPicked] = useState<{
+    widgetId: string;
+    scenarioId: string;
+  } | null>(null);
+  const [live, setLive] = useState(true);
+
+  const scenarioOptions = scenarioOptionsFor(widgetId);
+  const isPickedHere =
+    picked?.widgetId === widgetId &&
+    scenarioOptions.some((option) => option.value === picked.scenarioId);
+  const activeScenarioId = isPickedHere
+    ? picked.scenarioId
+    : openingScenarioFor(widgetId);
+
+  return (
+    <>
+      <div className={styles.scenarioBar}>
+        {scenarioOptions.length > 0 && (
+          <>
+            <span className={styles.scenarioLabel}>
+              {t('widgetWorkbench.scenario')}
+            </span>
+            <Select
+              size="small"
+              value={activeScenarioId}
+              onChange={(scenarioId) => setPicked({ widgetId, scenarioId })}
+              options={scenarioOptions}
+              style={{ minWidth: 160 }}
+              popupMatchSelectWidth={false}
+            />
+          </>
+        )}
+
+        <label className={styles.liveToggle}>
+          <Switch size="small" checked={live} onChange={setLive} />
+          <span className={styles.scenarioLabel}>
+            {t('widgetWorkbench.live')}
+          </span>
+        </label>
+      </div>
+
+      {/* The widget over a drawn track, as it sits over the game. */}
+      <div className={`${styles.previewPane} ${styles.scene}`}>
+        <WidgetPreview
+          key={widgetId}
+          widgetId={widgetId}
+          scenarioId={activeScenarioId}
+          live={live}
+        />
+      </div>
+
+      <div className={styles.transparencyBar}>
+        <span className={styles.transparencyTitle}>
+          {t('settingsPage.overlayTransparency.title')}
+        </span>
+        <span className={styles.transparencyValue}>
+          {appSettings.appSettings.overlayTransparency}%
+        </span>
+        <Slider
+          className={styles.transparencySlider}
+          min={0}
+          max={100}
+          step={TRANSPARENCY_SLIDER_STEP}
+          value={appSettings.appSettings.overlayTransparency}
+          tooltip={{ open: false }}
+          onChange={(value) => appSettings.setOverlayTransparency(value)}
+        />
+      </div>
+    </>
+  );
+});

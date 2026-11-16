@@ -1,10 +1,39 @@
 .carCircle {
-  fill: var(--car-dot-bg, #18181b);
+  fill: var(--car-dot-bg, #{$map-dot-surface});
+}
+
+.carCasing {
+  fill: $map-dot-casing;
+}
+
+.playerHalo {
+  fill: none;
+  stroke: $map-player-halo;
 }
 
 .carNumber {
   font-family: $font-widget;
-  font-weight: 700;
+  font-weight: 800;
+  // Two figures inside a small dot: closed up so they stay inside it.
+  letter-spacing: -0.08em;
   fill: var(--car-dot-text, #ffffff);
   pointer-events: none;
+}
+
+// The markers over a dot are filled shapes with a dark edge of their own — an
+// edge, not a shadow: the dot moves on every tick, and a blur would be
+// rasterised again each time.
+.pointer {
+  fill: $brand-accent;
+  stroke: $map-dot-casing;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+.crown {
+  stroke: $map-dot-casing;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  paint-order: stroke;
 }

@@ -38,6 +38,8 @@ export interface ClientSnapshot {
   widgets: WidgetDefaultConfig[];
   hideAllWidgets: boolean;
   hideWidgetsWhenGameClosed: boolean;
+  /** Percent of every panel's background taken away (app setting). */
+  overlayTransparency: number;
   /**
    * Whether a widget is hidden while the car is off track. Derived in main from
    * the auto-switch setting and the garage layout, which the overlay otherwise

@@ -1,4 +1,11 @@
-import { computedStruct, makeAutoObservable } from 'mobx';
+import {
+  computedStruct,
+  makeAutoObservable,
+  reaction,
+  type IReactionDisposer,
+} from 'mobx';
+
+import { LapPaceTracker } from '@entities/cars/lap-pace';
 
 import type { WidgetInstanceContext } from '@entities/widget/widget-instances.store';
 import { isHiddenInQualifying } from '@shared/lib/qualifying-visibility';
@@ -48,19 +55,66 @@ export class RelativeWidgetStore {
 
   private readonly instanceId: string;
 
+  /** Each car's laps as the overlay saw them: the average and stint columns. */
+  readonly lapPace = new LapPaceTracker();
+
+  private readonly stopLapPace: IReactionDisposer;
+
   constructor({ core, instanceId }: WidgetInstanceContext<RelativeDeps>) {
     this.root = core;
     this.instanceId = instanceId;
 
-    makeAutoObservable<RelativeWidgetStore, 'root' | 'instanceId'>(
+    makeAutoObservable<
+      RelativeWidgetStore,
+      'root' | 'instanceId' | 'stopLapPace'
+    >(
       this,
-      { root: false, instanceId: false, rowOrder: computedStruct },
+      {
+        root: false,
+        instanceId: false,
+        lapPace: false,
+        stopLapPace: false,
+        rowOrder: computedStruct,
+      },
       { autoBind: true }
+    );
+
+    // The whole field, not the strip: a car's laps count while it is out of
+    // sight too. Identities change once a lap, never per tick.
+    this.stopLapPace = reaction(
+      () => this.root.backendComputed.driverIdentities,
+      (entries) =>
+        this.lapPace.record(
+          entries,
+          `${this.root.session.sessionInfo?.currentSessionNum ?? -1}`
+        )
     );
   }
 
-  /** Nothing to stop: the store is derivations only. */
-  dispose() {}
+  dispose() {
+    this.stopLapPace();
+  }
+
+  /** The fastest lap each class has set: its best-lap cell reads purple. */
+  get classBestLaps(): Map<number, number> {
+    const result = new Map<number, number>();
+
+    for (const entry of this.root.backendComputed.driverIdentities) {
+      const best = entry.bestLapTime;
+
+      if (best === null || best <= 0) {
+        continue;
+      }
+
+      const current = result.get(entry.carClassId);
+
+      if (current === undefined || best < current) {
+        result.set(entry.carClassId, best);
+      }
+    }
+
+    return result;
+  }
 
   private get settings(): RelativeWidgetSettings {
     return this.root.liveWidgets.getSettings<RelativeWidgetSettings>(

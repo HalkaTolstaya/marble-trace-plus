@@ -14,15 +14,7 @@
 
   // Class marker, matching the one the class header carries. A pseudo-element
   // rather than a border so the grid columns keep their measured width.
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--row-class-marker, transparent);
-  }
+  // The class colour lives in the position cell's fade (below).
 
   // The flash of a place won or lost (useRowMoveAnimation sets the
   // attribute). Opacity on a layer of its own: a one-shot composited fade,
@@ -83,8 +75,7 @@
 // First row of the "around the player" block — detaches it from the top block
 .driverRowWindowStart {
   margin-top: sp(sm);
-  border-top: 1px solid $widget-border-default;
-  box-shadow: 0 -4px 6px -4px rgba(0, 0, 0, 0.6);
+  border-top: 1px solid $widget-border-subtle;
 }
 
 // Rows the wheel is about to scroll — the cursor sits on this class. No highlight
@@ -198,7 +189,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 400;
 }
@@ -208,7 +199,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 400;
 }
@@ -222,7 +213,7 @@
 
 // Car number — the badge carries the class color
 .carNumber {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 700;
   line-height: 1;
@@ -268,7 +259,7 @@
 
 // Brand label
 .brandLabel {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(xs);
   color: $widget-text-secondary;
   text-transform: uppercase;
@@ -284,7 +275,7 @@
 }
 
 .irValue {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 600;
   color: $widget-text-primary;
@@ -296,7 +287,7 @@
   align-items: center;
   justify-content: center;
   font-size: fs(md);
-  font-family: $font-mono;
+  font-family: $font-table;
   font-weight: 400;
 }
 
@@ -310,7 +301,7 @@
 
 // Pit stops
 .pitStops {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(sm);
   color: $widget-text-muted;
 }
@@ -320,7 +311,7 @@
 }
 
 .lapsCompleted {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 400;
   color: $widget-text-primary;
@@ -328,29 +319,46 @@
 
 // Gap
 .gapLeader {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 400;
   color: $widget-text-primary;
 }
 
 .gapValue {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
-  font-weight: 400;
+  // Read like the lap times beside it, not as a secondary number.
+  font-weight: 900;
   color: $widget-text-primary;
 }
 
 // Lap time columns
+.interval {
+  font-family: $font-table;
+  font-size: fs(md);
+  font-weight: 900;
+  color: $widget-text-primary;
+}
+
+// The car the player is chasing, and the one chasing the player.
+.intervalAhead {
+  color: $widget-status-danger;
+}
+
+.intervalBehind {
+  color: $widget-status-positive;
+}
+
 .lastLap {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 900;
   color: $widget-text-primary;
 }
 
 .bestLap {
-  font-family: $font-mono;
+  font-family: $font-table;
   font-size: fs(md);
   font-weight: 900;
   color: $widget-text-primary;
@@ -372,4 +380,145 @@
 .cellDimmed {
   color: $widget-text-secondary;
   font-weight: 400;
+}
+
+// ── Table look ─────────────────────────────────────────────────────────────
+// A grotesque with tabular figures, heavy for the names and times; the rows
+// sit on the card without lines between them, the position cell carries the
+// class colour as a fade, and the car number is a plain muted figure.
+
+.driverRow {
+  font-family: $font-table;
+  font-weight: 800;
+  border-bottom: 0;
+  min-height: ws(30);
+}
+
+.rowOdd {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+$class-fade-reach: 92;
+
+// The class colour opens the row: densest on the card's edge, through the
+// position and gone before the driver's name. It belongs to the row, not to
+// the position cell, so its reach does not depend on that column's width.
+.driverRow {
+  isolation: isolate;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: -1;
+    width: ws($class-fade-reach);
+    border-bottom-left-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--row-class-marker, transparent) 70%, transparent),
+      color-mix(in srgb, var(--row-class-marker, transparent) 26%, transparent)
+        48%,
+      transparent
+    );
+    pointer-events: none;
+  }
+}
+
+.posNumber {
+  font-family: $font-table;
+  font-size: fs(lg);
+  font-weight: 800;
+}
+
+.carNumber {
+  background: none !important;
+  color: $widget-text-secondary !important;
+  font-family: $font-table;
+  font-weight: 800;
+  padding: 0;
+}
+
+.driverName {
+  font-family: $font-table;
+  font-weight: 800;
+  // A long name fades out instead of ending in an ellipsis.
+  text-overflow: clip;
+  mask-image: linear-gradient(90deg, #000 calc(100% - #{ws(14)}), transparent);
+}
+
+.gapValue,
+.gapLeader,
+.interval,
+.lastLap,
+.bestLap {
+  font-family: $font-table;
+  font-weight: 800;
+}
+
+.bestLapFastest {
+  color: $widget-text-best-lap;
+}
+
+// ── Pit pills, outside the table on the right ──────────────────────────────
+// A tile of the same glass hanging off the row's end. It arrives once, out of
+// the row's edge with a slight spring — a car entering the pits is a change of
+// state; its seconds then tick without any motion (ADR-0009).
+
+.pitPill {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + #{ws(6)});
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  padding: ws(4) ws(8);
+  border-radius: ws(6);
+  background: var(--widget-bg);
+  box-shadow: $widget-panel-bevel;
+  font-family: $font-table;
+  font-size: fs(sm);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: $widget-text-primary;
+  pointer-events: none;
+  animation: pitPillIn 0.34s $ease-spring both;
+}
+
+@keyframes pitPillIn {
+  from {
+    opacity: 0;
+    transform: translate(#{ws(-10)}, -50%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(0, -50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pitPill {
+    animation: none;
+  }
+}
+
+// On pit road now: the pit colour as a wash from the tile's leading edge and
+// a bar on it.
+.pitPillLive {
+  background:
+    linear-gradient(90deg, $widget-wash-pit, transparent 70%), var(--widget-bg);
+  box-shadow:
+    $widget-panel-bevel,
+    inset 3px 0 0 $widget-pit-entry;
+  padding-left: ws(10);
+}
+
+// Being towed: a large yellow plate, dark type.
+.pitPillTow {
+  padding: ws(6) ws(12);
+  font-size: fs(md);
+  background: $widget-status-caution;
+  color: $widget-text-on-accent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }

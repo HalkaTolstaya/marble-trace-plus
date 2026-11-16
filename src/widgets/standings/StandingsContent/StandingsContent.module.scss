@@ -2,7 +2,23 @@
 .listWrap {
   position: relative;
   flex: 1 1 0;
-  overflow: hidden;
+  // Overflow is visible, so the list would otherwise refuse to shrink below
+  // its rows and squeeze the header cards instead.
+  min-height: 0;
+  // Rows that do not fit are still cut at the bottom, but the pit pills may
+  // stand outside the table on the right.
+  overflow: visible;
+  clip-path: inset(0 -240px 0 0);
   display: flex;
   flex-direction: column;
+  gap: sp(xs);
+}
+
+// The single-list views: one card holding the column titles and the rows.
+.singleList {
+  @include widget-card;
+
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
 }

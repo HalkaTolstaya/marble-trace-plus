@@ -1,9 +1,9 @@
 .forecastBlock {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: sp(xxs);
   width: 100%;
-  margin-bottom: sp(xs);
+  padding: 0 sp(xs) sp(xs);
 }
 
 .forecastRow {
@@ -13,15 +13,17 @@
   gap: sp(xxs);
   font-family: $font-mono;
   padding: sp(xxs) sp(xs);
-  background: $widget-surface-cell;
-  border-left: 3px solid rgba(255, 255, 255, $opacity-subtle);
-  opacity: 0.5;
+  // Each hour ahead is a well in the panel, as the forecast strip's cells are.
+  background: $widget-surface-well;
+  border-radius: radius(md);
+  box-shadow: $widget-well-bevel;
   font-size: fs(xs);
 }
 
 .forecastTime {
   font-size: fs(xxxs);
-  color: $widget-text-muted;
+  font-weight: 700;
+  color: $widget-text-secondary;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -29,7 +31,7 @@
 .forecastSkies {
   font-size: fs(xxs);
   color: $widget-text-primary;
-  font-weight: 600;
+  font-weight: 700;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -44,14 +46,15 @@
 
 .forecastTemp {
   font-size: fs(sm);
-  font-weight: 700;
+  font-weight: 800;
   color: $widget-text-primary;
   font-variant-numeric: tabular-nums;
 }
 
 .forecastWind {
   font-size: fs(xxxs);
-  color: $widget-text-muted;
+  font-weight: 700;
+  color: $widget-text-secondary;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

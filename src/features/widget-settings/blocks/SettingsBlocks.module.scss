@@ -1,0 +1,206 @@
+// Compact settings blocks: hairline-separated sections, a grid of checkboxes,
+// − N + steppers and radio columns, all in the brand accent.
+
+$control-size: 18px;
+$stepper-button-size: 24px;
+$hairline: rgba(255, 255, 255, 0.08);
+$label-muted: rgba(255, 255, 255, 0.55);
+$label-on: rgba(255, 255, 255, 0.92);
+
+.block {
+  padding: 14px 0;
+  border-top: 1px solid $hairline;
+
+  &:first-child {
+    border-top: 0;
+    padding-top: 4px;
+  }
+}
+
+.blockTitle {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.subtitle {
+  margin: 12px 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: $label-on;
+}
+
+.hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: $label-muted;
+}
+
+.checkGrid {
+  display: grid;
+  gap: 8px 16px;
+}
+
+.columns2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.columns3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.columns4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@container (max-width: 560px) {
+  .columns4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.check,
+.radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  min-width: 0;
+}
+
+.checkDisabled {
+  cursor: default;
+  opacity: 0.4;
+}
+
+// Visually hidden, still focusable and announced.
+.checkInput {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.checkBox {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $control-size;
+  height: $control-size;
+  border-radius: 4px;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  color: #06140c;
+  transition:
+    background-color 0.14s ease,
+    border-color 0.14s ease;
+}
+
+.checkOn .checkBox {
+  background: $brand-accent;
+  border-color: $brand-accent;
+}
+
+.checkLabel {
+  font-size: 13px;
+  color: $label-muted;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.14s ease;
+}
+
+.checkOn .checkLabel,
+.radioOn .checkLabel {
+  color: $label-on;
+}
+
+.checkInput:focus-visible + .checkBox,
+.checkInput:focus-visible + .radioDot {
+  outline: 2px solid $brand-accent-glow;
+  outline-offset: 2px;
+}
+
+.radioColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radioInline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+
+.radioDot {
+  flex: none;
+  width: $control-size - 2px;
+  height: $control-size - 2px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  transition:
+    border-color 0.14s ease,
+    box-shadow 0.14s ease;
+}
+
+.radioOn .radioDot {
+  border-color: $brand-accent;
+  box-shadow:
+    inset 0 0 0 3.5px #0b0c0f,
+    inset 0 0 0 9px $brand-accent;
+}
+
+.stepperRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.stepperLabel {
+  font-size: 13px;
+  color: $label-muted;
+}
+
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stepperValue {
+  min-width: 2ch;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+.stepperButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $stepper-button-size;
+  height: $stepper-button-size;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.14s ease;
+
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.35;
+  }
+}

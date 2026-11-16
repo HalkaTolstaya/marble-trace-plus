@@ -23,9 +23,10 @@
   width: 100%;
   height: 100%;
   position: relative;
-  border-radius: rem(6);
-  border: 2px solid;
+  border-radius: rem(8);
+  border: 1px solid;
   overflow: hidden;
+  font-variant-numeric: tabular-nums;
   // Telemetry lost: the widget dims instead of freezing at full strength.
   transition: opacity 0.25s ease;
 }

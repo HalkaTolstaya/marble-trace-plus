@@ -48,11 +48,6 @@
     "resetOk": "Restablecer y reiniciar",
     "resetCancel": "Cancelar"
   },
-  "installMismatch": {
-    "title": "Estás ejecutando una segunda copia desactualizada de Trailbrake",
-    "description": "Esta ventana ejecuta la v{{runningVersion}} desde {{runningDir}}, pero la versión instalada es {{registeredVersion}} en {{registeredDir}}. Las actualizaciones van a la copia instalada, así que esta se queda atrás. Desinstala la copia de {{runningDir}} e inicia Trailbrake desde la instalada.",
-    "unknownVersion": "desconocida"
-  },
   "updateBanner": {
     "downloading": "Descargando actualización...",
     "ready": "Actualización descargada. Reiniciando...",
@@ -205,7 +200,8 @@
   },
   "widgetWorkbench": {
     "scenario": "Escenario",
-    "noWidgets": "No hay widgets disponibles."
+    "noWidgets": "No hay widgets disponibles.",
+    "live": "En vivo"
   },
   "layoutCanvas": {
     "move": "Mover",
@@ -646,6 +642,11 @@
       },
       "folderDesc": "Deja en esta carpeta los CSV exportados de Garage 61 (Export → CSV en una vuelta de la búsqueda). Se importan en segundos y se usan para el circuito y coche correspondientes cuando son más rápidos.",
       "openFolder": "Abrir carpeta"
+    },
+    "overlayTransparency": {
+      "title": "Transparencia de overlays",
+      "sliderTitle": "Transparencia de paneles: {{value}}%",
+      "desc": "Deja ver el juego a través del fondo de cada widget. El texto, las líneas y los bordes no cambian."
     }
   },
   "bindings": {

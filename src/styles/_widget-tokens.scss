@@ -65,6 +65,15 @@ $widget-panel-bevel:
   inset 0 -1px 0 rgba(0, 0, 0, 0.4),
   inset 0 -10px 16px -12px rgba(0, 0, 0, 0.45);
 
+// A free-standing card of a widget made of several (Standings, Relative):
+// the panel colour, rounded, with the inset bevel and no outer shadow.
+@mixin widget-card {
+  background: var(--widget-bg);
+  border-radius: ws(8);
+  box-shadow: $widget-panel-bevel;
+  overflow: hidden;
+}
+
 // Surfaces
 $widget-surface-base: plate(rgba(0, 0, 0, 0.75));
 $widget-surface-overlay: plate(rgba(0, 0, 0, 0.8));
@@ -204,3 +213,75 @@ $widget-tire-wet-bg: rgba($race-blue, 0.1);
 // of its own and simply follows, so the two numbers stack in one column instead
 // of the eye hunting for each of them in turn.
 $pit-readout-seam: 82%;
+
+// A state colour coming in from an edge of a dark plate and fading out before
+// the text it announces (the delta plate).
+$widget-wash-positive: rgba($race-green, 0.34);
+$widget-wash-danger: rgba($race-red, 0.34);
+$widget-wash-reach: 58%;
+
+// The bevel for a plate too thin for $widget-panel-bevel's soft falls — a bar,
+// a chip: only the lit top edge and the dark lip.
+$widget-chip-bevel:
+  inset 0 1px 0 rgba(255, 255, 255, 0.14),
+  inset 0 -1px 0 rgba(0, 0, 0, 0.45);
+
+// The lit leading edge of a state-coloured fill: the same hue pulled towards
+// white, so the cap reads as light on the bar rather than a second colour.
+$widget-cap-positive: color-mix(in srgb, $race-green 45%, #ffffff);
+$widget-cap-danger: color-mix(in srgb, $race-red 45%, #ffffff);
+
+// Track map — the circuit as a dark ribbon drawn straight on the game: a
+// casing that holds its edge on any ground, a hairline of light, the surface.
+$map-track-casing: rgba(6, 7, 9, 0.78);
+$map-track-edge: rgba(255, 255, 255, 0.3);
+$map-track-surface: #1c1e24;
+// A car's marker: the disc the number sits on, and the ring that singles out
+// the player's own.
+$map-dot-surface: #101216;
+$map-dot-casing: rgba(6, 7, 9, 0.85);
+$map-player-halo: rgba(46, 230, 128, 0.75);
+
+// A well: a surface sunk into its panel (a plot, a bar's track). Darker than
+// the plate, shaded under its top lip and lit along its bottom edge — the
+// panel bevel turned inside out.
+$widget-surface-well: plate(rgba(0, 0, 0, 0.42));
+$widget-well-bevel:
+  inset 0 1px 0 rgba(0, 0, 0, 0.55),
+  inset 0 6px 10px -8px rgba(0, 0, 0, 0.6),
+  inset 0 -1px 0 rgba(255, 255, 255, 0.07);
+
+// A rev light that is off, and the lit edge of one that is on.
+$widget-led-off: rgba(255, 255, 255, 0.08);
+$widget-led-sheen: rgba(255, 255, 255, 0.5);
+
+// The pit colour coming in from the edge of a tile beside the table.
+$widget-wash-pit: rgba($widget-pit-entry, 0.3);
+
+// Driver status chips (PIT, PIT IN, OUT...): dark glass let the status colour
+// into — a tinted ground, an outline of the colour, lettering pulled towards
+// white — where a solid block of it would outshout the row it sits in.
+$status-chip-ground: rgba(9, 10, 13, 0.72);
+$status-chip-tint: 24%;
+$status-chip-outline: 75%;
+$status-chip-ink: 62%;
+
+// Brake point — the solid red BRAKE plate, lit from its top edge down to a
+// deeper floor.
+$brake-cue-crest: color-mix(in srgb, $race-red 70%, #ffffff);
+$brake-cue-floor: #c81e1e;
+
+// The cell that is "now" in a row of wells (the forecast's current hour): the
+// info colour let into the ground and drawn round it, as a status chip is.
+$widget-tint-info: rgba($race-blue, 0.16);
+$widget-outline-info: rgba($race-blue, 0.7);
+
+// Smooth motion (ADR-0017): how long a value on the driver's primary telemetry
+// takes to reach its next reading — a little over one overlay tick at 30 Hz,
+// so consecutive readings join into one movement without trailing behind.
+$smooth-motion-step: 0.1s;
+
+// Delta sectors — the stripe of an odd row on a card, and the bar of a
+// running sector that is level with the reference.
+$widget-row-stripe: rgba(255, 255, 255, 0.02);
+$widget-sector-bar-neutral: rgba(255, 255, 255, 0.14);

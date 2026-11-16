@@ -1,6 +1,5 @@
 import type { CarIdentity } from '@shared/contracts/car-identity';
 import type { DriverEntry } from '@shared/contracts/driver-entry';
-import { licColumnWidthPx } from '@shared/ui/RatingBadge/LicBadge.utils';
 import type { StandingsWidgetSettings } from './settings-schema';
 
 export interface VisibleRows {
@@ -122,6 +121,58 @@ export const buildVisibleRows = (
   return { drivers: visibleDrivers, windowStartIndex: topRowCount };
 };
 
+/**
+ * The rows one class gets in the grouped view. The player's class shows
+ * `ownClassRows`: its leaders on top, then the cars around the player split
+ * evenly ahead and behind. Every other class shows its first `otherClassRows`.
+ */
+export const multiclassRows = (
+  drivers: CarIdentity[],
+  settings: Pick<
+    StandingsWidgetSettings,
+    'ownClassRows' | 'leaderRows' | 'otherClassRows'
+  >,
+  scrollOffset = 0
+): VisibleRows => {
+  const holdsPlayer = drivers.some((driver) => driver.isPlayer);
+
+  if (!holdsPlayer) {
+    return buildVisibleRows(
+      drivers,
+      settings.otherClassRows,
+      0,
+      0,
+      scrollOffset
+    );
+  }
+
+  const rows = settings.ownClassRows;
+  const leaders = Math.min(settings.leaderRows, Math.max(0, rows - 1));
+  const aroundPlayer = Math.max(0, rows - leaders - 1);
+
+  if (leaders === 0) {
+    const ahead = Math.ceil(aroundPlayer / 2);
+    const playerIndex = drivers.findIndex((driver) => driver.isPlayer);
+    const start = Math.max(
+      0,
+      Math.min(playerIndex - ahead, drivers.length - rows)
+    );
+
+    return {
+      drivers: drivers.slice(start, start + rows),
+      windowStartIndex: NO_WINDOW,
+    };
+  }
+
+  return buildVisibleRows(
+    drivers,
+    rows,
+    Math.ceil(aroundPlayer / 2),
+    Math.floor(aroundPlayer / 2),
+    scrollOffset
+  );
+};
+
 export const parseWeekendTemp = (
   tempStr: string | null | undefined
 ): number | null => {
@@ -165,29 +216,69 @@ interface ColSpec {
   show: boolean;
 }
 
+/** The ratings pill's width: its letter, iRating and change, as shown. */
+export const ratingPillPx = (
+  settings: Pick<
+    StandingsWidgetSettings,
+    'showLicenseLetter' | 'showIRating' | 'showIrChange' | 'abbreviateIRating'
+  >
+): number =>
+  16 +
+  (settings.showLicenseLetter ? 14 : 0) +
+  (settings.showIRating ? (settings.abbreviateIRating ? 38 : 46) : 0) +
+  (settings.showIrChange ? 30 : 0);
+
+// Lap times widen by a digit per decimal; "1:46.000" at three.
+// A layout saved before the decimals existed reads them as missing.
+const decimalsOr = (decimals: number | undefined, fallback: number) =>
+  Number.isFinite(decimals) ? (decimals as number) : fallback;
+
+const lapTimeColumnPx = (decimals: number) => 58 + 8 * decimals;
+
+// Gaps likewise; "+12.345" at three.
+const gapColumnPx = (decimals: number) => 40 + 8 * decimals;
+
 const colSpecs = (settings: StandingsWidgetSettings): ColSpec[] => [
   { px: 28, show: true }, // pos      "00" (fs md, bold)
-  { px: 40, show: true }, // carNum   class-colored badge, right after pos
   { px: 38, show: settings.showPosChange }, // +/- pos  "▲12"
-  { px: 22, show: settings.showCountryFlag }, // country flag, right before the name
+  { px: 40, show: settings.showCarNumber }, // carNum   class-colored badge
+  { px: 22, show: settings.showCountryFlag }, // country flag
+  { px: 34, show: settings.showBrand }, // the maker's plate, right before the name
   { px: clampNameColumnWidth(settings.nameColumnWidth), show: true }, // name — fixed, user-sized
-  {
-    // "A 4.99" — matches Relative for an equal PIT↔SR gap; the width follows
-    // both the class letter and the style the value is drawn in.
-    px: licColumnWidthPx(settings.licBadgeStyle, settings.showLicenseLetter),
-    show: settings.showLicBadge,
-  },
+  // The ratings pill: licence letter, iRating and its change in one outline.
+  // With the licence off, the iRating and its change keep columns of their own.
+  { px: ratingPillPx(settings), show: settings.showLicBadge },
   {
     // "9.9k" abbreviated, "12345" spelled out — five mono digits need the room.
     px: settings.abbreviateIRating ? 42 : 52,
-    show: settings.showIRating,
+    show: settings.showIRating && !settings.showLicBadge,
   },
-  { px: 42, show: settings.showIrChange }, // ΔiR     "+123"
+  {
+    px: 42,
+    show: settings.showIrChange && !settings.showLicBadge,
+  }, // ΔiR     "+123"
   { px: 28, show: settings.showLapsCompleted }, // laps "00"
-  { px: 50, show: settings.showGap }, // gap  "+123.4" / "12 L"
-  { px: 82, show: settings.showLastLap }, // last "--:--.---" (9 chars mono)
-  { px: 82, show: settings.showBestLap }, // best "--:--.---" (9 chars mono)
-  { px: 36, show: settings.showBrand }, // brand    "MERC" — at end
+  {
+    px: gapColumnPx(decimalsOr(settings.gapDecimals, 3)),
+    show: settings.showGap,
+  }, // gap  "+12.345" / "12 L"
+  {
+    px: gapColumnPx(decimalsOr(settings.gapDecimals, 3)),
+    show: settings.showInterval,
+  }, // int  "+1.234"
+  {
+    px: lapTimeColumnPx(decimalsOr(settings.lapTimeDecimals, 3)),
+    show: settings.showBestLap,
+  }, // best
+  {
+    px: lapTimeColumnPx(decimalsOr(settings.lapTimeDecimals, 3)),
+    show: settings.showLastLap,
+  }, // last
+  {
+    px: lapTimeColumnPx(decimalsOr(settings.lapTimeDecimals, 3)),
+    show: settings.showAvgLap,
+  }, // avg
+  { px: 28, show: settings.showStintLaps }, // stint laps "00"
   { px: 30, show: settings.showTire }, // tire     badge — at end
 ];
 
@@ -263,12 +354,29 @@ export interface StandingsGapInfo {
   isEmpty: boolean;
 }
 
+export interface GapFormat {
+  /** Digits after the point. */
+  decimals: number;
+  /** Prefix a time gap with "+". */
+  signed: boolean;
+}
+
+const DEFAULT_GAP_FORMAT: GapFormat = { decimals: 1, signed: false };
+
+const formatGapSeconds = (seconds: number, format: GapFormat) =>
+  `${format.signed ? '+' : ''}${seconds.toFixed(format.decimals)}`;
+
+/** The placeholder of an empty gap, as wide as the decimals it stands for. */
+const emptyGap = (format: GapFormat) =>
+  format.decimals > 0 ? `--.${'-'.repeat(format.decimals)}` : '--';
+
 export const getStandingsGap = (
   driver: DriverEntry,
   leader: DriverEntry | null,
   isRace: boolean,
   isLeader: boolean,
-  lapsBehind: number
+  lapsBehind: number,
+  format: GapFormat = DEFAULT_GAP_FORMAT
 ): StandingsGapInfo => {
   if (isLeader) {
     return { value: '-', isLeader: true, isEmpty: false };
@@ -283,13 +391,17 @@ export const getStandingsGap = (
       const timeDiff = driver.bestLapTime - leader.bestLapTime;
 
       if (timeDiff > 0) {
-        return { value: timeDiff.toFixed(1), isLeader: false, isEmpty: false };
+        return {
+          value: formatGapSeconds(timeDiff, format),
+          isLeader: false,
+          isEmpty: false,
+        };
       }
 
-      return { value: '--.-', isLeader: false, isEmpty: true };
+      return { value: emptyGap(format), isLeader: false, isEmpty: true };
     }
 
-    return { value: '--.-', isLeader: false, isEmpty: true };
+    return { value: emptyGap(format), isLeader: false, isEmpty: true };
   }
 
   // In race, try to use Session ResultsPositions gap data. Everything the sim
@@ -322,14 +434,18 @@ export const getStandingsGap = (
       const timeDiff = resTime - leaderTime;
 
       if (timeDiff > 0) {
-        return { value: timeDiff.toFixed(1), isLeader: false, isEmpty: false };
+        return {
+          value: formatGapSeconds(timeDiff, format),
+          isLeader: false,
+          isEmpty: false,
+        };
       }
     }
 
     // Only the row the caller marked as leader may render as leader. A
     // non-positive difference here means the reference row is not actually
     // ahead of this car — showing a second '-' would read as a second leader.
-    return { value: '--.-', isLeader: false, isEmpty: true };
+    return { value: emptyGap(format), isLeader: false, isEmpty: true };
   }
 
   // Fallback if resultsPosition values are not available (e.g. at the start of a
@@ -342,13 +458,13 @@ export const getStandingsGap = (
 
   if (f2Diff > 0) {
     return {
-      value: f2Diff.toFixed(1),
+      value: formatGapSeconds(f2Diff, format),
       isLeader: false,
       isEmpty: false,
     };
   }
 
-  return { value: '--.-', isLeader: false, isEmpty: true };
+  return { value: emptyGap(format), isLeader: false, isEmpty: true };
 };
 
 const UNLIMITED_LAPS = 'unlimited';

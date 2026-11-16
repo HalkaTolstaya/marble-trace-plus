@@ -12,6 +12,20 @@ import { useWidgetEditor } from '@features/widget-settings/WidgetEditorContext';
 import { usePanelWidgetId } from '@features/widget-settings/setting-rows';
 import { schemaRows } from '@features/widget-settings/schema-rows';
 import {
+  BlockHint,
+  BlockSubtitle,
+  CheckBox,
+  CheckGrid,
+  RadioColumn,
+  SettingsBlock,
+  StepperRow,
+  type CheckItem,
+} from '@features/widget-settings/blocks/SettingsBlocks';
+import {
+  AVG_LAP_MODE,
+  type AvgLapMode,
+} from '@shared/contracts/widget-choices';
+import {
   STANDINGS_SETTINGS,
   type StandingsWidgetSettings,
 } from './settings-schema';
@@ -20,8 +34,42 @@ import {
 export const PANEL_WIDGET_IDS = ['standings'];
 
 const { Row, useLabels } = schemaRows(STANDINGS_SETTINGS);
-const { nameColumnWidth, groupedRowsPerClass, driversAhead } =
-  STANDINGS_SETTINGS.shape;
+const {
+  nameColumnWidth,
+  driversAhead,
+  ownClassRows,
+  leaderRows,
+  otherClassRows,
+  gapDecimals,
+  lapTimeDecimals,
+} = STANDINGS_SETTINGS.shape;
+
+type BoolSetting = {
+  [
+    Key in keyof StandingsWidgetSettings
+  ]: StandingsWidgetSettings[Key] extends boolean ? Key : never;
+}[keyof StandingsWidgetSettings];
+
+/** The row's parts, in the order the grid lists them. */
+const ROW_LAYOUT: ReadonlyArray<{ setting: BoolSetting; label: string }> = [
+  { setting: 'showCarNumber', label: 'carNumber' },
+  { setting: 'showCountryFlag', label: 'countryFlag' },
+  { setting: 'showBrand', label: 'carBrand' },
+  { setting: 'showLicBadge', label: 'license' },
+  { setting: 'showIRating', label: 'iRating' },
+  { setting: 'showIrChange', label: 'eloChange' },
+  { setting: 'showGap', label: 'gap' },
+  { setting: 'showInterval', label: 'interval' },
+  { setting: 'showBestLap', label: 'bestLap' },
+  { setting: 'showLastLap', label: 'lastLap' },
+  { setting: 'showPitIndicator', label: 'pitInformation' },
+  { setting: 'showTire', label: 'tyreCompound' },
+  { setting: 'showStintLaps', label: 'lapsInStint' },
+  { setting: 'showPosChange', label: 'positionChange' },
+  { setting: 'showAvgLap', label: 'averageLap' },
+  { setting: 'showDriverFlags', label: 'flags' },
+  { setting: 'showColumnHeaders', label: 'columnHeaders' },
+];
 
 const PLAYER_WINDOW_OPTIONS = Array.from(
   { length: driversAhead.max - driversAhead.min + 1 },
@@ -58,8 +106,108 @@ export const StandingsSettingsPanel = observer(() => {
     });
   };
 
+  const rowLayoutItems: CheckItem[] = ROW_LAYOUT.map(({ setting, label }) => ({
+    key: setting,
+    label: t(`settingsPanels.common.layout_${label}`),
+    checked: settings[setting],
+  }));
+
+  const toggleSetting = (key: string, checked: boolean) =>
+    update({ [key]: checked } as Partial<StandingsWidgetSettings>);
+
   return (
     <>
+      <Card title={t('settingsPanels.standings.layout')} defaultOpen>
+        <SettingsBlock title={t('settingsPanels.standings.multiclass')}>
+          <CheckBox
+            label={t('settingsPanels.standings.showOtherClasses')}
+            checked={settings.showOtherClasses}
+            onChange={(checked) => update({ showOtherClasses: checked })}
+          />
+          <StepperRow
+            label={t('settingsPanels.standings.ownClassRows')}
+            value={settings.ownClassRows}
+            min={ownClassRows.min}
+            max={ownClassRows.max}
+            onChange={(value) => update({ ownClassRows: value })}
+          />
+          <StepperRow
+            label={t('settingsPanels.standings.leaderRows')}
+            value={settings.leaderRows}
+            min={leaderRows.min}
+            max={leaderRows.max}
+            onChange={(value) => update({ leaderRows: value })}
+          />
+          <BlockHint>{t('settingsPanels.standings.leaderRowsDesc')}</BlockHint>
+          <StepperRow
+            label={t('settingsPanels.standings.otherClassRows')}
+            value={settings.otherClassRows}
+            min={otherClassRows.min}
+            max={otherClassRows.max}
+            onChange={(value) => update({ otherClassRows: value })}
+          />
+          {settings.viewMode !== 'grouped' && (
+            <BlockHint>
+              {t('settingsPanels.standings.multiclassViewHint')}
+            </BlockHint>
+          )}
+        </SettingsBlock>
+
+        <SettingsBlock title={t('settingsPanels.common.timing')}>
+          <StepperRow
+            label={t('settingsPanels.standings.gapDecimals')}
+            value={settings.gapDecimals}
+            min={gapDecimals.min}
+            max={gapDecimals.max}
+            onChange={(value) => update({ gapDecimals: value })}
+          />
+          <StepperRow
+            label={t('settingsPanels.standings.lapTimeDecimals')}
+            value={settings.lapTimeDecimals}
+            min={lapTimeDecimals.min}
+            max={lapTimeDecimals.max}
+            onChange={(value) => update({ lapTimeDecimals: value })}
+          />
+        </SettingsBlock>
+
+        <SettingsBlock title={t('settingsPanels.common.headerLayout')}>
+          <CheckGrid
+            columns={2}
+            items={[
+              {
+                key: 'showWeather',
+                label: t('settingsPanels.common.layout_weather'),
+                checked: settings.showWeather,
+              },
+              {
+                key: 'showSessionHeader',
+                label: t('settingsPanels.common.layout_raceInformation'),
+                checked: settings.showSessionHeader,
+              },
+            ]}
+            onToggle={toggleSetting}
+          />
+        </SettingsBlock>
+
+        <SettingsBlock title={t('settingsPanels.common.rowLayout')}>
+          <CheckGrid items={rowLayoutItems} onToggle={toggleSetting} />
+
+          <BlockSubtitle>
+            {t('settingsPanels.common.layout_averageLap')}
+          </BlockSubtitle>
+          <RadioColumn<AvgLapMode>
+            name="standings-avg-lap"
+            value={settings.avgLapMode}
+            options={AVG_LAP_MODE.map((mode) => ({
+              value: mode,
+              label: t(`settingsPanels.common.avgLapMode_${mode}`),
+            }))}
+            onChange={(value) => update({ avgLapMode: value })}
+          />
+          <BlockHint>{t('settingsPanels.common.avgLapModeDesc')}</BlockHint>
+        </SettingsBlock>
+      </Card>
+
       <Card title={t('settingsPanels.standings.appearance')}>
         <div className={styles.fieldGroup}>
           <Row setting="rowPadding" />
@@ -115,41 +263,9 @@ export const StandingsSettingsPanel = observer(() => {
         </div>
 
         {/*
-          Not gated on the grouped view: the view is cycled by a hotkey mid-race,
-          and a row that came and went with each press would move the panel
-          under the pointer. It only takes effect while the view is grouped.
+          The window around the player of the single-list views; the grouped
+          view sizes it from the multiclass rows above.
         */}
-        <div className={styles.fieldGroup}>
-          <span className={styles.fieldLabel}>
-            {t('settingsPanels.standings.groupedRowsPerClass', {
-              value:
-                settings.groupedRowsPerClass > 0
-                  ? settings.groupedRowsPerClass
-                  : t('settingsPanels.standings.rowsPerClassAuto'),
-            })}
-          </span>
-
-          <Slider
-            min={groupedRowsPerClass.min}
-            max={groupedRowsPerClass.max}
-            step={groupedRowsPerClass.step}
-            value={settings.groupedRowsPerClass}
-            onChange={(value) => update({ groupedRowsPerClass: value })}
-            tooltip={{
-              formatter: (value) =>
-                value === 0
-                  ? t('settingsPanels.standings.rowsPerClassAuto')
-                  : String(value),
-            }}
-          />
-
-          <div className={styles.fieldDesc}>
-            {t('settingsPanels.standings.groupedRowsPerClassDesc')}
-          </div>
-        </div>
-      </Card>
-
-      <Card title={t('settingsPanels.standings.playerWindow')}>
         <div className={styles.fieldGroup}>
           <SettingRow title={aheadLabels.title} desc={aheadLabels.desc}>
             <Segmented<number>
@@ -193,32 +309,18 @@ export const StandingsSettingsPanel = observer(() => {
       </Card>
 
       <Card title={t('settingsPanels.common.dataColumns')}>
-        <Row setting="showPosChange" />
         <Row setting="showLivePosChange" />
-        <Row setting="showBrand" />
-        <Row setting="showTire" />
-        <Row setting="showLicBadge" />
         <Row setting="licBadgeStyle" dependsOn="showLicBadge" />
         <Row setting="showLicenseLetter" dependsOn="showLicBadge" />
-        <Row setting="showIRating" />
         <Row setting="abbreviateIRating" dependsOn="showIRating" />
-        <Row setting="showGap" />
-        <Row setting="showLastLap" />
-        <Row setting="showBestLap" />
-        <Row setting="showPitIndicator" />
         <Row setting="showRadioMark" />
-        <Row setting="showIrChange" />
         <Row setting="showLapsCompleted" />
         <Row setting="abbreviateNames" />
-        <Row setting="showCountryFlag" />
-        <Row setting="showDriverFlags" />
         <Row setting="hideRetiredDrivers" />
         <Row setting="hideDriversWithoutLap" />
       </Card>
 
       <Card title={t('settingsPanels.standings.headerInfo')}>
-        <Row setting="showColumnHeaders" />
-        <Row setting="showSessionHeader" />
         <Row setting="showSessionTime" dependsOn="showSessionHeader" />
         <Row setting="showLapProgress" dependsOn="showSessionHeader" />
         <Row setting="lapCounter" dependsOn={isLapProgressShown} />
@@ -230,7 +332,6 @@ export const StandingsSettingsPanel = observer(() => {
       <Card title={t('settingsPanels.standings.footerInfo')}>
         <Row setting="showPitStops" />
         <Row setting="showIncidentsBadge" />
-        <Row setting="showWeather" />
       </Card>
     </>
   );

@@ -1,0 +1,64 @@
+// The strips above and below the relative table: one line each, the same
+// height as a row, so the widget reads as a single block.
+
+.header,
+.footer {
+  @include widget-card;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: sp(md);
+  padding: sp(sm) sp(md);
+  font-size: fs(md);
+  font-weight: 800;
+  color: $widget-text-primary;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: sp(xxs);
+}
+
+.icon {
+  color: $widget-text-secondary;
+}
+
+.label {
+  font-size: fs(sm);
+  font-weight: 600;
+  color: $widget-text-secondary;
+}
+
+.columns {
+  display: grid;
+  align-items: center;
+  column-gap: sp(xxxs);
+  padding: sp(xs) sp(md) sp(xxs);
+}
+
+// As the Standings titles: small, muted, spaced.
+.columnTitle {
+  font-size: fs(xxs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $widget-text-muted;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.left {
+  text-align: left;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}

@@ -3,7 +3,7 @@
   align-items: center;
   gap: sp(xxs);
   text-align: right;
-  font-family: $font-mono;
+  font-family: $font-table;
   font-variant-numeric: tabular-nums;
   // Matches .lapsValue in SessionHeader — the two sit side by side as one readout.
   font-size: fs(sm);

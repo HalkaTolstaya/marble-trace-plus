@@ -47,7 +47,8 @@ export default defineConfig(() => ({
   },
 
   test: {
-    exclude: ['**/node_modules/**', '**/dist/**'],
+    // .claude/worktrees holds agents' copies of the repo, not this one's tests.
+    exclude: ['**/node_modules/**', '**/dist/**', '.claude/**'],
   },
 
   css: {

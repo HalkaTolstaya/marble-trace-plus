@@ -1,0 +1,34 @@
+// A plate in the maker's colour with its second colour along the lower edge,
+// lit like the other chips of the tables (the inset bevel, no outer shadow).
+.mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: ws(30);
+  height: ws(18);
+  padding: 0 ws(4);
+  border-radius: ws(4);
+  background: var(--brand-color);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 ws(-2) 0 var(--brand-accent),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+  font-family: $font-table;
+  font-size: fs(xxxs);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+// The maker's logo, square, in its colour; a light grey stands in for a brand
+// colour too dark to read on the table.
+.logo {
+  --brand-logo-light: #{$widget-text-secondary};
+
+  display: block;
+  width: ws(20);
+  height: ws(20);
+  flex: none;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
+}

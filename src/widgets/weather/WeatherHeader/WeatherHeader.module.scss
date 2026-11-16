@@ -5,11 +5,13 @@
   justify-content: space-between;
   gap: sp(sm);
   padding: sp(md) sp(sm);
-  background: $widget-surface-cell;
   width: 100%;
 
+  // Under the dial the conditions open the readouts: a hairline over them,
+  // as there is one under.
   &.hasCompass {
-    margin-top: sp(sm);
+    margin-top: sp(xs);
+    box-shadow: inset 0 1px 0 $widget-border-subtle;
   }
 }
 
@@ -43,13 +45,12 @@
   width: ws(20);
   height: ws(20);
   color: $widget-text-primary;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
 }
 
 .conditionText {
   font-family: $font-widget;
   font-size: fs(md);
-  font-weight: 600;
+  font-weight: 800;
   color: $widget-text-primary;
   line-height: 1;
   white-space: nowrap;
@@ -60,7 +61,7 @@
 .airTempValue {
   font-family: $font-mono;
   font-size: fs(lg);
-  font-weight: 700;
+  font-weight: 800;
   color: $widget-text-primary;
   line-height: 1;
   white-space: nowrap;
@@ -69,7 +70,7 @@
 
 .unit {
   font-size: fs(xxs);
-  font-weight: 500;
+  font-weight: 700;
   margin-left: 1px;
-  color: $widget-text-muted;
+  color: $widget-text-secondary;
 }

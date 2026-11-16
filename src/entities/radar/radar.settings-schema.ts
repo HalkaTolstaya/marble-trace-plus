@@ -51,6 +51,12 @@ export const PROXIMITY_RADAR_SETTINGS = defineSettings('radar', {
    * widget zooms the same picture rather than seeing further.
    */
   scopeRange: num(10, { min: 5, max: 30, step: 1 }),
+  /**
+   * The cars glide to where each tick puts them instead of stepping
+   * (ADR-0017): the driver's primary picture, kept fluid at the user's
+   * choice. Off returns to one change per tick.
+   */
+  smoothMotion: bool(true),
   backgroundTexture: choice(RADAR_BACKGROUND_TEXTURE, 'polar-dots'),
   showAxes: bool(true),
   /**

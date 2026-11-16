@@ -51,11 +51,15 @@
 // Temperatures carry their own zone color — the same one that fills the tread
 // below them, so the number and the block agree without a second legend.
 .zoneTemp {
-  font-size: fs(sm);
+  font-size: fs(xs);
+  letter-spacing: -0.04em;
 }
 
 .zoneWear {
-  font-size: fs(sm);
+  font-size: fs(xs);
+  // Three readings side by side in a tread's width: closed up so each stays
+  // inside its own zone.
+  letter-spacing: -0.04em;
   color: $widget-text-primary;
 }
 

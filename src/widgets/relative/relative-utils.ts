@@ -6,7 +6,7 @@ import type {
 import type { DriverEntry } from '@shared/contracts/driver-entry';
 import type { CarIdentity } from '@shared/contracts/car-identity';
 import type { PaceCarPitPhase } from '@shared/contracts/generated/bindings';
-import { licColumnWidthPx } from '@shared/ui/RatingBadge/LicBadge.utils';
+import type { NameFormat } from '@shared/contracts/widget-choices';
 import type { RelativeWidgetSettings } from './settings-schema';
 
 const ws = (px: number) => `calc(${px}px * var(--wfs, 1))`;
@@ -37,19 +37,50 @@ interface ColSpec {
 
 // Single source of truth for column order + widths (px at scale 1). Order MUST
 // match the render order in DriverRow.tsx.
+// Lap times widen by a digit per decimal; "1:46.40" at two.
+// A layout saved before the decimals existed reads them as missing.
+const decimalsOr = (decimals: number | undefined, fallback: number) =>
+  Number.isFinite(decimals) ? (decimals as number) : fallback;
+
+const lapTimeColumnPx = (decimals: number) => 52 + 8 * decimals;
+
 const colSpecs = (settings: RelativeWidgetSettings): ColSpec[] => [
   { px: 28, show: true }, // pos
-  { px: 40, show: settings.showCarNumber }, // carNum — class-colored badge, right after pos
-  { px: 22, show: settings.showCountryFlag }, // country flag, right before the name
+  { px: 34, show: settings.showPosChange }, // ± "▲2"
+  { px: 40, show: settings.showCarNumber }, // carNum — class-colored badge
+  { px: 22, show: settings.showCountryFlag }, // country flag
+  { px: 34, show: settings.showBrand }, // the maker's plate, right before the name
   { px: clampNameColumnWidth(settings.nameColumnWidth), show: true }, // name — fixed, user-sized
-  // Both widths follow the format the value is written in — see the same pair in
-  // Standings, which the two widgets keep aligned so their SR columns match.
+  { px: 36, show: settings.showLapNumber }, // lap "L29"
+  // The ratings pill; with the licence off, iRating and its change stand alone.
   {
-    px: licColumnWidthPx(settings.licBadgeStyle, settings.showLicenseLetter),
+    px:
+      16 +
+      (settings.showLicenseLetter ? 14 : 0) +
+      (settings.showIRating ? (settings.abbreviateIRating ? 38 : 46) : 0) +
+      (settings.showIrChange ? 30 : 0),
     show: settings.showLicBadge,
   },
-  { px: settings.abbreviateIRating ? 36 : 48, show: settings.showIRating },
-  { px: 56, show: true }, // gap
+  {
+    px: settings.abbreviateIRating ? 36 : 48,
+    show: settings.showIRating && !settings.showLicBadge,
+  },
+  { px: 40, show: settings.showIrChange && !settings.showLicBadge }, // ΔiR "+12"
+  {
+    px: lapTimeColumnPx(decimalsOr(settings.lapTimeDecimals, 2)),
+    show: settings.showBestLap,
+  },
+  {
+    px: lapTimeColumnPx(decimalsOr(settings.lapTimeDecimals, 2)),
+    show: settings.showLastLap,
+  },
+  {
+    px: lapTimeColumnPx(decimalsOr(settings.lapTimeDecimals, 2)),
+    show: settings.showAvgLap,
+  },
+  { px: 28, show: settings.showStintLaps }, // stint laps
+  { px: 30, show: settings.showTire }, // tire badge
+  { px: 40 + 8 * decimalsOr(settings.gapDecimals, 1), show: true }, // gap
 ];
 
 export const buildRelativeGridTemplate = (
@@ -216,4 +247,61 @@ export const resolveRowPosition = (
   }
 
   return driver.classPosition || driver.position || 0;
+};
+
+/** "J. Smith", "Smith" or "John Smith" from the name as the sim gives it. */
+export const formatDriverName = (
+  fullName: string,
+  format: NameFormat
+): string => {
+  const parts = fullName.trim().split(/\s+/);
+
+  if (format === 'full' || parts.length < 2) {
+    return fullName;
+  }
+
+  const lastName = parts.slice(1).join(' ');
+
+  if (format === 'last') {
+    return lastName;
+  }
+
+  return `${parts[0].charAt(0)}. ${lastName}`;
+};
+
+/** Places gained (positive) or lost since the start, null before it. */
+export const classPlacesGained = (
+  startPosition: number | null,
+  position: number
+): number | null =>
+  startPosition === null || position <= 0 ? null : startPosition - position;
+
+/** A session temperature as the sim writes it ("21.5 C"), in degrees. */
+export const parseSessionTemp = (
+  text: string | null | undefined
+): number | null => {
+  if (text === null || text === undefined) {
+    return null;
+  }
+
+  const degrees = parseFloat(text);
+
+  return Number.isNaN(degrees) ? null : degrees;
+};
+
+/**
+ * The rows of the strip: the player with up to `ahead` cars in front and
+ * `behind` behind, each side clipped to the cars that exist there.
+ */
+export const windowAroundPlayer = <Row>(
+  rows: readonly Row[],
+  playerIndex: number,
+  ahead: number,
+  behind: number
+): Row[] => {
+  if (playerIndex < 0) {
+    return rows.slice(0, ahead + behind + 1);
+  }
+
+  return rows.slice(Math.max(0, playerIndex - ahead), playerIndex + behind + 1);
 };

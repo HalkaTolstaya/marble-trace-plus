@@ -42,6 +42,10 @@ export const STANDINGS_MANIFEST: WidgetManifest = {
   deriveDesignWidth: (settings) =>
     computeStandingsDesignWidth(settings as unknown as StandingsWidgetSettings),
   requiredCapabilities: ['standings'],
+  // Each part draws its own card, with the game showing between them.
+  transparentContainer: true,
+  // The pit pills stand outside the table, to its right.
+  overflowVisible: true,
   designWidth: STANDINGS_DESIGN_WIDTH,
   designHeight: 500,
   userSettings: {

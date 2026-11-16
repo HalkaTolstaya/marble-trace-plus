@@ -3,5 +3,25 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  gap: sp(xs);
   min-width: 0;
+}
+
+// The class's column titles and rows, in a card of their own under its header.
+.body {
+  @include widget-card;
+
+  display: flex;
+  flex-direction: column;
+  // The pit pills sit outside it; the rounded corners are kept by the rows.
+  overflow: visible;
+
+  > :last-child {
+    border-bottom-left-radius: ws(8);
+    border-bottom-right-radius: ws(8);
+  }
+
+  > :last-child [class*='posCell'] {
+    border-bottom-left-radius: ws(8);
+  }
 }

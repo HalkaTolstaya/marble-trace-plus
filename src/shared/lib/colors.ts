@@ -58,11 +58,15 @@ export const getContrastTextColor = (background: string): string => {
 
 // Golden angle rotation ensures maximum perceptual distance between consecutive hues
 const GOLDEN_ANGLE_DEG = 137.508;
+// Clear enough to tell three sectors apart on a dark ribbon, short of the
+// flag colours a stretch of track is painted in when something happens on it.
+const SECTOR_SATURATION_PCT = 58;
+const SECTOR_LIGHTNESS_PCT = 57;
 
 export const getSectorColor = (index: number): string => {
   const hue = (index * GOLDEN_ANGLE_DEG) % 360;
 
-  return `hsl(${hue.toFixed(1)}, 40%, 50%)`;
+  return `hsl(${hue.toFixed(1)}, ${SECTOR_SATURATION_PCT}%, ${SECTOR_LIGHTNESS_PCT}%)`;
 };
 
 // ─── Status color constants matching SCSS tokens in _widget-tokens.scss ─────
@@ -100,6 +104,7 @@ export const playerRowStyle = (
 ): CSSProperties | undefined =>
   isPlayer
     ? {
-        background: `linear-gradient(to bottom, ${playerRowColor}, transparent 2px), linear-gradient(to top, ${playerRowColor}, transparent 2px), ${playerRowColor}`,
+        // Strong at the position, fading out across the row.
+        background: `linear-gradient(90deg, ${playerRowColor} 0%, color-mix(in srgb, ${playerRowColor} 45%, transparent) 55%, transparent 100%)`,
       }
     : undefined;

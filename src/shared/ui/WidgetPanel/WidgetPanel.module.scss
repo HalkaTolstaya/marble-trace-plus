@@ -1,5 +1,7 @@
 .panel {
   font-family: $font-widget;
+  // One width per figure everywhere, so changing numbers hold still.
+  font-variant-numeric: tabular-nums;
   color: $widget-text-primary;
   box-sizing: border-box;
   width: 100%;

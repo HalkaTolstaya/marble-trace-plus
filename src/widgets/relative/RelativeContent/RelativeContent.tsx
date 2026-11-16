@@ -9,6 +9,12 @@ import { NoDataPlaceholder } from '@shared/ui/NoDataPlaceholder/NoDataPlaceholde
 import { useBackendComputedStore } from '@entities/cars/computed-context';
 import { useSimStore } from '@entities/sim/sim-context';
 import { useRelativeWidgetStore } from '@widgets/relative/relative.store';
+import { windowAroundPlayer } from '@widgets/relative/relative-utils';
+import {
+  RelativeColumnHeaders,
+  RelativeFooter,
+  RelativeHeader,
+} from '@widgets/relative/RelativeStrips/RelativeStrips';
 
 import styles from './RelativeContent.module.scss';
 import type { RelativeWidgetSettings } from '../settings-schema';
@@ -29,7 +35,8 @@ export const RelativeContent = observer(() => {
   const relativeWidget = useRelativeWidgetStore();
   const sim = useSimStore();
 
-  const { rowPadding } = useWidgetSettings<RelativeWidgetSettings>('relative');
+  const { rowPadding, driversAhead, driversBehind } =
+    useWidgetSettings<RelativeWidgetSettings>('relative');
 
   const rows = relativeWidget.rowOrder;
 
@@ -48,34 +55,33 @@ export const RelativeContent = observer(() => {
       '[data-relative-row]'
     );
 
+  // The cars the settings ask for, each side clipped to the ones there are,
+  // and never more than the widget height holds.
   const displayRows = useMemo(() => {
     const playerIdx = rows.findIndex((row) => row.carIdx === playerCarIdx);
+    const window = windowAroundPlayer(
+      rows,
+      playerIdx,
+      driversAhead,
+      driversBehind
+    );
 
-    if (playerIdx === -1) {
-      return rows.slice(0, visibleRowCount);
+    if (window.length <= visibleRowCount || playerIdx === -1) {
+      return window;
     }
 
-    // Force an odd window so the player can sit dead-centre with an equal
-    // number of rows above and below. On resize, rows are then added/removed
-    // symmetrically from both ends — the player row never shifts position.
-    let total = Math.min(visibleRowCount, rows.length);
+    // Too short for the window: the side the player has more of gives way.
+    const playerInWindow = window.findIndex(
+      (row) => row.carIdx === playerCarIdx
+    );
+    const half = Math.floor((visibleRowCount - 1) / 2);
+    const start = Math.max(
+      0,
+      Math.min(playerInWindow - half, window.length - visibleRowCount)
+    );
 
-    if (total % 2 === 0 && total > 1) {
-      total -= 1;
-    }
-
-    const aboveAvail = playerIdx;
-    const belowAvail = rows.length - playerIdx - 1;
-    const half = (total - 1) / 2;
-
-    let above = Math.min(half, aboveAvail);
-    let below = Math.min(half, belowAvail);
-    // Reclaim the opposite side's unused budget when the player is near an edge.
-    above = Math.min(total - 1 - below, aboveAvail);
-    below = Math.min(total - 1 - above, belowAvail);
-
-    return rows.slice(playerIdx - above, playerIdx + below + 1);
-  }, [rows, playerCarIdx, visibleRowCount]);
+    return window.slice(start, start + visibleRowCount);
+  }, [rows, playerCarIdx, visibleRowCount, driversAhead, driversBehind]);
 
   const hasData = sim.isConnected && rows.length > 0;
 
@@ -84,14 +90,21 @@ export const RelativeContent = observer(() => {
   }
 
   return (
-    <div ref={driverListRef} className={styles.driverList}>
-      {displayRows.map((row, index) =>
-        row.isPaceCar ? (
-          <PaceCarRow key={row.carIdx} carIdx={row.carIdx} index={index} />
-        ) : (
-          <DriverRow key={row.carIdx} carIdx={row.carIdx} index={index} />
-        )
-      )}
-    </div>
+    <>
+      <RelativeHeader />
+      <div className={styles.table}>
+        <RelativeColumnHeaders />
+        <div ref={driverListRef} className={styles.driverList}>
+          {displayRows.map((row, index) =>
+            row.isPaceCar ? (
+              <PaceCarRow key={row.carIdx} carIdx={row.carIdx} index={index} />
+            ) : (
+              <DriverRow key={row.carIdx} carIdx={row.carIdx} index={index} />
+            )
+          )}
+        </div>
+      </div>
+      <RelativeFooter />
+    </>
   );
 });

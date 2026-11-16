@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import type { DriverGroup } from '@shared/contracts/domain';
 import { ClassGroupHeader } from '@widgets/standings/ClassGroupHeader/ClassGroupHeader';
 import { DriverRow } from '@widgets/standings/DriverRow/DriverRow';
+import { StandingsHeader } from '@widgets/standings/StandingsHeader/StandingsHeader';
 import { ScrollIndicator } from '@shared/ui/ScrollIndicator/ScrollIndicator';
 import { useAppSettingsStore } from '@entities/app-settings/app-settings-context';
 import { useStandingsWidgetStore } from '@widgets/standings/standings.store';
@@ -39,14 +40,19 @@ export const ClassGroup = observer(
           />
         )}
 
-        {group.drivers.map((driver, index) => (
-          <DriverRow
-            key={driver.carIdx}
-            carIdx={driver.carIdx}
-            index={index}
-            startsPlayerWindow={index === group.windowStartIndex}
-          />
-        ))}
+        <div className={styles.body}>
+          {/* Every class repeats the titles over its own card. */}
+          {showHeader && <StandingsHeader />}
+
+          {group.drivers.map((driver, index) => (
+            <DriverRow
+              key={driver.carIdx}
+              carIdx={driver.carIdx}
+              index={index}
+              startsPlayerWindow={index === group.windowStartIndex}
+            />
+          ))}
+        </div>
 
         {showScrollbar && (
           <ScrollIndicator
