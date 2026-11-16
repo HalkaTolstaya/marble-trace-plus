@@ -1,8 +1,7 @@
 /**
- * The maker of a car, from the name the sim gives it, as a small mark the
- * tables draw before the driver: a short name on the maker's colours. Our own
- * drawing — not the makers' logos, which are their trademarks — so a glance
- * still tells a Porsche from a BMW in the pack.
+ * The maker of a car, from the name the sim gives it. `mark` keys the maker's
+ * logo (`BrandMark`/`brand-logos.ts`); for a maker without one it is the
+ * short name drawn on the maker's colours instead.
  */
 export interface CarBrand {
   /** Shown on the mark, two to four letters. */

@@ -20,3 +20,15 @@
   line-height: 1;
   white-space: nowrap;
 }
+
+// The maker's logo, square, in its colour; a light grey stands in for a brand
+// colour too dark to read on the table.
+.logo {
+  --brand-logo-light: #{$widget-text-secondary};
+
+  display: block;
+  width: ws(20);
+  height: ws(20);
+  flex: none;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.5));
+}

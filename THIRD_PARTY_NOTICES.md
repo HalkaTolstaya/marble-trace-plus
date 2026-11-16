@@ -706,3 +706,11 @@ SOFTWARE.
 - **Manrope** (`public/fonts/Manrope-Variable-*.woff2`) — Copyright 2019 The
   Manrope Project Authors, SIL Open Font License 1.1
   (`public/fonts/Manrope-OFL.txt`). Used by the Standings and Relative tables.
+
+## Car logos
+
+- **Simple Icons** 16.38.0 (`src/shared/ui/BrandMark/brand-logos.ts`) — the SVG
+  paths and brand colours of 22 car makers, CC0 1.0 Universal
+  (https://simpleicons.org). The logos themselves are trademarks of their
+  makers. Regenerate with `npm pack simple-icons` and the slugs listed in
+  `brand-logos.ts`.
