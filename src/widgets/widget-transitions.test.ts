@@ -17,7 +17,6 @@ const SMOOTH_MOTION =
   "smooth motion on the driver's primary telemetry, user's decision, off with smoothMotion (ADR-0017)";
 
 const STATE_CHANGE_TRANSITIONS: Record<string, string> = {
-  'brake-point/BrakePointWidget.module.scss': SMOOTH_MOTION,
   'close-battle/BattleAxis.module.scss':
     'the axis rescales when the battle range changes, not every frame',
   'delta-sectors/DeltaSectorsWidget.module.scss': SMOOTH_MOTION,

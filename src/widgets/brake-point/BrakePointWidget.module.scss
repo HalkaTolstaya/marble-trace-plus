@@ -111,15 +111,9 @@ $contour-width: 3px;
   stroke: $race-red;
 }
 
-// Smooth motion (the user's setting, ADR-0017): the line runs on to each new
-// value instead of stepping to it. Linear, and about as long as the gap
-// between two frames of the cue, so it neither lags the count nor eases into
-// every one of them. Back onto the idle plate it does not run: a line
-// shortening would read as a count going backwards.
-.plateSmooth:not(.plateIdle) .contourLine,
-.plateSmooth:not(.plateIdle) .contourJoin {
-  transition: stroke-dasharray $smooth-motion-step linear;
-}
+// Smooth motion (ADR-0017) is drawn frame by frame from the cue's own clock
+// (`contour-motion.ts`), not by a transition: a transition restarted by every
+// frame of the cue ran in fits.
 
 .label {
   position: absolute;
@@ -247,11 +241,6 @@ $contour-width: 3px;
   .flashLabel,
   .strike {
     animation: none;
-  }
-
-  .plateSmooth:not(.plateIdle) .contourLine,
-  .plateSmooth:not(.plateIdle) .contourJoin {
-    transition: none;
   }
 }
 

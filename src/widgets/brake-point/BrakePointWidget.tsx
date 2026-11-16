@@ -1,3 +1,5 @@
+import { useEffect, useRef, type RefObject } from 'react';
+import { fillAt, type ContourAnchor } from './contour-motion';
 import { observer } from 'mobx-react-lite';
 import { useTranslation } from 'react-i18next';
 
@@ -34,6 +36,71 @@ const PLATE_STAGE_CLASS: Record<PlateStage, string> = {
   brake: styles.plateBrake,
 };
 
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+/**
+ * Draws the countdown line at the display's rate while the count runs, from
+ * the last cue frame and the time since it arrived (`contour-motion.ts`).
+ * React still writes each frame's own length; between frames this writes the
+ * predicted one straight to the element.
+ */
+const useSmoothContour = (
+  frame: BrakeCueFrame | null,
+  running: boolean
+): RefObject<SVGRectElement | null> => {
+  const lineRef = useRef<SVGRectElement | null>(null);
+  const anchorRef = useRef<ContourAnchor | null>(null);
+  const shownRef = useRef(0);
+
+  useEffect(() => {
+    if (!frame || frame.untilBrake === null) {
+      anchorRef.current = null;
+
+      return;
+    }
+
+    anchorRef.current = {
+      fill: Math.max(frame.fill, running ? shownRef.current : 0),
+      untilBrake: frame.untilBrake,
+      receivedAtMs: performance.now(),
+    };
+  }, [frame, running]);
+
+  useEffect(() => {
+    const reduced =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia(REDUCED_MOTION_QUERY).matches;
+
+    if (!running || reduced) {
+      shownRef.current = 0;
+
+      return;
+    }
+
+    let rafId = 0;
+
+    const step = (now: number) => {
+      const anchor = anchorRef.current;
+      const line = lineRef.current;
+
+      if (anchor && line) {
+        const fill = Math.max(shownRef.current, fillAt(anchor, now));
+
+        shownRef.current = fill;
+        line.style.strokeDasharray = `${unit(fill)} 1`;
+      }
+
+      rafId = requestAnimationFrame(step);
+    };
+
+    rafId = requestAnimationFrame(step);
+
+    return () => cancelAnimationFrame(rafId);
+  }, [running]);
+
+  return lineRef;
+};
+
 const MESSAGE_KEYS: Partial<Record<BrakeCueFrame['mode'], string>> = {
   noReference: 'noReference',
   noZones: 'noZones',
@@ -52,6 +119,8 @@ export const BrakePointWidget = observer(() => {
   const { t } = useTranslation('widgets');
   const { frame } = useBrakePointWidgetStore();
   const settings = useWidgetSettings<BrakePointSettings>('brake-point');
+  const smoothCountdown = settings.smoothMotion && frame?.mode === 'countdown';
+  const contourLineRef = useSmoothContour(frame, smoothCountdown);
   const messageKey = frame ? MESSAGE_KEYS[frame.mode] : 'noReference';
 
   if (!frame || messageKey) {
@@ -115,9 +184,7 @@ export const BrakePointWidget = observer(() => {
       ) : null}
 
       <div className={styles.body}>
-        <div
-          className={`${styles.plate} ${PLATE_STAGE_CLASS[stage]} ${settings.smoothMotion ? styles.plateSmooth : ''}`}
-        >
+        <div className={`${styles.plate} ${PLATE_STAGE_CLASS[stage]}`}>
           {/* The count's progress, drawn round the plate's own edge: the line
               starts at the top left corner and has gone all the way round by
               the brake point. Its length moves with the telemetry. */}
@@ -128,9 +195,17 @@ export const BrakePointWidget = observer(() => {
               style={{ strokeDasharray: `${unit(frame.join)} 1` }}
             />
             <rect
+              ref={contourLineRef}
               className={styles.contourLine}
               pathLength={1}
-              style={{ strokeDasharray: `${unit(frame.fill)} 1` }}
+              // While the count runs smoothly the line is drawn per display
+              // frame; a frame's own, slightly older length written here
+              // would pull it back for a frame.
+              style={
+                smoothCountdown
+                  ? undefined
+                  : { strokeDasharray: `${unit(frame.fill)} 1` }
+              }
             />
           </svg>
 
