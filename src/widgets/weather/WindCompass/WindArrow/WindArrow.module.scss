@@ -1,5 +1,16 @@
 .windArrowGroup {
-  // See RotatingRing.module.scss: --wind-bearing already writes at up to
-  // 60 Hz, so a transition here only adds a retargeted transition per frame.
+  // Stepped by default, as the ring is (RotatingRing.module.scss).
   transform: rotate(var(--wind-bearing, 0deg));
+}
+
+// Smooth motion (the user's setting, ADR-0017): the arrow turns to each new
+// bearing, the short way round — the angle it is given is unwrapped.
+.smooth {
+  transition: transform $smooth-motion-step linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smooth {
+    transition: none;
+  }
 }

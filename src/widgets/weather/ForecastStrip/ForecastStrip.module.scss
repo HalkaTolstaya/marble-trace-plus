@@ -14,22 +14,22 @@
   align-items: center;
   gap: sp(xxs);
   padding: sp(xs) sp(xxs);
-  background: $widget-surface-cell;
-  border: 1px solid $widget-border-subtle;
+  background: $widget-surface-well;
   border-radius: radius(md);
+  box-shadow: $widget-well-bevel;
   font-family: $font-mono;
 }
 
 // The hour being raced in reads as the anchor of the strip, not as one of the
 // hours ahead of it.
 .cell.cellNow {
-  border-color: rgba($race-blue, 0.7);
-  background: rgba($race-blue, 0.12);
+  background: $widget-tint-info;
+  box-shadow: inset 0 0 0 1px $widget-outline-info;
 }
 
 .time {
   font-size: fs(xxs);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.06em;
   color: $widget-text-secondary;
   white-space: nowrap;
@@ -62,14 +62,14 @@
 
 .rainPct {
   font-size: fs(xxxs);
-  font-weight: 600;
-  color: $widget-text-muted;
+  font-weight: 700;
+  color: $widget-text-secondary;
   white-space: nowrap;
 }
 
 .temp {
   font-size: fs(sm);
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
   color: $widget-text-primary;
   white-space: nowrap;
@@ -80,8 +80,9 @@
   padding: sp(xs) sp(sm);
   font-family: $font-mono;
   font-size: fs(xxs);
-  color: $widget-text-muted;
+  color: $widget-text-secondary;
   text-align: center;
-  background: $widget-surface-cell;
+  background: $widget-surface-well;
   border-radius: radius(md);
+  box-shadow: $widget-well-bevel;
 }

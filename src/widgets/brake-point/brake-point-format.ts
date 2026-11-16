@@ -56,15 +56,45 @@ export const percent = (value: number | null): string =>
     ? '--'
     : `${Math.round(Math.min(Math.max(value, 0), 1) * 100)}`;
 
-/** What the bar's big label reads. */
-export const barLabel = (frame: BrakeCueFrame): string => {
+export type PlateStage = 'idle' | 'count3' | 'count2' | 'count1' | 'brake';
+
+/** What the plate is saying, as one name: each change of it is a change of state. */
+export const plateStageOf = (frame: BrakeCueFrame): PlateStage => {
+  if (frame.mode === 'brake') {
+    return 'brake';
+  }
+
+  if (frame.mode !== 'countdown') {
+    return 'idle';
+  }
+
+  if (frame.beat >= 3) {
+    return 'count3';
+  }
+
+  return frame.beat === 2 ? 'count2' : 'count1';
+};
+
+export type BrakePointLayout = 'countdown' | 'meters';
+
+const metresLabel = (frame: BrakeCueFrame): string =>
+  frame.dist > 0 ? `${Math.round(frame.dist)} m` : '';
+
+/**
+ * What the plate's figure reads: the count, or — by metres — how far the
+ * brake point still is. Between zones it is the distance either way.
+ */
+export const plateLabel = (
+  frame: BrakeCueFrame,
+  layout: BrakePointLayout = 'countdown'
+): string => {
   switch (frame.mode) {
     case 'countdown':
-      return String(frame.beat);
+      return layout === 'meters' ? metresLabel(frame) : String(frame.beat);
     case 'brake':
       return 'BRAKE';
     case 'idle':
-      return frame.dist > 0 ? `${Math.round(frame.dist)} m` : '';
+      return metresLabel(frame);
     default:
       return '';
   }

@@ -48,6 +48,9 @@
     "g-meter": {
       "description": "Círculo de fricción con las fuerzas G laterales y longitudinales."
     },
+    "delta-sectors": {
+      "description": "Sector a sector frente a la referencia: dónde se gana y se pierde tiempo."
+    },
     "sector-matrix": {
       "description": "Tiempos por sector: progreso, delta de cada sector, ÚLTIMA y MEJOR."
     },
@@ -102,6 +105,8 @@
   },
   "settingsPanels": {
     "common": {
+      "smoothMotion": "Animación suave",
+      "smoothMotionDesc": "Las partes móviles se desplazan con suavidad entre las actualizaciones de telemetría en lugar de saltar. Se desactiva si Windows pide reducir el movimiento.",
       "lapCounter": "Contador de Vueltas",
       "lapCounterDesc": "Sesión cuenta la vuelta de la carrera, la del líder. Propia cuenta la vuelta en la que estás, que es menor si te han doblado.",
       "lapCounter_session": "Sesión",
@@ -637,6 +642,20 @@
       "ledShape_circle": "Círculo",
       "ledShape_parallelogram": "Inclinado"
     },
+    "deltaSectors": {
+      "layout": "Diseño",
+      "visibleSectors": "Filas de sectores",
+      "visibleSectorsDesc": "Cuántos sectores se muestran. Si la vuelta tiene más, se ve una ventana que sigue al coche.",
+      "showLapCard": "Tarjeta de vueltas",
+      "showLapCardDesc": "La mejor, la última y la vuelta de referencia bajo los sectores, con la diferencia respecto a la referencia.",
+      "title": "Delta",
+      "versusReference": "vs referencia",
+      "noReference": "Sin vuelta de referencia",
+      "best": "Mejor",
+      "last": "Última",
+      "reference": "Ref",
+      "referenceMark": "Ref"
+    },
     "sectorMatrix": {
       "options": "Opciones",
       "showSectors": "Mostrar los tiempos por sector",
@@ -1031,6 +1050,11 @@
       "hideDriverLinesDesc": "Muestra solo al ingeniero. Lo que dijiste y el ✓ o ✗ de un comando no aparecen."
     },
     "brakePoint": {
+      "layoutBlock": "Diseño",
+      "layout": "Lectura",
+      "layoutDesc": "Lo que muestra la placa al acercarse: la cuenta 3-2-1 o los metros que faltan hasta el punto de frenada.",
+      "layout_countdown": "Cuenta atrás",
+      "layout_meters": "Metros",
       "countdown": "Cuenta atrás",
       "grading": "Calificación",
       "display": "Visualización",

@@ -48,6 +48,9 @@
     "g-meter": {
       "description": "横向和纵向 G 力摩擦圆。"
     },
+    "delta-sectors": {
+      "description": "逐个分段对比参考圈：这一圈在哪里赢得时间、在哪里丢失时间。"
+    },
     "sector-matrix": {
       "description": "逐分段计时，带进度条、每段实时差值、LAST 和 BEST。"
     },
@@ -102,6 +105,8 @@
   },
   "settingsPanels": {
     "common": {
+      "smoothMotion": "平滑动画",
+      "smoothMotionDesc": "活动部件在遥测更新之间平滑过渡，而不是跳变。Windows 要求减少动态效果时关闭。",
       "lapCounter": "圈数计数",
       "lapCounterDesc": "“赛段”显示比赛本身的圈数，即领跑者的圈数；“自己”显示你当前所在的圈数，被套圈后会更小。",
       "lapCounter_session": "赛段",
@@ -637,6 +642,20 @@
       "ledShape_circle": "圆形",
       "ledShape_parallelogram": "斜角"
     },
+    "deltaSectors": {
+      "layout": "布局",
+      "visibleSectors": "分段行数",
+      "visibleSectorsDesc": "屏幕上显示多少个分段。一圈的分段更多时，显示一个跟随赛车的窗口。",
+      "showLapCard": "圈速卡片",
+      "showLapCardDesc": "分段下方显示最佳圈、上一圈和参考圈，以及与参考圈的差距。",
+      "title": "差距",
+      "versusReference": "对比参考圈",
+      "noReference": "没有参考圈",
+      "best": "最佳",
+      "last": "上一圈",
+      "reference": "参考",
+      "referenceMark": "参考"
+    },
     "sectorMatrix": {
       "options": "选项",
       "showSectors": "显示分段时间",
@@ -1031,6 +1050,11 @@
       "hideDriverLinesDesc": "只显示工程师。你说的话和指令的 ✓ / ✗ 不再显示。"
     },
     "brakePoint": {
+      "layoutBlock": "布局",
+      "layout": "读数",
+      "layoutDesc": "接近时面板显示的内容：3-2-1 倒计时，或距刹车点的米数。",
+      "layout_countdown": "倒计时",
+      "layout_meters": "米",
       "countdown": "倒数",
       "grading": "评分",
       "display": "显示",

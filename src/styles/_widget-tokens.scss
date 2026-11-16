@@ -265,3 +265,23 @@ $status-chip-ground: rgba(9, 10, 13, 0.72);
 $status-chip-tint: 24%;
 $status-chip-outline: 75%;
 $status-chip-ink: 62%;
+
+// Brake point — the solid red BRAKE plate, lit from its top edge down to a
+// deeper floor.
+$brake-cue-crest: color-mix(in srgb, $race-red 70%, #ffffff);
+$brake-cue-floor: #c81e1e;
+
+// The cell that is "now" in a row of wells (the forecast's current hour): the
+// info colour let into the ground and drawn round it, as a status chip is.
+$widget-tint-info: rgba($race-blue, 0.16);
+$widget-outline-info: rgba($race-blue, 0.7);
+
+// Smooth motion (ADR-0017): how long a value on the driver's primary telemetry
+// takes to reach its next reading — a little over one overlay tick at 30 Hz,
+// so consecutive readings join into one movement without trailing behind.
+$smooth-motion-step: 0.1s;
+
+// Delta sectors — the stripe of an odd row on a card, and the bar of a
+// running sector that is level with the reference.
+$widget-row-stripe: rgba(255, 255, 255, 0.02);
+$widget-sector-bar-neutral: rgba(255, 255, 255, 0.14);

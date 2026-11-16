@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { BrakeCueFrame } from '@shared/contracts/reflaps';
 import { BrakePointWidgetStore, cueConfigOf } from './brake-point.store';
 import {
-  barLabel,
+  plateLabel,
   formatMetres,
   formatSeconds,
   percent,
@@ -51,10 +51,10 @@ describe('brake point', () => {
   });
 
   it('labels the bar by mode', () => {
-    expect(barLabel(frame({ mode: 'countdown', beat: 2 }))).toBe('2');
-    expect(barLabel(frame({ mode: 'brake' }))).toBe('BRAKE');
-    expect(barLabel(frame({ mode: 'idle', dist: 212.4 }))).toBe('212 m');
-    expect(barLabel(frame({ mode: 'braking' }))).toBe('');
+    expect(plateLabel(frame({ mode: 'countdown', beat: 2 }))).toBe('2');
+    expect(plateLabel(frame({ mode: 'brake' }))).toBe('BRAKE');
+    expect(plateLabel(frame({ mode: 'idle', dist: 212.4 }))).toBe('212 m');
+    expect(plateLabel(frame({ mode: 'braking' }))).toBe('');
   });
 
   it('formats signed timing and clamps percentages', () => {
