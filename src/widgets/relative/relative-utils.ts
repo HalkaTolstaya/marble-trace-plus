@@ -48,7 +48,8 @@ const colSpecs = (settings: RelativeWidgetSettings): ColSpec[] => [
   { px: 28, show: true }, // pos
   { px: 34, show: settings.showPosChange }, // ± "▲2"
   { px: 40, show: settings.showCarNumber }, // carNum — class-colored badge
-  { px: 22, show: settings.showCountryFlag }, // country flag, right before the name
+  { px: 22, show: settings.showCountryFlag }, // country flag
+  { px: 34, show: settings.showBrand }, // the maker's plate, right before the name
   { px: clampNameColumnWidth(settings.nameColumnWidth), show: true }, // name — fixed, user-sized
   { px: 36, show: settings.showLapNumber }, // lap "L29"
   // The ratings pill; with the licence off, iRating and its change stand alone.

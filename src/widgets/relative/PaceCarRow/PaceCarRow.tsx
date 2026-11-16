@@ -94,6 +94,8 @@ export const PaceCarRow = observer(({ carIdx, index }: PaceCarRowProps) => {
 
       {settings.showCountryFlag && <div className={styles.flagCell} />}
 
+      {settings.showBrand && <div />}
+
       <span
         className={[
           styles.centerLabel,

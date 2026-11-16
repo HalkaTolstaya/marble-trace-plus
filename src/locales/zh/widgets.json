@@ -211,7 +211,8 @@
       "gapDecimalsShort": "差距小数位",
       "lapTimeDecimalsShort": "圈速小数位",
       "layoutTitle": "布局",
-      "layout_realTimeClock": "实时时钟"
+      "layout_realTimeClock": "实时时钟",
+      "layout_carBrand": "车辆品牌"
     },
     "delta": {
       "deltaReference": "差值参考",
@@ -626,7 +627,8 @@
       "showColumnHeaders": "列标题",
       "showTableHeader": "表头",
       "showTableFooter": "表尾",
-      "showRealTimeClock": "实时时钟"
+      "showRealTimeClock": "实时时钟",
+      "showBrand": "车辆品牌"
     },
     "rpmLights": {
       "shiftLights": "换挡灯",

@@ -57,6 +57,8 @@ const COLUMNS = {
   abbreviateIRating: bool(true),
   /** Driver's profile country flag, in its own column before the name. */
   showCountryFlag: bool(false),
+  /** The car maker's plate before the driver's name. */
+  showBrand: bool(true),
   /** Places gained (▲) or lost (▼) in the class since the start. */
   showPosChange: bool(true),
   /** Projected iRating change. */

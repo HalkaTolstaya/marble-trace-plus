@@ -53,6 +53,7 @@ type BoolSetting = {
 const LAYOUT: ReadonlyArray<{ setting: BoolSetting; label: string }> = [
   { setting: 'showCarNumber', label: 'carNumber' },
   { setting: 'showCountryFlag', label: 'countryFlag' },
+  { setting: 'showBrand', label: 'carBrand' },
   { setting: 'showLicBadge', label: 'license' },
   { setting: 'showIRating', label: 'iRating' },
   { setting: 'showIrChange', label: 'eloChange' },

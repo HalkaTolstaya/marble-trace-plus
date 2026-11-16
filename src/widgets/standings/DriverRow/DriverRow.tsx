@@ -5,7 +5,6 @@ import { formatLapTime } from '@shared/lib/telemetry-format';
 import { formatAverageLap } from '@entities/cars/lap-pace';
 import {
   abbreviateName,
-  formatBrand,
   formatCarNumber,
   TRACK_SURFACE_IN_PIT_STALL,
   TRACK_SURFACE_OFF_TRACK,
@@ -18,6 +17,7 @@ import { getContrastTextColor, playerRowStyle } from '@shared/lib/colors';
 import { CountryFlag } from '@shared/ui/CountryFlag/CountryFlag';
 import { DriverFlagBadge } from '@shared/ui/DriverFlagBadge/DriverFlagBadge';
 import { RatingPill } from '@shared/ui/RatingPill/RatingPill';
+import { BrandMark } from '@shared/ui/BrandMark/BrandMark';
 import { formatIr } from '@shared/ui/RatingBadge/LicBadge.utils';
 import { TireBadge } from '@shared/ui/TireBadge/TireBadge';
 import {
@@ -258,6 +258,12 @@ export const DriverRow = observer(
           </div>
         )}
 
+        {settings.showBrand && (
+          <div className={`${styles.cell} ${styles.cellCenter}`}>
+            <BrandMark carScreenName={driver.carScreenName} />
+          </div>
+        )}
+
         <div className={`${styles.cell} ${styles.nameCell}`}>
           {settings.showDriverFlags &&
             (isFinished ? (
@@ -381,17 +387,6 @@ export const DriverRow = observer(
           <div className={`${styles.cell} ${styles.cellCenter}`}>
             <span className={`${styles.lapsCompleted} ${dimClass}`}>
               {standingsWidget.lapPace.stintLaps(carIdx, driver.lap)}
-            </span>
-          </div>
-        )}
-
-        {settings.showBrand && (
-          <div className={`${styles.cell} ${styles.cellCenter}`}>
-            <span
-              className={`${styles.brandLabel} ${dimClass}`}
-              title={driver.carScreenName}
-            >
-              {formatBrand(driver.carScreenName)}
             </span>
           </div>
         )}

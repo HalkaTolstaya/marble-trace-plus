@@ -211,7 +211,8 @@
       "gapDecimalsShort": "Decimales del gap",
       "lapTimeDecimalsShort": "Decimales de vuelta",
       "layoutTitle": "Diseño",
-      "layout_realTimeClock": "Reloj"
+      "layout_realTimeClock": "Reloj",
+      "layout_carBrand": "Marca"
     },
     "delta": {
       "deltaReference": "Referencia del delta",
@@ -626,7 +627,8 @@
       "showColumnHeaders": "Encabezados",
       "showTableHeader": "Cabecera",
       "showTableFooter": "Pie de tabla",
-      "showRealTimeClock": "Reloj"
+      "showRealTimeClock": "Reloj",
+      "showBrand": "Marca"
     },
     "rpmLights": {
       "shiftLights": "Luces de cambio",

@@ -137,6 +137,7 @@ export const RelativeColumnHeaders = observer(() => {
     [settings.showPosChange, '±', 'center'],
     [settings.showCarNumber, '#', 'center'],
     [settings.showCountryFlag, '', 'center'],
+    [settings.showBrand, '', 'center'],
     [true, 'Driver', 'left'],
     [settings.showLapNumber, 'Lap', 'center'],
     [settings.showLicBadge, 'IR', 'center'],

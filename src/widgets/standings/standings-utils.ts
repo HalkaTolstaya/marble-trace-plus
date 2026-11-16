@@ -242,7 +242,8 @@ const colSpecs = (settings: StandingsWidgetSettings): ColSpec[] => [
   { px: 28, show: true }, // pos      "00" (fs md, bold)
   { px: 38, show: settings.showPosChange }, // +/- pos  "▲12"
   { px: 40, show: settings.showCarNumber }, // carNum   class-colored badge
-  { px: 22, show: settings.showCountryFlag }, // country flag, right before the name
+  { px: 22, show: settings.showCountryFlag }, // country flag
+  { px: 34, show: settings.showBrand }, // the maker's plate, right before the name
   { px: clampNameColumnWidth(settings.nameColumnWidth), show: true }, // name — fixed, user-sized
   // The ratings pill: licence letter, iRating and its change in one outline.
   // With the licence off, the iRating and its change keep columns of their own.
@@ -278,7 +279,6 @@ const colSpecs = (settings: StandingsWidgetSettings): ColSpec[] => [
     show: settings.showAvgLap,
   }, // avg
   { px: 28, show: settings.showStintLaps }, // stint laps "00"
-  { px: 36, show: settings.showBrand }, // brand    "MERC" — at end
   { px: 30, show: settings.showTire }, // tire     badge — at end
 ];
 
