@@ -1,0 +1,229 @@
+// Two cards over the game, as Standings is built: the sectors, and under them
+// the three laps. The frame carries no plate of its own.
+$plate-width: 34;
+$row-height: 28;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: sp(xs);
+  width: 100%;
+  font-family: $font-table;
+  font-variant-numeric: tabular-nums;
+  color: $widget-text-primary;
+}
+
+.empty {
+  @include widget-card;
+
+  display: flex;
+  width: 100%;
+}
+
+.sectors {
+  @include widget-card;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: sp(sm);
+  padding: sp(xs) sp(md) sp(xxs);
+  line-height: 1.2;
+}
+
+.title {
+  font-size: fs(sm);
+  font-weight: 800;
+}
+
+.versus {
+  font-size: fs(xxs);
+  font-weight: 700;
+  color: $widget-text-secondary;
+  white-space: nowrap;
+}
+
+.row {
+  --sector-bar: transparent;
+
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: ws($plate-width) 1fr auto;
+  align-items: center;
+  column-gap: sp(sm);
+  min-height: ws($row-height);
+  padding-right: sp(md);
+  font-size: fs(md);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.row:nth-child(odd) {
+  background-color: $widget-row-stripe;
+}
+
+// The running sector fills from the plate's edge as the car goes through it:
+// how much of the sector is behind, in the colour of how it is going. Its
+// width moves with the lap and is set without a transition, unless the user
+// asked for smooth motion (below).
+.row::before {
+  content: '';
+  position: absolute;
+  // From the plate's edge to the row's: the plate keeps its own ground.
+  inset: 0 auto 0 ws($plate-width);
+  z-index: -1;
+  width: calc((100% - #{ws($plate-width)}) * var(--sector-progress, 0));
+  background: linear-gradient(to right, transparent, var(--sector-bar) 70%);
+  box-shadow: inset -2px 0 0 var(--sector-bar-cap, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rowCurrent::before {
+  opacity: 1;
+}
+
+.rowCurrent {
+  --sector-bar: #{$widget-sector-bar-neutral};
+  --sector-bar-cap: #{$widget-text-secondary};
+}
+
+.rowCurrent.toneFaster {
+  --sector-bar: #{$widget-wash-positive};
+  --sector-bar-cap: #{$widget-cap-positive};
+}
+
+.rowCurrent.toneSlower {
+  --sector-bar: #{$widget-wash-danger};
+  --sector-bar-cap: #{$widget-cap-danger};
+}
+
+// Smooth motion (the user's setting, ADR-0017): the bar runs on to each new
+// reading instead of stepping to it.
+.smooth .rowCurrent::before {
+  transition: width $smooth-motion-step linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smooth .rowCurrent::before {
+    transition: none;
+  }
+}
+
+// The sector's name on a plate that carries its verdict: purple for a sector
+// quicker than the reference, red for a slower one, plain until it is driven.
+.plate {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: fs(xs);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: $widget-text-primary;
+  background: $widget-surface-raised;
+}
+
+.plate.toneFaster {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, $race-purple 78%, transparent),
+    color-mix(in srgb, $race-purple 38%, transparent)
+  );
+}
+
+.plate.toneSlower {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, $race-red 78%, transparent),
+    color-mix(in srgb, $race-red 38%, transparent)
+  );
+}
+
+.time {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.delta {
+  // The widest delta the column carries, so the times beside it hold still.
+  min-width: 6ch;
+  text-align: right;
+  font-size: fs(sm);
+  white-space: nowrap;
+  color: $widget-text-muted;
+}
+
+.row.toneFaster .delta {
+  color: $widget-status-positive;
+}
+
+.row.toneSlower .delta {
+  color: $widget-status-danger;
+}
+
+.rowAhead .time,
+.rowAhead .plate {
+  color: $widget-text-muted;
+}
+
+// ── Best, last and the reference lap ───────────────────────────────────────
+
+.lapCard {
+  @include widget-card;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: sp(xs) sp(xxs);
+}
+
+.lapCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: sp(xxs);
+  min-width: 0;
+  line-height: 1;
+}
+
+.lapLabel {
+  font-size: fs(xxxs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $widget-text-secondary;
+}
+
+.lapTime {
+  font-size: fs(sm);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.lapGap,
+.referenceMark {
+  min-height: fs(xxs);
+  font-size: fs(xxs);
+  font-weight: 800;
+  white-space: nowrap;
+  color: $widget-text-muted;
+}
+
+.referenceMark {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lapCell.toneFaster .lapGap {
+  color: $widget-status-positive;
+}
+
+.lapCell.toneSlower .lapGap {
+  color: $widget-status-danger;
+}

@@ -280,3 +280,8 @@ $widget-outline-info: rgba($race-blue, 0.7);
 // takes to reach its next reading — a little over one overlay tick at 30 Hz,
 // so consecutive readings join into one movement without trailing behind.
 $smooth-motion-step: 0.1s;
+
+// Delta sectors — the stripe of an odd row on a card, and the bar of a
+// running sector that is level with the reference.
+$widget-row-stripe: rgba(255, 255, 255, 0.02);
+$widget-sector-bar-neutral: rgba(255, 255, 255, 0.14);

@@ -48,6 +48,9 @@
     "g-meter": {
       "description": "Lateral and longitudinal G-force friction circle."
     },
+    "delta-sectors": {
+      "description": "Sector by sector against the reference lap: where time is won and lost."
+    },
     "sector-matrix": {
       "description": "Sector-by-sector timing with progress bar, live delta per sector, LAST and BEST."
     },
@@ -637,6 +640,20 @@
       "ledShape_square": "Square",
       "ledShape_circle": "Circle",
       "ledShape_parallelogram": "Slant"
+    },
+    "deltaSectors": {
+      "layout": "Layout",
+      "visibleSectors": "Sector rows",
+      "visibleSectorsDesc": "How many sectors are on screen. A lap with more is shown as a window that follows the car.",
+      "showLapCard": "Lap card",
+      "showLapCardDesc": "Best, last and the reference lap under the sectors, with the gap to the reference.",
+      "title": "Delta",
+      "versusReference": "vs Ref Lap",
+      "noReference": "No reference lap",
+      "best": "Best",
+      "last": "Last",
+      "reference": "Ref",
+      "referenceMark": "Ref"
     },
     "sectorMatrix": {
       "options": "Options",

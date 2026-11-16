@@ -48,6 +48,9 @@
     "g-meter": {
       "description": "横向和纵向 G 力摩擦圆。"
     },
+    "delta-sectors": {
+      "description": "逐个分段对比参考圈：这一圈在哪里赢得时间、在哪里丢失时间。"
+    },
     "sector-matrix": {
       "description": "逐分段计时，带进度条、每段实时差值、LAST 和 BEST。"
     },
@@ -637,6 +640,20 @@
       "ledShape_square": "方形",
       "ledShape_circle": "圆形",
       "ledShape_parallelogram": "斜角"
+    },
+    "deltaSectors": {
+      "layout": "布局",
+      "visibleSectors": "分段行数",
+      "visibleSectorsDesc": "屏幕上显示多少个分段。一圈的分段更多时，显示一个跟随赛车的窗口。",
+      "showLapCard": "圈速卡片",
+      "showLapCardDesc": "分段下方显示最佳圈、上一圈和参考圈，以及与参考圈的差距。",
+      "title": "差距",
+      "versusReference": "对比参考圈",
+      "noReference": "没有参考圈",
+      "best": "最佳",
+      "last": "上一圈",
+      "reference": "参考",
+      "referenceMark": "参考"
     },
     "sectorMatrix": {
       "options": "选项",
