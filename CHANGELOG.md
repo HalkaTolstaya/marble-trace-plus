@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.29.1] — 2026-11-21
+## [0.29.2] — 2026-11-21
 
 ### Changed
 
@@ -17,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Settings saves replace the file atomically and preserve unreadable files. A failed save now shows a warning in the main window.
+- Updated the release dependency check for the inactive optional chrono dependency.
+
+## [0.29.1] — 2026-11-21
+
+The release workflow stopped before publishing an installer. The changes are included in 0.29.2.
 
 ## [0.29.0] — 2026-11-15
 

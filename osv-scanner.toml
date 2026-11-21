@@ -40,3 +40,8 @@ reason = "glob 13 (dev only): Storybook's docgen plugin; never bundled into the 
 id = "GHSA-g3hv-75wg-m249"
 ignoreUntil = 2027-02-14
 reason = "minimatch 10 (dev only): Storybook's docgen plugin; never bundled into the app"
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0543"
+ignoreUntil = 2027-02-14
+reason = "Informational unmaintained notice for chrono, an optional serde_with dependency present only in Cargo.lock for this Windows build. The Windows Cargo graph does not activate it."
