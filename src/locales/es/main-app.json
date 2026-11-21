@@ -44,6 +44,7 @@
       "description": "Se ha dejado intacto para que puedas recuperarlo a mano. Trailbrake funciona con los valores por defecto y no lo sobrescribirá."
     },
     "reset": "Restablecer ajustes",
+    "saveFailed": "No se pudo guardar settings.json. Trailbrake necesita permiso de escritura en la carpeta del programa.",
     "resetConfirm": "¿Reemplazar el archivo de ajustes por los valores por defecto? Se perderán los diseños, widgets y asignaciones que contiene.",
     "resetOk": "Restablecer y reiniciar",
     "resetCancel": "Cancelar"

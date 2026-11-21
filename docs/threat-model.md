@@ -11,7 +11,7 @@ cloud database. Decisions: ADR-0015, ADR-0016.
 | Twitch OAuth token (upstream feature)         | Windows Credential Manager                                |
 | Local lap library                             | `%APPDATA%\<id>\reflaps\`                                 |
 | Microphone audio (Voice Crew)                 | memory only, while push-to-talk is held                   |
-| Settings and layouts                          | `settings.json` (plugin-store)                            |
+| Settings and layouts                          | `settings.json` next to `trailbrake.exe`                  |
 | Integrity of the installed binary and updates | Program Files / updater                                   |
 
 ## Trust boundaries

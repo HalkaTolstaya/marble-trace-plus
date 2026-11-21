@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.1] — 2026-11-21
+
+### Changed
+
+- Trailbrake saves `settings.json` next to the executable. On first launch without a local file, it loads existing settings from the old Windows profile folder.
+- The main window footer shows the app version without external links.
+
+### Fixed
+
+- Settings saves replace the file atomically and preserve unreadable files. A failed save now shows a warning in the main window.
+
 ## [0.29.0] — 2026-11-15
 
 ### Added

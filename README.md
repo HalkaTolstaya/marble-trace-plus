@@ -382,8 +382,10 @@ Download **`trailbrake_<version>_x64-setup.exe`** from the [latest release](http
 > _Windows protected your PC_ on first run: choose **More info → Run anyway**. Updates are protected separately: the
 > app installs only updates signed with this project's updater key.
 
-Trailbrake installs alongside an existing Marble Trace; the two keep separate settings
-(`%APPDATA%\io.github.halkatolstaya.trailbrake`) and never update each other.
+Trailbrake installs alongside Marble Trace and saves `settings.json` next to
+`trailbrake.exe`. The program folder needs to be writable by your Windows user.
+Existing Trailbrake settings in `%APPDATA%` are loaded when the executable has
+no settings file beside it.
 
 ### First run with Garage 61
 
@@ -432,7 +434,7 @@ integration is removed).
 | Twitch / YouTube chat                  | Twitch / YouTube                   | Only if you connect stream chat                                                  |
 
 The microphone is only open while push-to-talk is held; audio is recognised locally and never written to disk or sent.
-Telemetry, laps and settings stay in `%APPDATA%`. Details: [docs/threat-model.md](docs/threat-model.md).
+Settings are saved beside the executable. The local lap library and logs use `%APPDATA%`. Details: [docs/threat-model.md](docs/threat-model.md).
 
 ---
 

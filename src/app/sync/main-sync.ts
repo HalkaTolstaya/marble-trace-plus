@@ -4,11 +4,7 @@ import { reaction, type IReactionDisposer, compareStructural } from 'mobx';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 
 import { logSettingsSnapshot } from './persistence';
-import {
-  createSaveHandle,
-  hydrateFromDisk,
-  readSettingsFile,
-} from './persistence-sync';
+import { createSaveHandle, hydrateFromDisk } from './persistence-sync';
 import { setupDeviceBindings } from '@features/hotkey-bindings/bindings-sync';
 import { listenSettingsActions, registerHotkeyReactions } from './hotkey-sync';
 import { setupMainListeners } from './listeners';
@@ -281,9 +277,7 @@ export const initMainSync = async (root: MainRoot) => {
 
   if (!mainSyncInitPromise) {
     mainSyncInitPromise = (async () => {
-      const { store, loaded } = await readSettingsFile();
-
-      await hydrateFromDisk(root, loaded);
+      await hydrateFromDisk(root);
 
       // A file this build cannot bring to the current schema is left untouched:
       // no hydration, no default layout, no save reactions. Everything below
@@ -320,7 +314,7 @@ export const initMainSync = async (root: MainRoot) => {
         await listMonitorBounds()
       );
 
-      const onSave = createSaveHandle(root, store);
+      const onSave = createSaveHandle(root);
 
       await onSave();
 

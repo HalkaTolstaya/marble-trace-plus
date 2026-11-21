@@ -1,6 +1,6 @@
 [package]
 name = "marble-trace"
-version = "0.29.0"
+version = "0.29.1"
 description = "Trailbrake - iRacing overlay with Garage 61 reference laps (fork of Marble Trace)"
 authors = ["mvoof"]
 license = "GPL-3.0-or-later"
@@ -159,6 +159,7 @@ tracing.workspace = true
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-appender = "0.2"
 tauri-plugin-store = "2"
+tempfile = "3"
 tauri-plugin-fs = "2"
 tauri-plugin-window-state = "2"
 tauri-plugin-global-shortcut = "2"

@@ -8,6 +8,7 @@ mod perf_run;
 mod process_priority;
 mod reflaps;
 mod remote_mirror;
+mod settings_disk;
 mod settings_snapshot;
 mod sim;
 mod sink;
@@ -35,7 +36,6 @@ use std::sync::Arc;
 use tauri::{
     generate_context, App, AppHandle, Builder, Listener, Manager, Runtime, Window, WindowEvent,
 };
-use tauri_plugin_store::StoreExt;
 use tauri_plugin_window_state::StateFlags;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -160,12 +160,12 @@ fn forward_to_telemetry(app: &App, event: &'static str, command: fn() -> Telemet
     });
 }
 
-/// Read straight from the store: it has to act before the main window has
+/// Read straight from disk: it has to act before the main window has
 /// loaded the settings.
 fn start_minimized(app: &App) -> bool {
-    app.store("settings.json")
+    commands::settings::read_for_app(app.handle())
         .ok()
-        .and_then(|store| store.get("settings"))
+        .flatten()
         .and_then(|settings| settings.get("app")?.get("startMinimized")?.as_bool())
         .unwrap_or(false)
 }

@@ -1,15 +1,35 @@
-//! Commands that touch `settings.json` itself.
-//!
-//! The frontend owns the contents — these exist because `tauri-plugin-store`
-//! can only read and write the live file, and the migration chain needs to know
-//! whether a file is absent or merely unreadable, and to move one aside before
-//! it rewrites it.
+//! Commands that read, write, back up and reset the main settings file.
 
+use mt_model::contract::windows::MAIN_WINDOW_LABEL;
 use serde_json::Value;
-use tauri::{AppHandle, Manager};
+use std::path::{Path, PathBuf};
+use tauri::{AppHandle, Manager, WebviewWindow};
 use tracing::info;
 
-use crate::settings_snapshot;
+use crate::{settings_disk, settings_snapshot};
+
+fn settings_dir(window: &WebviewWindow) -> Result<PathBuf, String> {
+    if window.label() != MAIN_WINDOW_LABEL {
+        return Err("settings are owned by the main window".into());
+    }
+
+    settings_disk::executable_dir().map_err(|error| error.to_string())
+}
+
+fn source_path(app: &AppHandle, dir: &Path) -> Result<PathBuf, String> {
+    let legacy_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|error| error.to_string())?;
+
+    settings_disk::source_path(dir, &legacy_dir).map_err(|error| error.to_string())
+}
+
+pub(crate) fn read_for_app(app: &AppHandle) -> Result<Option<Value>, String> {
+    let dir = settings_disk::executable_dir().map_err(|error| error.to_string())?;
+
+    settings_disk::read(&source_path(app, &dir)?).map_err(|error| error.to_string())
+}
 
 #[tauri::command]
 pub async fn log_settings_snapshot(settings: Value) -> Result<(), String> {
@@ -18,45 +38,34 @@ pub async fn log_settings_snapshot(settings: Value) -> Result<(), String> {
     Ok(())
 }
 
-/// Whether `settings.json` exists on disk with content in it.
-///
-/// `tauri-plugin-store` hands the frontend an empty store both for a fresh
-/// install and for a file it could not parse — a stray BOM, a truncated write.
-/// Those two need opposite responses, and only the filesystem can tell them
-/// apart: the first should be seeded with defaults, the second must never be
-/// written over.
 #[tauri::command]
-pub async fn settings_file_exists(app: AppHandle) -> Result<bool, String> {
-    let dir = app
-        .path()
-        .app_config_dir()
-        .map_err(|e| format!("no config dir: {e}"))?;
+pub fn read_settings_file(window: WebviewWindow) -> Result<Option<Value>, String> {
+    let dir = settings_dir(&window)?;
+    settings_disk::read(&source_path(window.app_handle(), &dir)?).map_err(|e| e.to_string())
+}
 
-    Ok(std::fs::metadata(dir.join("settings.json"))
-        .map(|meta| meta.is_file() && meta.len() > 0)
-        .unwrap_or(false))
+#[tauri::command]
+pub fn write_settings_file(window: WebviewWindow, settings: Value) -> Result<(), String> {
+    let dir = settings_dir(&window)?;
+    settings_disk::write(&dir, settings).map_err(|e| e.to_string())
 }
 
 /// Copies `settings.json` aside before the frontend writes a newly migrated
-/// version over it. `tauri-plugin-store` can only read and write the live file,
-/// so the copy has to happen here.
+/// version over it.
 ///
 /// Best effort by design: a failed backup must not stop the migration, or a
 /// user with a read-only config directory could never upgrade.
 #[tauri::command]
-pub async fn backup_settings_file(app: AppHandle, suffix: String) -> Result<(), String> {
+pub async fn backup_settings_file(window: WebviewWindow, suffix: String) -> Result<(), String> {
     if !suffix.chars().all(|c| c.is_ascii_alphanumeric()) {
         return Err(format!("refusing suffix {suffix:?}"));
     }
 
-    let dir = app
-        .path()
-        .app_config_dir()
-        .map_err(|e| format!("no config dir: {e}"))?;
+    let dir = settings_dir(&window)?;
 
-    let source = dir.join("settings.json");
+    let source = source_path(window.app_handle(), &dir)?;
 
-    if !source.exists() {
+    if !source.try_exists().map_err(|error| error.to_string())? {
         return Ok(());
     }
 
@@ -69,30 +78,10 @@ pub async fn backup_settings_file(app: AppHandle, suffix: String) -> Result<(), 
     Ok(())
 }
 
-/// Removes `settings.json` from disk.
-///
-/// The reset button is the only way out of a locked settings file, so it has to
-/// leave nothing behind: `tauri-plugin-store`'s own `clear()` + `save()` writes
-/// an empty `{}` over the file, which `settings_file_exists` then reports as a
-/// file present but unreadable — locking the app again on the next start.
-///
-/// A missing file is a fresh install, which is exactly what a reset means.
+/// Writes an empty local store to prevent reimporting legacy settings after a reset.
 #[tauri::command]
-pub async fn delete_settings_file(app: AppHandle) -> Result<(), String> {
-    let dir = app
-        .path()
-        .app_config_dir()
-        .map_err(|e| format!("no config dir: {e}"))?;
+pub fn reset_settings_file(window: WebviewWindow) -> Result<(), String> {
+    let dir = settings_dir(&window)?;
 
-    let target = dir.join("settings.json");
-
-    match std::fs::remove_file(&target) {
-        Ok(()) => {
-            info!("settings file deleted: {}", target.display());
-
-            Ok(())
-        }
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
-        Err(error) => Err(format!("delete failed: {error}")),
-    }
+    settings_disk::reset(&dir).map_err(|error| error.to_string())
 }

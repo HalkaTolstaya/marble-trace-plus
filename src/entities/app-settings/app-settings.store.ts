@@ -7,7 +7,7 @@ import {
   requestInteractMode,
 } from '@shared/api/hotkeys.service';
 import {
-  deleteSettingsFile,
+  resetSettingsFile,
   setCarLengthSilent,
   setOverlayUpdateHzSilent,
 } from '@shared/api/settings.service';
@@ -193,6 +193,7 @@ export class AppSettingsStore {
    */
   settingsLocked = false;
   settingsLockReason: SettingsLockReason | null = null;
+  settingsSaveFailed = false;
 
   /**
    * The overlay's mouse modes. Owned by the hotkey dispatcher in the backend —
@@ -550,18 +551,21 @@ export class AppSettingsStore {
     this.appSettings.editorGridSize = value;
   }
 
-  /**
-   * Deliberately goes straight to the file instead of through `onSave`: this is
-   * the only way out of a locked settings file, so the write gate must not
-   * apply to it.
-   *
-   * The file is deleted rather than emptied. `tauri-plugin-store`'s `clear()`
-   * leaves a valid but empty `{}` on disk, which the next start reads as a file
-   * that is present and yet holds no settings — the exact signature of a
-   * corrupt file, so the reset would lock the app instead of freeing it.
-   */
   async resetSettings() {
-    await deleteSettingsFile();
+    const previouslyLocked = this.settingsLocked;
+    this.settingsLocked = true;
+
+    try {
+      await resetSettingsFile();
+    } catch (error) {
+      runInAction(() => {
+        this.settingsLocked = previouslyLocked;
+        this.settingsSaveFailed = true;
+      });
+
+      throw error;
+    }
+
     await relaunch();
   }
 }

@@ -1,7 +1,10 @@
 import { invoke } from '@tauri-apps/api/core';
 
-export const settingsFileExists = async (): Promise<boolean> =>
-  invoke('settings_file_exists');
+export const readSettingsFile = async (): Promise<unknown> =>
+  invoke('read_settings_file');
+
+export const writeSettingsFile = async (settings: unknown): Promise<void> =>
+  invoke('write_settings_file', { settings });
 
 export const backupSettingsFile = async (suffix: string): Promise<void> =>
   invoke('backup_settings_file', { suffix });
@@ -11,8 +14,8 @@ export const backupSettingsFile = async (suffix: string): Promise<void> =>
 export const logSettingsSnapshot = async (settings: unknown): Promise<void> =>
   invoke('log_settings_snapshot', { settings });
 
-export const deleteSettingsFile = async (): Promise<void> =>
-  invoke('delete_settings_file');
+export const resetSettingsFile = async (): Promise<void> =>
+  invoke('reset_settings_file');
 
 /** Fire-and-forget backend mirrors of widget settings: callers never await. */
 export const setPitWarningLapsSilent = (laps: number): void => {

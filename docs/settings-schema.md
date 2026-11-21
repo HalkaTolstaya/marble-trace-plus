@@ -5,9 +5,15 @@ to write one.
 
 ## Where settings live
 
-User settings are persisted to `settings.json` in the app config directory
-(`%APPDATA%/com.voof.marble-trace` on Windows) through `tauri-plugin-store`. The
-shape is `Settings` in `src/app/sync/persistence.ts`.
+Trailbrake stores `settings.json` next to `trailbrake.exe`. The program
+directory must be writable. If the executable has no local file, Trailbrake
+loads the previous settings from
+`%APPDATA%\io.github.halkatolstaya.trailbrake\settings.json` and writes the new
+file next to the executable on the first save. The development installer
+resolves the legacy folder using its own app identifier
+(`io.github.halkatolstaya.trailbrake.dev`).
+
+The shape of the settings object is `Settings` in `src/app/sync/persistence.ts`.
 
 The file carries a `schemaVersion` at its top level. It is an **integer** and is
 deliberately unrelated to the app's semver:
@@ -56,7 +62,7 @@ widget belonged to whichever monitor contained its centre; the catalogue was
 ## Load pipeline
 
 ```
-store.get('settings')
+read_settings_file
       ▼
 runMigrations(blob)          ← shared/settings-schema, pure, works on raw JSON
       ▼
@@ -118,17 +124,14 @@ the overlays in the client snapshot, and `OverlayCanvas` renders nothing, becaus
 holds shipped defaults and painting them looks exactly like the user losing their
 config. The main window shows `SettingsLockBanner`.
 
-The only write left is `resetSettings()`, which goes straight to the file and
-bypasses the gate on purpose: it is the only way out. It **deletes** the file
-through the `delete_settings_file` backend command rather than clearing the
-store — `tauri-plugin-store`'s `clear()` + `save()` leaves a valid but empty
-`{}` behind, which the next start reads as a file that is present and holds no
-settings: the exact signature of a corrupt one, so the reset would lock the app
-again instead of freeing it.
+The reset button writes an empty local store (`{}`) and restarts the app
+with defaults. That local file takes precedence over the old copy in
+`%APPDATA%`. An empty store starts with defaults. The reader accepts a UTF-8 BOM and
+locks settings if it encounters damaged JSON.
 
-Before the first save at a new version, the old file is copied to
-`settings.v{n}.bak` by the `backup_settings_file` backend command —
-`tauri-plugin-store` can only touch the live file.
+Before the first save at a new schema version, the backend copies the
+old file to `settings.v{n}.bak` next to the executable. Saves write to a temporary file in the
+same directory and replace the live file after the new contents are ready.
 
 ## When you do NOT need a migration
 

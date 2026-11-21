@@ -44,6 +44,7 @@
       "description": "It has been left untouched so it can be recovered by hand. Trailbrake is running on defaults and will not save over it."
     },
     "reset": "Reset settings",
+    "saveFailed": "Could not save settings.json. Trailbrake needs write access to its program folder.",
     "resetConfirm": "Replace the settings file with defaults? Layouts, widgets and bindings in it will be lost.",
     "resetOk": "Reset and restart",
     "resetCancel": "Cancel"

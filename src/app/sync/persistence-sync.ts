@@ -1,64 +1,30 @@
-import { load } from '@tauri-apps/plugin-store';
+import { runInAction } from 'mobx';
 
+import { readSettingsFile } from '@shared/api/settings.service';
 import {
   backupSettingsFile,
-  settingsFileExists,
   hydrateStores,
   saveSettings,
-  SETTINGS_FILE,
   type Settings,
 } from './persistence';
 import { runMigrations } from '@shared/settings-schema/migrate';
 import type { MigrationResult } from '@shared/settings-schema/types';
 import type { MainRoot } from '@app/roots/main-root';
 
-/**
- * Settings-file bootstrap. Main's alone: it is the only window that reads the
- * file — every other one is sent a snapshot (ADR-0007).
- *
- * Ordering contract: everything here runs *before* any reaction is registered.
- * `readSettingsFile` → `hydrateFromDisk` → (caller checks `settingsLocked`) →
- * `createSaveHandle`. Registering a save reaction before hydration would write
- * defaults over the user's file within a second of start.
- */
+/** Load and migrate settings before registering any save reactions. */
+export const hydrateFromDisk = async (root: MainRoot) => {
+  let loaded: unknown;
 
-export interface SettingsFileHandle {
-  set(key: string, value: unknown): Promise<void>;
-  save(): Promise<void>;
-}
+  try {
+    loaded = await readSettingsFile();
+  } catch (error) {
+    console.error('Settings locked: could not read the settings file:', error);
+    root.appSettings.lockSettings('corrupt');
 
-export const readSettingsFile = async (): Promise<{
-  store: SettingsFileHandle;
-  loaded: Settings | null | undefined;
-}> => {
-  const store = await load(SETTINGS_FILE);
-  const loaded = await store.get<Settings>('settings');
+    return;
+  }
 
-  return { store, loaded };
-};
-
-/**
- * Brings the settings file to the current schema and fills the stores from it.
- *
- * When it cannot — the file was written by a newer build, predates the chain,
- * or is not a settings object — the settings are locked rather than repaired.
- * A file we do not understand is worth more to the user intact than replaced
- * with defaults, and it can be sent to us as-is.
- */
-export const hydrateFromDisk = async (
-  root: MainRoot,
-  loaded: Settings | null | undefined
-) => {
-  // The plugin hands back nothing both for a fresh install and for a file it
-  // could not parse — a stray BOM, a half-written save. Only the filesystem
-  // separates them, and seeding defaults over the second overwrites exactly the
-  // file this whole path exists to protect.
-  if (!loaded) {
-    if (await settingsFileExists()) {
-      console.error('Settings locked: present on disk but could not be read');
-      root.appSettings.lockSettings('corrupt');
-    }
-
+  if (loaded === null) {
     return;
   }
 
@@ -100,12 +66,28 @@ export const hydrateFromDisk = async (
   }
 };
 
-/**
- * The one way settings reach disk. Locked settings never write — a file this
- * build could not migrate must survive the session untouched.
- */
-export const createSaveHandle =
-  (root: MainRoot, store: SettingsFileHandle) => (): Promise<void> =>
-    root.appSettings.settingsLocked
-      ? Promise.resolve()
-      : saveSettings(store, root);
+export const createSaveHandle = (root: MainRoot): (() => Promise<void>) => {
+  let pending = Promise.resolve();
+
+  return () => {
+    pending = pending.then(async () => {
+      if (root.appSettings.settingsLocked) {
+        return;
+      }
+
+      try {
+        await saveSettings(root);
+        runInAction(() => {
+          root.appSettings.settingsSaveFailed = false;
+        });
+      } catch (error) {
+        console.error('Failed to save settings:', error);
+        runInAction(() => {
+          root.appSettings.settingsSaveFailed = true;
+        });
+      }
+    });
+
+    return pending;
+  };
+};

@@ -13,18 +13,34 @@ export const SettingsLockBanner = observer(() => {
   const appSettings = useAppSettingsStore();
   const { t } = useTranslation('main-app');
 
-  const { settingsLockReason } = appSettings;
+  const { settingsLockReason, settingsSaveFailed } = appSettings;
 
-  if (!settingsLockReason) return null;
+  if (!settingsLockReason && !settingsSaveFailed) {
+    return null;
+  }
 
-  const handleReset = () => {
-    void appSettings.resetSettings();
+  if (!settingsLockReason) {
+    return (
+      <Alert title={t('settingsLock.saveFailed')} type="warning" showIcon />
+    );
+  }
+
+  const handleReset = async () => {
+    try {
+      await appSettings.resetSettings();
+    } catch (error) {
+      console.error('Failed to reset settings:', error);
+    }
   };
 
   return (
     <Alert
       title={t(`settingsLock.${settingsLockReason}.title`)}
-      description={t(`settingsLock.${settingsLockReason}.description`)}
+      description={
+        settingsSaveFailed
+          ? t('settingsLock.saveFailed')
+          : t(`settingsLock.${settingsLockReason}.description`)
+      }
       type="error"
       showIcon
       action={
